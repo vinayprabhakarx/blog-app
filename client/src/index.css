@@ -1,0 +1,475 @@
+@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+
+/* Import Tailwind CSS v4 and animations */
+@import "tailwindcss";
+@import "tw-animate-css";
+
+
+/* Define a custom variant for dark mode for easier use in components */
+@custom-variant dark (&:is(.dark *));
+
+/* Map CSS variables to Tailwind's theme object */
+@theme inline {
+    --radius-sm: calc(var(--radius) - 4px);
+    --radius-md: calc(var(--radius) - 2px);
+    --radius-lg: var(--radius);
+    --radius-xl: calc(var(--radius) + 4px);
+    --color-background: var(--background);
+    --color-foreground: var(--foreground);
+    --color-card: var(--card);
+    --color-card-foreground: var(--card-foreground);
+    --color-popover: var(--popover);
+    --color-popover-foreground: var(--popover-foreground);
+    --color-primary: var(--primary);
+    --color-primary-foreground: var(--primary-foreground);
+    --color-secondary: var(--secondary);
+    --color-secondary-foreground: var(--secondary-foreground);
+    --color-muted: var(--muted);
+    --color-muted-foreground: var(--muted-foreground);
+    --color-accent: var(--accent);
+    --color-accent-foreground: var(--accent-foreground);
+    --color-destructive: var(--destructive);
+    --color-border: var(--border);
+    --color-input: var(--input);
+    --color-ring: var(--ring);
+    --color-success: var(--success);
+    --color-warning: var(--warning);
+    --color-info: var(--info);
+    --color-chart-1: var(--chart-1);
+    --color-chart-2: var(--chart-2);
+    --color-chart-3: var(--chart-3);
+    --color-chart-4: var(--chart-4);
+    --color-chart-5: var(--chart-5);
+    --color-sidebar: var(--sidebar);
+    --color-sidebar-foreground: var(--sidebar-foreground);
+    --color-sidebar-primary: var(--sidebar-primary);
+    --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+    --color-sidebar-accent: var(--sidebar-accent);
+    --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+    --color-sidebar-border: var(--sidebar-border);
+    --color-sidebar-ring: var(--sidebar-ring);
+}
+
+/* CSS Custom Properties for semantic colors */
+:root {
+    --success: 142 76% 36%;
+    --success-foreground: 355 7% 97%;
+    --warning: 38 92% 50%;
+    --warning-foreground: 24 9% 2%;
+    --info: 221 83% 53%;
+    --info-foreground: 210 40% 98%;
+}
+
+.dark {
+    --success: 142 70% 45%;
+    --success-foreground: 144 9% 10%;
+    --warning: 48 96% 89%;
+    --warning-foreground: 38 96% 32%;
+    --info: 217 91% 60%;
+    --info-foreground: 222 84% 5%;
+}
+
+/* Prevent horizontal scrolling and improve layout */
+html,
+body {
+    max-width: 100%;
+    overflow-x: hidden;
+    position: relative;
+}
+
+/* Ensure all elements stay within viewport */
+* {
+    box-sizing: border-box;
+    max-width: 100%;
+}
+
+/* Line clamp utilities for text truncation */
+.line-clamp-1 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 1;
+}
+
+/* Hide scrollbar for webkit browsers */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    /* IE and Edge */
+    scrollbar-width: none;
+    /* Firefox */
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+    /* Chrome, Safari and Opera */
+}
+
+.line-clamp-2 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+}
+
+/* Custom navigation breakpoint styles */
+@media (min-width: 764px) {
+    .tablet-nav\:block {
+        display: block !important;
+    }
+
+    .tablet-nav\:flex {
+        display: flex !important;
+    }
+
+    .tablet-nav\:hidden {
+        display: none !important;
+    }
+}
+
+@media (max-width: 763px) {
+    .tablet-nav\:block {
+        display: none !important;
+    }
+
+    .tablet-nav\:flex {
+        display: none !important;
+    }
+
+    .tablet-nav\:hidden {
+        display: block !important;
+    }
+}
+
+/* --- Light Theme (Default) --- */
+:root {
+    --radius: 0.625rem;
+    --background: oklch(1 0 0);
+    --foreground: oklch(0.145 0 0);
+    --card: oklch(1 0 0);
+    --card-foreground: oklch(0.145 0 0);
+    --popover: oklch(1 0 0);
+    --popover-foreground: oklch(0.145 0 0);
+    --primary: oklch(0.205 0 0);
+    --primary-foreground: oklch(0.985 0 0);
+    --secondary: oklch(0.97 0 0);
+    --secondary-foreground: oklch(0.205 0 0);
+    --muted: oklch(0.97 0 0);
+    --muted-foreground: oklch(0.556 0 0);
+    --accent: oklch(0.97 0 0);
+    --accent-foreground: oklch(0.205 0 0);
+    --destructive: oklch(0.577 0.245 27.325);
+    --border: oklch(0.922 0 0);
+    --input: oklch(0.922 0 0);
+    --ring: oklch(0.708 0 0);
+    --chart-1: oklch(0.646 0.222 41.116);
+    --chart-2: oklch(0.6 0.118 184.704);
+    --chart-3: oklch(0.398 0.07 227.392);
+    --chart-4: oklch(0.828 0.189 84.429);
+    --chart-5: oklch(0.769 0.188 70.08);
+    --sidebar: oklch(0.985 0 0);
+    --sidebar-foreground: oklch(0.145 0 0);
+    --sidebar-primary: oklch(0.205 0 0);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.97 0 0);
+    --sidebar-accent-foreground: oklch(0.205 0 0);
+    --sidebar-border: oklch(0.922 0 0);
+    --sidebar-ring: oklch(0.708 0 0);
+}
+
+/* --- Dark Theme --- */
+.dark {
+    --background: oklch(0.145 0 0);
+    --foreground: oklch(0.985 0 0);
+    --card: oklch(0.205 0 0);
+    --card-foreground: oklch(0.985 0 0);
+    --popover: oklch(0.205 0 0);
+    --popover-foreground: oklch(0.985 0 0);
+    --primary: oklch(0.922 0 0);
+    --primary-foreground: oklch(0.205 0 0);
+    --secondary: oklch(0.269 0 0);
+    --secondary-foreground: oklch(0.985 0 0);
+    --muted: oklch(0.269 0 0);
+    --muted-foreground: oklch(0.708 0 0);
+    --accent: oklch(0.269 0 0);
+    --accent-foreground: oklch(0.985 0 0);
+    --destructive: oklch(0.704 0.191 22.216);
+    --border: oklch(1 0 0 / 10%);
+    --input: oklch(1 0 0 / 15%);
+    --ring: oklch(0.556 0 0);
+    --chart-1: oklch(0.488 0.243 264.376);
+    --chart-2: oklch(0.696 0.17 162.48);
+    --chart-3: oklch(0.769 0.188 70.08);
+    --chart-4: oklch(0.627 0.265 303.9);
+    --chart-5: oklch(0.645 0.246 16.439);
+    --sidebar: oklch(0.205 0 0);
+    --sidebar-foreground: oklch(0.985 0 0);
+    --sidebar-primary: oklch(0.488 0.243 264.376);
+    --sidebar-primary-foreground: oklch(0.985 0 0);
+    --sidebar-accent: oklch(0.269 0 0);
+    --sidebar-accent-foreground: oklch(0.985 0 0);
+    --sidebar-border: oklch(1 0 0 / 10%);
+    --sidebar-ring: oklch(0.556 0 0);
+}
+
+/* Apply base styles to global elements */
+@layer base {
+    * {
+        @apply border-border outline-ring/50;
+    }
+
+    body {
+        @apply bg-background text-foreground;
+        font-family: "Nunito", sans-serif;
+        /* Performance optimizations */
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+        /* Reduce layout shifts */
+        font-display: swap;
+    }
+}
+
+/* Lightweight performance optimizations */
+.transition-colors {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+/* Lightweight performance optimizations */
+.transition-colors {
+    transition-property: background-color, border-color, color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 150ms;
+}
+
+/* Prose list styles */
+.prose {
+    /* Allow components to control their own max-width */
+    width: 100%;
+}
+
+.prose ol,
+.prose ul {
+    list-style-position: outside;
+    padding-left: 1.5rem;
+    margin-bottom: 1rem;
+    max-width: 100%;
+    width: 100%;
+}
+
+.prose ol {
+    list-style-type: decimal;
+}
+
+.prose ul {
+    list-style-type: disc;
+}
+
+/* Re-enable pointer events for heading content but not links */
+.wmde-markdown h1 *:not(a),
+.wmde-markdown h2 *:not(a),
+.wmde-markdown h3 *:not(a),
+.wmde-markdown h4 *:not(a),
+.wmde-markdown h5 *:not(a),
+.wmde-markdown h6 *:not(a),
+.prose h1 *:not(a),
+.prose h2 *:not(a),
+.prose h3 *:not(a),
+.prose h4 *:not(a),
+.prose h5 *:not(a),
+.prose h6 *:not(a) {
+    pointer-events: auto !important;
+}
+
+
+/* Grid pattern for hero section */
+.bg-grid-pattern {
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+    background-size: 50px 50px;
+}
+
+.dark .bg-grid-pattern {
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+}
+
+/* Utility for printing */
+@media print {
+    .no-print {
+        display: none !important;
+    }
+}
+
+/* Scrollbar utilities for better mobile experience */
+.scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+    display: none;
+}
+
+/* Touch-friendly hover states */
+@media (hover: hover) and (pointer: fine) {
+    .hover-desktop:hover {
+        /* Desktop hover styles */
+    }
+}
+
+/* Mobile-specific optimizations */
+@media (max-width: 640px) {
+
+    /* Improve touch targets */
+    .touch-manipulation {
+        touch-action: manipulation;
+    }
+
+    /* Optimize text rendering for mobile */
+    body {
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+        text-rendering: optimizeLegibility;
+    }
+
+    /* Prevent zoom on input focus */
+    input,
+    select,
+    textarea {
+        font-size: 16px;
+    }
+
+    /* Better button spacing for mobile */
+    button {
+        min-height: 44px;
+        min-width: 44px;
+    }
+}
+
+/* Tablet optimizations */
+@media (min-width: 641px) and (max-width: 1024px) {
+
+    /* Tablet-specific styles */
+    .touch-manipulation {
+        touch-action: manipulation;
+    }
+}
+
+/* Consistent comfortable padding across all screen sizes */
+.container {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+}
+
+/* Critical fixes for 764-820px range */
+@media (min-width: 764px) and (max-width: 820px) {
+
+    /* Maintain consistent container padding */
+    .container {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+        max-width: 100% !important;
+    }
+
+    /* Minimize grid gaps */
+    .grid {
+        gap: 0.75rem !important;
+    }
+
+    /* Ensure blog cards fit perfectly */
+    .blog-card {
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    /* Compact navigation */
+    nav {
+        padding-top: 0.5rem !important;
+        padding-bottom: 0.5rem !important;
+    }
+
+    /* Reduce button padding */
+    button {
+        padding: 0.375rem 0.5rem !important;
+        font-size: 0.875rem !important;
+    }
+
+    /* Compact text elements */
+    h1,
+    h2,
+    h3 {
+        font-size: 85% !important;
+        line-height: 1.2 !important;
+    }
+
+    /* Minimize margins */
+    .mb-3,
+    .mb-4 {
+        margin-bottom: 0.5rem !important;
+    }
+
+    .mt-6,
+    .mt-8 {
+        margin-top: 1rem !important;
+    }
+
+    /* Force 2-column layout with minimal gaps */
+    .grid-cols-1.sm\:grid-cols-2.md\:grid-cols-2.lg\:grid-cols-3 {
+        grid-template-columns: repeat(2, 1fr) !important;
+    }
+}
+
+/* Broader tablet landscape optimizations (768px - 850px) */
+@media (min-width: 768px) and (max-width: 850px) {
+
+    /* Reduce container padding for better space utilization */
+    .container {
+        padding-left: 1rem;
+        padding-right: 1rem;
+    }
+
+    /* Optimize grid gaps for this specific range */
+    .grid {
+        gap: 1rem;
+    }
+
+    /* Ensure blog cards don't overflow */
+    .blog-card {
+        max-width: 100%;
+        overflow: hidden;
+    }
+
+    /* Adjust text sizes for better readability */
+    h1,
+    h2,
+    h3 {
+        font-size: 90%;
+    }
+
+    /* Optimize button and interactive element sizes */
+    button {
+        padding: 0.5rem 0.75rem;
+    }
+}
+
+/* High DPI display optimizations */
+@media (-webkit-min-device-pixel-ratio: 2),
+(min-resolution: 192dpi) {
+
+    /* Sharper images on retina displays */
+    img {
+        image-rendering: -webkit-optimize-contrast;
+        image-rendering: crisp-edges;
+    }
+}

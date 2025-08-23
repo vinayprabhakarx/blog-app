@@ -1,0 +1,794 @@
+import React, { useState, useEffect, useMemo, useCallback } from "react";
+import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Card, CardContent } from "../../components/ui/card";
+import { Button } from "../../components/ui/button";
+import { Badge } from "../../components/ui/badge";
+import { Input } from "../../components/ui/input";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "../../components/ui/select";
+import { useAuth } from "../../hooks/useAuth";
+import { useBlog, useCategories } from "../../hooks/useRedux";
+import {
+  fetchAllBlogs,
+  fetchMyBlogs,
+  setFilters,
+  deleteBlog,
+} from "./blogSlice";
+import { fetchAllCategories } from "../category/categoriesSlice";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import Pagination from "../../components/common/Pagination";
+import {
+  Eye,
+  Calendar,
+  User,
+  Tag,
+  Clock,
+  Search,
+  FileText,
+  ArrowLeft,
+  Edit,
+  Trash2,
+  FileCheck,
+  FilePenLine,
+  Plus,
+} from "lucide-react";
+import { formatDate } from "../../utils/formatDate";
+import { showToast } from "../../utils/showToast";
+
+const BlogList = () => {
+  const { slug, username } = useParams();
+  const navigate = useNavigate();
+  const location = useLocation();
+
+  const { user, isAuthenticated } = useAuth();
+
+  const isMyBlogsPage = location.pathname.includes("my-blogs");
+  const isUserBlogsPage =
+    location.pathname.includes("/blogs") &&
+    !location.pathname.includes("/category/") &&
+    !location.pathname.includes("/my-blogs");
+
+  const {
+    allBlogs,
+    allBlogsLoading,
+    allBlogsError,
+    myBlogs,
+    myBlogsLoading,
+    myBlogsError,
+    filters,
+    dispatch: blogDispatch,
+  } = useBlog();
+  const {
+    categories,
+    loading: categoriesLoading,
+    dispatch: categoriesDispatch,
+  } = useCategories();
+
+  const [searchTerm, setSearchTerm] = useState(filters.search || "");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(
+    filters.search || ""
+  );
+  const [selectedCategory, setSelectedCategory] = useState(
+    slug || filters.category || "all"
+  );
+  const [sortBy, setSortBy] = useState(filters.sortBy || "createdAt");
+  const [sortOrder, setSortOrder] = useState(filters.sortOrder || "desc");
+
+  const [draftFilter, setDraftFilter] = useState("all");
+  const [selectedAuthor, setSelectedAuthor] = useState("all");
+
+  // Debounce search to prevent excessive API calls
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDebouncedSearchTerm(searchTerm);
+    }, 500);
+
+    return () => clearTimeout(timer);
+  }, [searchTerm]);
+
+  const [currentPage, setCurrentPage] = useState(1);
+  const blogsPerPage = 10;
+
+  const currentCategory = slug
+    ? categories.find((cat) => cat.slug === slug)
+    : null;
+  const isViewingCategory = !!slug;
+
+  useEffect(() => {
+    if (categories.length === 0 && !categoriesLoading) {
+      categoriesDispatch(fetchAllCategories());
+    }
+  }, [categoriesDispatch, categories.length, categoriesLoading]);
+
+  useEffect(() => {
+    const params = {
+      page: currentPage,
+      limit: blogsPerPage,
+    };
+
+    if (selectedCategory && selectedCategory !== "all") {
+      const categoryData = categories.find(
+        (cat) => cat.slug === selectedCategory
+      );
+      if (categoryData) {
+        params.category = categoryData._id;
+      }
+    }
+
+    if (debouncedSearchTerm) {
+      params.search = debouncedSearchTerm;
+    }
+
+    params.sortBy = sortBy;
+    params.sortOrder = sortOrder;
+
+    if (isUserBlogsPage && username) {
+      params.username = username;
+    }
+
+    if (isMyBlogsPage) {
+      blogDispatch(fetchMyBlogs(params));
+    } else {
+      blogDispatch(fetchAllBlogs(params));
+    }
+  }, [
+    blogDispatch,
+    currentPage,
+    selectedCategory,
+    debouncedSearchTerm,
+    sortBy,
+    sortOrder,
+    categories,
+    blogsPerPage,
+    isMyBlogsPage,
+    isUserBlogsPage,
+    username,
+  ]);
+
+  useEffect(() => {
+    const debounceTimer = setTimeout(() => {
+      blogDispatch(
+        setFilters({
+          search: debouncedSearchTerm,
+          category: selectedCategory,
+          sortBy,
+          sortOrder,
+        })
+      );
+    }, 300);
+
+    return () => clearTimeout(debounceTimer);
+  }, [debouncedSearchTerm, selectedCategory, sortBy, sortOrder, blogDispatch]);
+
+  const [isInitialized, setIsInitialized] = useState(false);
+
+  useEffect(() => {
+    if (isInitialized) {
+      setCurrentPage(1);
+    } else {
+      setIsInitialized(true);
+    }
+  }, [debouncedSearchTerm, selectedCategory, sortBy, sortOrder, isInitialized]);
+
+  const formatReadTime = (content) => {
+    const wordsPerMinute = 200;
+    const wordCount = content?.replace(/<[^>]*>/g, "").split(/\s+/).length || 0;
+    const readTime = Math.ceil(wordCount / wordsPerMinute);
+    return `${readTime} min read`;
+  };
+
+  const truncateContent = (content, maxLength = 150) => {
+    const textContent = content?.replace(/<[^>]*>/g, "") || "";
+    if (textContent.length <= maxLength) return textContent;
+    return textContent.substring(0, maxLength) + "...";
+  };
+
+  const blogPagination = useSelector((state) =>
+    isMyBlogsPage ? state.blog.myBlogsPagination : state.blog.allBlogsPagination
+  );
+  const currentBlogs = isMyBlogsPage ? myBlogs : allBlogs;
+  const currentLoading = isMyBlogsPage ? myBlogsLoading : allBlogsLoading;
+  const currentError = isMyBlogsPage ? myBlogsError : allBlogsError;
+
+  const shouldShowLoading =
+    currentLoading &&
+    (debouncedSearchTerm ||
+      selectedCategory !== "all" ||
+      sortBy !== "createdAt" ||
+      sortOrder !== "desc");
+
+  const totalBlogs = blogPagination?.totalBlogs || currentBlogs.length;
+
+  const filteredBlogs = useMemo(() => {
+    if (isMyBlogsPage) {
+      return currentBlogs.filter((blog) => {
+        let passesDraftFilter = true;
+        if (draftFilter === "published") passesDraftFilter = !blog.draft;
+        if (draftFilter === "drafts") passesDraftFilter = blog.draft;
+
+        let passesAuthorFilter = true;
+        if (selectedAuthor && selectedAuthor !== "all") {
+          try {
+            const blogAuthor =
+              blog.author?.name ||
+              blog.author?.personal_info?.username ||
+              blog.author?.personal_info?.name ||
+              blog.author;
+            passesAuthorFilter =
+              typeof blogAuthor === "string" && blogAuthor === selectedAuthor;
+          } catch (error) {
+            console.warn(
+              "Error filtering by author for blog:",
+              blog._id,
+              error
+            );
+            passesAuthorFilter = false;
+          }
+        }
+
+        return passesDraftFilter && passesAuthorFilter;
+      });
+    } else {
+      return currentBlogs.filter((blog) => {
+        if (selectedAuthor && selectedAuthor !== "all") {
+          try {
+            const blogAuthor =
+              blog.author?.name ||
+              blog.author?.personal_info?.username ||
+              blog.author?.personal_info?.name ||
+              blog.author;
+            return (
+              typeof blogAuthor === "string" && blogAuthor === selectedAuthor
+            );
+          } catch (error) {
+            console.warn(
+              "Error filtering by author for blog:",
+              blog._id,
+              error
+            );
+            return false;
+          }
+        }
+        return true;
+      });
+    }
+  }, [currentBlogs, isMyBlogsPage, draftFilter, selectedAuthor]);
+
+  const sortedAndFilteredBlogs = useMemo(() => {
+    return [...filteredBlogs].sort((a, b) => {
+      let aValue, bValue;
+
+      switch (sortBy) {
+        case "title":
+          aValue = a.title?.toLowerCase() || "";
+          bValue = b.title?.toLowerCase() || "";
+          break;
+        case "views":
+          aValue = a.views || 0;
+          bValue = b.views || 0;
+          break;
+        case "createdAt":
+        default:
+          aValue = new Date(a.createdAt || 0);
+          bValue = new Date(b.createdAt || 0);
+          break;
+      }
+
+      if (sortOrder === "asc") {
+        return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
+      } else {
+        return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
+      }
+    });
+  }, [filteredBlogs, sortBy, sortOrder]);
+
+  const displayTotalBlogs = useMemo(() => {
+    return isMyBlogsPage ? sortedAndFilteredBlogs.length : totalBlogs;
+  }, [isMyBlogsPage, sortedAndFilteredBlogs.length, totalBlogs]);
+
+  const paginatedBlogs = sortedAndFilteredBlogs;
+
+  useEffect(() => {
+    if (slug && slug !== selectedCategory) {
+      setSelectedCategory(slug);
+      setCurrentPage(1);
+    }
+  }, [slug, selectedCategory]);
+
+  const handleClearFilters = useCallback(() => {
+    setSearchTerm("");
+    setDebouncedSearchTerm("");
+    setSelectedCategory("all");
+    setSortBy("createdAt");
+    setSortOrder("desc");
+    setCurrentPage(1);
+    setDraftFilter("all");
+    setSelectedAuthor("all");
+  }, []);
+
+  const handleDeleteBlog = useCallback(
+    async (blogId, blogTitle) => {
+      if (
+        window.confirm(
+          `Are you sure you want to delete "${blogTitle}"? This action cannot be undone.`
+        )
+      ) {
+        try {
+          await blogDispatch(deleteBlog(blogId)).unwrap();
+          showToast("success", "Blog deleted successfully!");
+
+          const params = {
+            page: currentPage,
+            limit: blogsPerPage,
+          };
+
+          if (selectedCategory && selectedCategory !== "all") {
+            const categoryData = categories.find(
+              (cat) => cat.slug === selectedCategory
+            );
+            if (categoryData) {
+              params.category = categoryData._id;
+            }
+          }
+
+          if (debouncedSearchTerm) {
+            params.search = debouncedSearchTerm;
+          }
+
+          params.sortBy = sortBy;
+          params.sortOrder = sortOrder;
+
+          blogDispatch(fetchAllBlogs(params));
+        } catch (error) {
+          console.error("Failed to delete blog:", error);
+          showToast(
+            "error",
+            error.message || "Failed to delete blog. Please try again."
+          );
+        }
+      }
+    },
+    [
+      blogDispatch,
+      currentPage,
+      selectedCategory,
+      debouncedSearchTerm,
+      sortBy,
+      sortOrder,
+      categories,
+      blogsPerPage,
+    ]
+  );
+
+  const canModifyBlog = useCallback(
+    (blog) => {
+      if (!isAuthenticated || !user) return false;
+
+      if (user.role === "admin") return true;
+
+      const blogAuthorId = blog.author?._id || blog.author?.id || blog.author;
+      const currentUserId = user._id || user.id;
+
+      return typeof blogAuthorId === "string" ||
+        typeof blogAuthorId === "number"
+        ? blogAuthorId === currentUserId
+        : false;
+    },
+    [isAuthenticated, user]
+  );
+
+  const isAdmin = user?.role === "admin";
+  const isAuthor = user?.role === "author";
+
+  if (shouldShowLoading) {
+    return (
+      <div className="flex justify-center items-center min-h-screen">
+        <LoadingSpinner />
+      </div>
+    );
+  }
+
+  if (currentError) {
+    return (
+      <div className="text-center text-red-500 p-8">
+        <FileText className="h-16 w-16 mx-auto mb-4 opacity-50" />
+        <p>Error loading blogs: {currentError}</p>
+        <Button
+          onClick={() =>
+            blogDispatch(isMyBlogsPage ? fetchMyBlogs() : fetchAllBlogs())
+          }
+          className="mt-4"
+          variant="outline"
+        >
+          Try Again
+        </Button>
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
+      <div className="flex flex-col space-y-3 sm:space-y-4 items-center">
+        <div className="text-center">
+          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+            {isAdmin || isAuthor ? "Blog Management" : "All Blogs"}
+          </h1>
+          <div className="flex justify-center gap-4 text-sm text-muted-foreground">
+            <span>{displayTotalBlogs} blogs</span>
+            <span>•</span>
+            <span>
+              {currentPage} of {Math.ceil(displayTotalBlogs / blogsPerPage)}{" "}
+              pages
+            </span>
+            {isMyBlogsPage && (
+              <>
+                <span>•</span>
+                <span>
+                  {draftFilter === "drafts"
+                    ? "Drafts"
+                    : draftFilter === "published"
+                    ? "Published"
+                    : "All Types"}
+                </span>
+              </>
+            )}
+          </div>
+        </div>
+
+        {isViewingCategory && (
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={() => navigate("/categories")}
+              variant="ghost"
+              size="sm"
+              className="flex items-center gap-2"
+            >
+              <ArrowLeft className="h-4 w-4" />
+              <span className="hidden sm:inline">Back to Topics</span>
+              <span className="sm:hidden">Back</span>
+            </Button>
+          </div>
+        )}
+
+        {isViewingCategory && currentCategory?.description && (
+          <p className="text-muted-foreground max-w-3xl mx-auto px-4 text-sm sm:text-base text-center">
+            {currentCategory.description}
+          </p>
+        )}
+      </div>
+
+      {(isAdmin || isAuthor) && (
+        <div className="flex justify-center">
+          <Button asChild className="flex items-center gap-2">
+            <Link to="/blogs/create">
+              <Plus className="h-4 w-4" />
+              Create Blog
+            </Link>
+          </Button>
+        </div>
+      )}
+
+      <div className="space-y-3 sm:space-y-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
+          <div className="relative col-span-1 sm:col-span-2 lg:col-span-1">
+            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+            <Input
+              type="text"
+              placeholder="Search blogs..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              onKeyDown={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                  e.stopPropagation();
+                }
+              }}
+              onKeyPress={(e) => {
+                if (e.key === "Enter") {
+                  e.preventDefault();
+                }
+              }}
+              className="pl-10 w-full h-10 sm:h-9"
+            />
+          </div>
+
+          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <SelectTrigger className="w-full h-10 sm:h-9 text-sm">
+              <SelectValue placeholder="All Categories" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Categories</SelectItem>
+              {categories.map((category) => (
+                <SelectItem key={category._id} value={category.slug}>
+                  {category.name}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          {isMyBlogsPage && (
+            <Select value={draftFilter} onValueChange={setDraftFilter}>
+              <SelectTrigger className="w-full h-10 sm:h-9 text-sm">
+                <SelectValue placeholder="All Blogs" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Types</SelectItem>
+                <SelectItem value="published">
+                  <div className="flex items-center gap-2">
+                    <FileCheck className="w-4 h-4" />
+                    <span className="hidden sm:inline">Published</span>
+                    <span className="sm:hidden">Pub</span>
+                  </div>
+                </SelectItem>
+                <SelectItem value="drafts">
+                  <div className="flex items-center gap-2">
+                    <FilePenLine className="w-4 h-4" />
+                    <span className="hidden sm:inline">Drafts</span>
+                    <span className="sm:hidden">Draft</span>
+                  </div>
+                </SelectItem>
+              </SelectContent>
+            </Select>
+          )}
+
+          <Select
+            value={selectedAuthor || "all"}
+            onValueChange={setSelectedAuthor}
+          >
+            <SelectTrigger className="w-full h-10 sm:h-9 text-sm">
+              <SelectValue placeholder="All Authors" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">All Authors</SelectItem>
+              {Array.from(
+                new Set(
+                  currentBlogs
+                    .map((blog) => {
+                      try {
+                        const author =
+                          blog.author?.name ||
+                          blog.author?.personal_info?.username ||
+                          blog.author?.personal_info?.name ||
+                          blog.author;
+                        return typeof author === "string" && author.trim()
+                          ? author
+                          : null;
+                      } catch (error) {
+                        console.warn(
+                          "Error extracting author from blog:",
+                          blog._id,
+                          error
+                        );
+                        return null;
+                      }
+                    })
+                    .filter((author) => author && author.trim())
+                )
+              ).map((author) => (
+                <SelectItem key={author} value={author}>
+                  {author}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+
+          <Select value={sortBy} onValueChange={setSortBy}>
+            <SelectTrigger className="w-full h-10 sm:h-9 text-sm">
+              <SelectValue placeholder="Sort by" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="createdAt">Date Created</SelectItem>
+              <SelectItem value="title">Title</SelectItem>
+              <SelectItem value="views">Views</SelectItem>
+            </SelectContent>
+          </Select>
+
+          <Select value={sortOrder} onValueChange={setSortOrder}>
+            <SelectTrigger className="w-full h-10 sm:h-9 text-sm">
+              <SelectValue placeholder="Order" />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="desc">Newest First</SelectItem>
+              <SelectItem value="asc">Oldest First</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-2 sm:gap-3">
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleClearFilters}
+            className="text-sm h-10 sm:h-9 w-full sm:w-auto"
+          >
+            Clear Filters
+          </Button>
+        </div>
+      </div>
+
+      {currentBlogs.length === 0 ? (
+        <Card>
+          <CardContent className="p-6 sm:p-8 text-center">
+            <FileText className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
+            <div className="text-muted-foreground text-sm sm:text-base">
+              {filters.search || filters.category !== "all"
+                ? "No blogs found matching your criteria."
+                : "No blogs available yet."}
+            </div>
+            {(filters.search || filters.category !== "all") && (
+              <Button
+                onClick={handleClearFilters}
+                className="mt-4"
+                variant="outline"
+              >
+                Clear Filters
+              </Button>
+            )}
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4 sm:gap-6">
+          {paginatedBlogs.map((blog) => (
+            <Card key={blog._id} className="hover:shadow-md transition-shadow">
+              <CardContent className="p-4 sm:p-6">
+                <div
+                  className={`flex flex-col lg:flex-row ${
+                    blog.banner ? "lg:gap-6" : "lg:gap-0"
+                  }`}
+                >
+                  {blog.banner && (
+                    <div className="w-full lg:w-48 h-48 lg:h-32 flex-shrink-0 mb-4 lg:mb-0">
+                      <img
+                        src={
+                          blog.banner.startsWith("http")
+                            ? blog.banner
+                            : `/api${blog.banner}`
+                        }
+                        alt={blog.title}
+                        className="w-full h-full object-cover rounded-lg"
+                        onError={(e) => {
+                          e.target.style.display = "none";
+                        }}
+                        crossOrigin="anonymous"
+                      />
+                    </div>
+                  )}
+
+                  <div className="flex-1">
+                    <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
+                      <div className="flex-1">
+                        <Link
+                          to={
+                            blog.draft
+                              ? `/blog/preview/${blog._id}`
+                              : `/blog/${blog.slug}`
+                          }
+                        >
+                          <h2 className="text-lg sm:text-xl font-semibold mb-2 cursor-pointer hover:text-primary transition-colors">
+                            {blog.title}
+                          </h2>
+                        </Link>
+
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground mb-3">
+                          <div className="flex items-center gap-1">
+                            <User className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span>
+                              {blog.author?.personal_info?.username || "Admin"}
+                            </span>
+                          </div>
+
+                          <div className="flex items-center gap-1">
+                            <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span>{formatDate(blog.createdAt)}</span>
+                          </div>
+
+                          <div className="flex items-center gap-1">
+                            <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span>{formatReadTime(blog.content)}</span>
+                          </div>
+
+                          {blog.views && (
+                            <div className="flex items-center gap-1">
+                              <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                              <span>{blog.views} views</span>
+                            </div>
+                          )}
+                        </div>
+
+                        <div className="mb-3 flex flex-wrap gap-2">
+                          {blog.category && (
+                            <Badge variant="secondary" className="text-xs">
+                              <Tag className="w-3 h-3 mr-1" />
+                              {categories.find(
+                                (cat) => cat.slug === blog.category
+                              )?.name ||
+                                (typeof blog.category === "object"
+                                  ? blog.category.name
+                                  : blog.category) ||
+                                "Unknown Category"}
+                            </Badge>
+                          )}
+                          {isMyBlogsPage && (
+                            <Badge
+                              variant={blog.draft ? "destructive" : "default"}
+                              className="text-xs"
+                            >
+                              {blog.draft ? (
+                                <>
+                                  <FilePenLine className="w-3 h-3 mr-1" />
+                                  Draft
+                                </>
+                              ) : (
+                                <>
+                                  <FileCheck className="w-3 h-3 mr-1" />
+                                  Published
+                                </>
+                              )}
+                            </Badge>
+                          )}
+                        </div>
+
+                        <p className="text-muted-foreground mb-4 text-sm sm:text-base">
+                          {truncateContent(blog.excerpt || blog.content || "")}
+                        </p>
+                      </div>
+
+                      {isAuthenticated && canModifyBlog(blog) && (
+                        <div className="flex flex-row lg:flex-col gap-2 lg:ml-4">
+                          <Button
+                            onClick={() =>
+                              navigate(
+                                blog.draft
+                                  ? `/editor/${blog._id}`
+                                  : `/blogs/edit/${blog.slug}`
+                              )
+                            }
+                            variant="outline"
+                            size="sm"
+                            className="flex items-center gap-1 flex-1 lg:flex-none"
+                          >
+                            <Edit className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="hidden sm:inline">Edit</span>
+                            <span className="sm:hidden">Edit</span>
+                          </Button>
+                          <Button
+                            onClick={() =>
+                              handleDeleteBlog(blog._id, blog.title)
+                            }
+                            variant="outline"
+                            size="sm"
+                            className="flex items-center gap-1 text-destructive hover:text-destructive-foreground hover:bg-destructive flex-1 lg:flex-none"
+                          >
+                            <Trash2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <span className="hidden sm:inline">Delete</span>
+                            <span className="sm:hidden">Del</span>
+                          </Button>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
+      )}
+
+      <Pagination
+        totalPages={Math.ceil(displayTotalBlogs / blogsPerPage)}
+        currentPage={currentPage}
+        setCurrentPage={setCurrentPage}
+        totalBlogs={displayTotalBlogs}
+        paginationThreshold={9}
+      />
+    </div>
+  );
+};
+
+export default BlogList;
