@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import logoLight from "../../assets/logo-light.png";
 import logoDark from "../../assets/logo-dark.png";
 import { Link, useNavigate } from "react-router-dom";
@@ -27,7 +27,7 @@ import { useAuth } from "../../hooks/useAuth";
 import { Bell, Search } from "lucide-react";
 import NotificationDropdown from "../../features/notification/NotificationDropdown";
 
-const Topbar = () => {
+const Topbar = React.memo(() => {
   const { toggleSidebar } = useSidebar();
   const [showSearch, setShowSearch] = useState(false);
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -39,24 +39,31 @@ const Topbar = () => {
 
   const { theme } = useTheme();
 
-  useEffect(() => {
-    setCurrentLogo(theme === "dark" ? logoDark : logoLight);
-  }, [theme]);
+  // Memoize logo based on theme
+  const currentLogoMemo = useMemo(
+    () => (theme === "dark" ? logoDark : logoLight),
+    [theme]
+  );
 
-  const handleLogout = () => {
+  useEffect(() => {
+    setCurrentLogo(currentLogoMemo);
+  }, [currentLogoMemo]);
+
+  // Memoize callback functions
+  const handleLogout = useCallback(() => {
     dispatch(logout());
     navigate(RouteIndex);
     showToast("success", "Logged out successfully");
-  };
+  }, [dispatch, navigate]);
 
-  const toggleSearch = () => {
-    setShowSearch(!showSearch);
-  };
+  const toggleSearch = useCallback(() => {
+    setShowSearch((prev) => !prev);
+  }, []);
 
-  const handleSidebarToggle = () => {
-    setIsSidebarOpen(!isSidebarOpen);
+  const handleSidebarToggle = useCallback(() => {
+    setIsSidebarOpen((prev) => !prev);
     toggleSidebar();
-  };
+  }, [toggleSidebar]);
 
   return (
     <>
@@ -203,6 +210,8 @@ const Topbar = () => {
       )}
     </>
   );
-};
+});
+
+Topbar.displayName = "Topbar";
 
 export default Topbar;

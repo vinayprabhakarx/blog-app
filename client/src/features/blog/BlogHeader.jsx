@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Eye,
@@ -35,7 +35,7 @@ const handlePrint = () => {
   window.print();
 };
 
-const BlogHeader = ({ blog, onCommentClick }) => {
+const BlogHeader = React.memo(({ blog, onCommentClick }) => {
   const dispatch = useDispatch();
 
   const [isShareDropdownOpen, setIsShareDropdownOpen] = useState(false);
@@ -53,37 +53,23 @@ const BlogHeader = ({ blog, onCommentClick }) => {
   );
   const { user } = useSelector((state) => state.auth);
 
-  const isAdmin = user?.role === "admin";
-  const currentUserId = user?._id || user?.id;
-  const blogAuthorId =
-    blog?.author?._id || blog?.author?.id || blog?.author || null;
-  const isAuthorOfBlog =
+  // Memoize computed values
+  const isAdmin = useMemo(() => user?.role === "admin", [user?.role]);
+  const currentUserId = useMemo(() => user?._id || user?.id, [user?._id, user?.id]);
+  const blogAuthorId = useMemo(() => 
+    blog?.author?._id || blog?.author?.id || blog?.author || null, 
+    [blog?.author]
+  );
+  const isAuthorOfBlog = useMemo(() => 
     currentUserId &&
     blogAuthorId &&
-    String(blogAuthorId) === String(currentUserId);
-  const canEdit = Boolean(isAdmin || isAuthorOfBlog);
+    String(blogAuthorId) === String(currentUserId),
+    [currentUserId, blogAuthorId]
+  );
+  const canEdit = useMemo(() => Boolean(isAdmin || isAuthorOfBlog), [isAdmin, isAuthorOfBlog]);
 
-  useEffect(() => {
-    if (blog?._id) {
-      dispatch(
-        getLikeCount({
-          likeableId: blog._id,
-          onModel: "Blog",
-        })
-      );
-
-      if (user) {
-        dispatch(
-          getUserLikeStatus({
-            likeableId: blog._id,
-            onModel: "Blog",
-          })
-        );
-      }
-    }
-  }, [blog?._id, user, dispatch]);
-
-  const handleLike = async () => {
+  // Memoize callback functions
+  const handleLike = useCallback(async () => {
     if (!user) {
       alert("Please log in to like this blog");
       return;
@@ -106,7 +92,7 @@ const BlogHeader = ({ blog, onCommentClick }) => {
       console.error("❌ Failed to toggle like:", error);
       dispatch(toggleBlogLikeFrontend({ blogId: blog._id }));
     }
-  };
+  }, [user, blog?._id, dispatch]);
 
   const handleShare = (e) => {
     e.preventDefault();
@@ -377,6 +363,6 @@ const BlogHeader = ({ blog, onCommentClick }) => {
       )}
     </div>
   );
-};
+});
 
 export default BlogHeader;

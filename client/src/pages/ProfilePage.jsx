@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import userService from "../features/user_management/usersService";
@@ -20,8 +20,9 @@ import {
 } from "react-icons/fa";
 import { FaXTwitter } from "react-icons/fa6";
 import { Link } from "react-router-dom";
+import LoadingSpinner from "../components/common/LoadingSpinner";
 
-const ProfilePage = () => {
+const ProfilePage = React.memo(() => {
   const { username } = useParams();
   const navigate = useNavigate();
   const { user } = useAuth();
@@ -30,51 +31,25 @@ const ProfilePage = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
-  // Determine if this is a public profile or user's own profile
-  const isPublicProfile =
-    username &&
-    username !== user?.personal_info?.username &&
-    username !== user?.username;
-  const isOwnProfile =
-    !username ||
-    username === user?.personal_info?.username ||
-    username === user?.username;
+  // Memoize profile type checks
+  const isPublicProfile = useMemo(
+    () =>
+      username &&
+      username !== user?.personal_info?.username &&
+      username !== user?.username,
+    [username, user?.personal_info?.username, user?.username]
+  );
 
-  useEffect(() => {
-    const fetchProfile = async () => {
-      try {
-        setLoading(true);
+  const isOwnProfile = useMemo(
+    () =>
+      !username ||
+      username === user?.personal_info?.username ||
+      username === user?.username,
+    [username, user?.personal_info?.username, user?.username]
+  );
 
-        if (isPublicProfile) {
-          // Fetch public profile of another user
-          const response = await userService.getPublicProfile(username);
-          setProfile(response.user);
-        } else {
-          // Use current user's profile data
-          setProfile(user);
-        }
-      } catch (err) {
-        setError(err.message || "Failed to load profile");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    if (isPublicProfile || isOwnProfile) {
-      fetchProfile();
-    }
-  }, [username, user, isPublicProfile, isOwnProfile]);
-
-  const handleBackClick = () => {
-    if (isPublicProfile) {
-      navigate("/");
-    } else {
-      navigate("/");
-    }
-  };
-
-  // Helper functions
-  const getSocialIcon = (platform) => {
+  // Memoize helper functions
+  const getSocialIcon = useCallback((platform) => {
     const iconMap = {
       website: FaGlobe,
       linkedin: FaLinkedin,
@@ -85,9 +60,9 @@ const ProfilePage = () => {
       instagram: FaInstagram,
     };
     return iconMap[platform] || FaGlobe;
-  };
+  }, []);
 
-  const formatSocialUrl = (platform, username) => {
+  const formatSocialUrl = useCallback((platform, username) => {
     if (!username) return null;
 
     const urlMap = {
@@ -100,96 +75,93 @@ const ProfilePage = () => {
       instagram: `https://instagram.com/${username}`,
     };
     return urlMap[platform] || username;
-  };
+  }, []);
+
+  // Memoize navigation handler
+  const handleBackClick = useCallback(() => {
+    if (isPublicProfile) {
+      navigate("/");
+    } else {
+      navigate("/");
+    }
+  }, [isPublicProfile, navigate]);
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        if (isPublicProfile) {
+          const response = await userService.getPublicProfile(username);
+          setProfile(response.user);
+        } else {
+          setProfile(user);
+        }
+      } catch (err) {
+        setError(err.message || "Failed to load profile");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchProfile();
+  }, [username, user, isPublicProfile, isOwnProfile]);
+
+  // Show loading spinner while profile is being fetched
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <div className="flex justify-center items-center min-h-[50vh]">
+          <LoadingSpinner size="lg" message="Loading profile..." />
+        </div>
+      </div>
+    );
+  }
+
+  // Show error state if profile loading failed
+  if (error) {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <div className="flex justify-center items-center min-h-[50vh]">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-destructive mb-4">
+              Error Loading Profile
+            </h2>
+            <p className="text-muted-foreground mb-4">{error}</p>
+            <Button onClick={handleBackClick} variant="outline">
+              Go Back
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Check if profile exists
+  if (!profile) {
+    return (
+      <div className="min-h-screen bg-background text-foreground">
+        <div className="flex justify-center items-center min-h-[50vh]">
+          <div className="text-center">
+            <h2 className="text-2xl font-bold text-muted-foreground mb-4">
+              Profile Not Found
+            </h2>
+            <p className="text-muted-foreground mb-4">
+              The requested profile could not be loaded.
+            </p>
+            <Button onClick={handleBackClick} variant="outline">
+              Go Back
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   const hasSocialLinks =
     profile?.social_links &&
     Object.values(profile.social_links).some((link) => link);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-6">
-          <div className="mb-6">
-            <Skeleton className="w-28 h-9 rounded-md" />
-          </div>
-
-          {/* Kaggle-style mobile layout */}
-          <div className="lg:hidden">
-            <div className="flex flex-col items-center text-center mb-8">
-              <Skeleton className="w-32 h-32 rounded-full mb-6" />
-              <Skeleton className="w-48 h-6 mb-2" />
-              <Skeleton className="w-32 h-4 mb-6" />
-              <div className="flex gap-3 w-full max-w-sm mb-8">
-                <Skeleton className="flex-1 h-10 rounded-full" />
-              </div>
-            </div>
-
-            <div className="space-y-4 mb-8">
-              <Skeleton className="w-full h-4" />
-              <Skeleton className="w-3/4 h-4" />
-              <Skeleton className="w-1/2 h-4" />
-            </div>
-
-            <div className="border-t pt-8">
-              <Skeleton className="w-24 h-6 mb-6" />
-              <Skeleton className="w-full h-4 mb-2" />
-              <Skeleton className="w-3/4 h-4" />
-            </div>
-          </div>
-
-          {/* Desktop layout skeleton */}
-          <div className="hidden lg:block">
-            <div className="max-w-4xl mx-auto p-8 ml-16">
-              <div className="flex gap-6 mb-6">
-                <Skeleton className="w-48 h-48 rounded-full" />
-                <div className="flex-1 space-y-4">
-                  <Skeleton className="w-32 h-4" />
-                  <Skeleton className="w-48 h-8" />
-                  <Skeleton className="w-24 h-6" />
-                  <Skeleton className="w-32 h-4" />
-                  <Skeleton className="w-40 h-4" />
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !profile) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="container mx-auto px-4 py-6">
-          <div className="mb-6">
-            <Button
-              variant="ghost"
-              onClick={handleBackClick}
-              className="hover:bg-transparent"
-            >
-              <FaArrowLeft className="w-4 h-4 mr-2" />
-              Back to Home
-            </Button>
-          </div>
-
-          <div className="text-center py-16">
-            <div className="w-16 h-16 mx-auto rounded-full bg-muted flex items-center justify-center mb-4">
-              <FaUser className="w-8 h-8 text-muted-foreground" />
-            </div>
-            <h1 className="text-2xl font-semibold mb-2">Profile Not Found</h1>
-            <p className="text-muted-foreground mb-4">
-              The user profile you're looking for doesn't exist or is not
-              available.
-            </p>
-            <Button asChild>
-              <Link to="/">Go to Home</Link>
-            </Button>
-          </div>
-        </div>
-      </div>
-    );
-  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -717,6 +689,8 @@ const ProfilePage = () => {
       </div>
     </div>
   );
-};
+});
+
+ProfilePage.displayName = "ProfilePage";
 
 export default ProfilePage;

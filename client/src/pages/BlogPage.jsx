@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { useParams, Navigate } from "react-router-dom";
+import React, { useEffect, useState, useCallback, useMemo } from "react";
+import { useParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { cn } from "@/lib/utils";
 // Redux and hooks
@@ -14,12 +14,22 @@ import { CommentSection } from "../features/comment";
 import LoadingSpinner from "../components/common/LoadingSpinner";
 import NotFound from "../components/common/NotFound";
 
-const BlogPage = () => {
+const BlogPage = React.memo(() => {
   const { slug, id } = useParams();
   const { currentBlog, currentBlogLoading, currentBlogError, dispatch } =
     useBlog();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const [showComments, setShowComments] = useState(false);
+
+  // Memoize user authentication check
+  const isAuthorized = useMemo(() => {
+    if (!currentBlog?.draft) return true;
+    if (!isAuthenticated || !user) return false;
+    return (
+      user.role === "admin" ||
+      (user._id || user.id) === (currentBlog.author?._id || currentBlog.author)
+    );
+  }, [currentBlog?.draft, currentBlog?.author, isAuthenticated, user]);
 
   useEffect(() => {
     if (id) {
@@ -29,6 +39,17 @@ const BlogPage = () => {
       dispatch(fetchBlogBySlug(slug));
     }
   }, [slug, id, dispatch]);
+
+  // Memoize callback functions
+  const toggleComments = useCallback(() => {
+    setShowComments((prev) => !prev);
+  }, []);
+
+  const handleCommentClick = useCallback(() => {
+    if (!showComments) {
+      setShowComments(true);
+    }
+  }, [showComments]);
 
   // Loading state
   if (currentBlogLoading) {
@@ -65,14 +86,7 @@ const BlogPage = () => {
   }
 
   // If blog is draft, only author or admin can view
-  if (
-    currentBlog?.draft === true &&
-    (!isAuthenticated ||
-      !user ||
-      (user.role !== "admin" &&
-        (user._id || user.id) !==
-          (currentBlog.author?._id || currentBlog.author)))
-  ) {
+  if (!isAuthorized) {
     return (
       <NotFound
         title="Not Authorized"
@@ -82,17 +96,6 @@ const BlogPage = () => {
       />
     );
   }
-
-  const toggleComments = () => {
-    setShowComments(!showComments);
-  };
-
-  // Handle comment click from header - show comments and scroll to them
-  const handleCommentClick = () => {
-    if (!showComments) {
-      setShowComments(true);
-    }
-  };
 
   return (
     <div className="min-h-screen bg-background">
@@ -200,10 +203,12 @@ const BlogPage = () => {
       <BackToTopButton />
     </div>
   );
-};
+});
+
+BlogPage.displayName = "BlogPage";
 
 // Back to Top Button Component
-const BackToTopButton = () => {
+const BackToTopButton = React.memo(() => {
   const [showButton, setShowButton] = useState(false);
 
   useEffect(() => {
@@ -215,12 +220,12 @@ const BackToTopButton = () => {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  const scrollToTop = () => {
+  const scrollToTop = useCallback(() => {
     window.scrollTo({
       top: 0,
       behavior: "smooth",
     });
-  };
+  }, []);
 
   if (!showButton) return null;
 
@@ -251,6 +256,8 @@ const BackToTopButton = () => {
       </svg>
     </button>
   );
-};
+});
+
+BackToTopButton.displayName = "BackToTopButton";
 
 export default BlogPage;

@@ -1,18 +1,19 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { Input } from "../ui/input";
 import { Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import blogService from "../../features/blog/blogsService";
 import { showToast } from "../../utils/showToast";
 
-const SearchBar = () => {
+const SearchBar = React.memo(() => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const navigate = useNavigate();
 
-  const handleSearch = async (query) => {
+  // Memoize callback functions
+  const handleSearch = useCallback(async (query) => {
     if (!query.trim()) {
       setSearchResults([]);
       setShowResults(false);
@@ -30,47 +31,56 @@ const SearchBar = () => {
     } finally {
       setIsSearching(false);
     }
-  };
+  }, []);
 
-  const handleInputChange = (e) => {
-    const value = e.target.value;
-    setSearchQuery(value);
+  const handleInputChange = useCallback(
+    (e) => {
+      const value = e.target.value;
+      setSearchQuery(value);
 
-    // Debounce search to avoid excessive API calls
-    if (value.trim()) {
-      const timeoutId = setTimeout(() => {
-        handleSearch(value);
-      }, 300);
+      // Debounce search to avoid excessive API calls
+      if (value.trim()) {
+        const timeoutId = setTimeout(() => {
+          handleSearch(value);
+        }, 300);
 
-      return () => clearTimeout(timeoutId);
-    } else {
-      setSearchResults([]);
+        return () => clearTimeout(timeoutId);
+      } else {
+        setSearchResults([]);
+        setShowResults(false);
+      }
+    },
+    [handleSearch]
+  );
+
+  const handleResultClick = useCallback(
+    (blog) => {
+      navigate(`/blog/details/${blog.slug}`);
+      setSearchQuery("");
       setShowResults(false);
-    }
-  };
+      setSearchResults([]);
+    },
+    [navigate]
+  );
 
-  const handleResultClick = (blog) => {
-    navigate(`/blog/details/${blog.slug}`);
-    setSearchQuery("");
-    setShowResults(false);
-    setSearchResults([]);
-  };
-
-  const handleClearSearch = () => {
+  const handleClearSearch = useCallback(() => {
     setSearchQuery("");
     setSearchResults([]);
     setShowResults(false);
-  };
+  }, []);
+
+  // Memoize form submit handler
+  const handleFormSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+      handleSearch(searchQuery);
+    },
+    [handleSearch, searchQuery]
+  );
 
   return (
     <div className="relative w-full">
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          handleSearch(searchQuery);
-        }}
-        className="relative"
-      >
+      <form onSubmit={handleFormSubmit} className="relative">
         <div className="relative">
           <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
           <Input
@@ -163,6 +173,8 @@ const SearchBar = () => {
       )}
     </div>
   );
-};
+});
+
+SearchBar.displayName = "SearchBar";
 
 export default SearchBar;
