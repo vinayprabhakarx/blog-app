@@ -1,11 +1,10 @@
-import React, { useEffect, useState, useCallback } from "react";
+import React, { useEffect, useState, useCallback, useRef } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 
 import { Filter } from "lucide-react";
 import BlogCard from "../features/blog/BlogCard";
 import Pagination from "../components/common/Pagination";
-import LoadingSpinner from "../components/common/LoadingSpinner";
 
 import {
   fetchAllBlogs,
@@ -36,34 +35,63 @@ const HomePage = () => {
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
   const postsPerPage = 9;
 
-  const loading = blogLoading.allBlogs || categoriesLoading;
+  useEffect(() => {
+    // Fetch categories only once on mount
+    dispatch(fetchAllCategories());
+  }, [dispatch]);
+
+  // Add ref to track if we've already fetched categories
+  const hasFetchedCategoriesRef = useRef(false);
+
+  // Add ref to track if we've already fetched blogs for current params
+  const hasFetchedBlogsRef = useRef(false);
+  const lastFetchParamsRef = useRef(null);
 
   useEffect(() => {
-    dispatch(fetchAllBlogs({ page: currentPage, limit: postsPerPage }));
-    dispatch(fetchAllCategories());
-  }, [dispatch, currentPage]);
+    // Only fetch blogs if categories have been loaded
+    if (!hasFetchedCategoriesRef.current && categories.length === 0) {
+      return; // Wait for categories to load first
+    }
+
+    // Mark categories as fetched
+    if (categories.length > 0) {
+      hasFetchedCategoriesRef.current = true;
+    }
+
+    // Check if we need to fetch blogs (prevent duplicate calls)
+    const currentParams = { currentPage, selectedCategory, postsPerPage };
+    const paramsChanged =
+      JSON.stringify(currentParams) !==
+      JSON.stringify(lastFetchParamsRef.current);
+
+    // Always fetch on first load or when params change
+    if (!hasFetchedBlogsRef.current || paramsChanged) {
+      // Fetch blogs with current parameters
+      const params = {
+        page: currentPage,
+        limit: postsPerPage,
+      };
+
+      if (selectedCategory !== "all") {
+        const categoryData = categories.find(
+          (cat) => cat.slug === selectedCategory
+        );
+        if (categoryData) {
+          params.category = categoryData._id;
+        }
+      }
+
+      // Mark as fetched and update last params
+      hasFetchedBlogsRef.current = true;
+      lastFetchParamsRef.current = currentParams;
+
+      dispatch(fetchAllBlogs(params));
+    }
+  }, [dispatch, currentPage, selectedCategory, postsPerPage, categories]);
 
   const blogPagination = useSelector((state) => state.blog.allBlogsPagination);
   const totalPages = blogPagination?.totalPages || 1;
   const filteredBlogsCount = blogPagination?.totalBlogs || allBlogs.length;
-
-  useEffect(() => {
-    const params = {
-      page: currentPage,
-      limit: postsPerPage,
-    };
-
-    if (selectedCategory !== "all") {
-      const categoryData = categories.find(
-        (cat) => cat.slug === selectedCategory
-      );
-      if (categoryData) {
-        params.category = categoryData._id;
-      }
-    }
-
-    dispatch(fetchAllBlogs(params));
-  }, [dispatch, currentPage, selectedCategory, postsPerPage, categories]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -235,65 +263,58 @@ const HomePage = () => {
         </div>
       </section>
 
-      {/* Blog Posts Section - Fixed minimum height to prevent layout shift */}
-      {loading ? (
-        <div className="fixed inset-0 w-full h-full flex items-center justify-center bg-background/95 z-50">
-          <LoadingSpinner size="lg" message="Loading articles..." />
-        </div>
-      ) : (
-        <section className="py-3 sm:py-4 md:py-6 lg:py-12 min-h-[60vh]">
-          <div className="container mx-auto px-6 sm:px-6">
-            <div className="mb-4 sm:mb-6">
-              <span className="text-xs sm:text-sm text-muted-foreground">
-                {filteredBlogsCount} articles
-              </span>
-            </div>
+      <section className="py-3 sm:py-4 md:py-6 lg:py-12 min-h-[60vh]">
+        <div className="container mx-auto px-6 sm:px-6">
+          <div className="mb-4 sm:mb-6">
+            <span className="text-xs sm:text-sm text-muted-foreground">
+              {filteredBlogsCount} articles
+            </span>
+          </div>
 
-            {/* Blog content will be rendered here */}
-            {allBlogs.length === 0 && !loading ? (
-              <div className="flex flex-col items-center justify-center py-8 sm:py-12 md:py-16 lg:py-20 min-h-[40vh]">
-                <div className="text-muted-foreground text-sm sm:text-base md:text-lg mb-3 sm:mb-4 text-center px-4">
-                  No articles found for this category.
-                </div>
-                <button
-                  onClick={() => handleCategorySelect("all")}
-                  className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors touch-manipulation"
-                >
-                  View All Articles
-                </button>
+          {/* Blog content will be rendered here */}
+          {allBlogs.length === 0 && !blogLoading ? (
+            <div className="flex flex-col items-center justify-center py-8 sm:py-12 md:py-16 lg:py-20 min-h-[40vh]">
+              <div className="text-muted-foreground text-sm sm:text-base md:text-lg mb-3 sm:mb-4 text-center px-4">
+                No articles found for this category.
               </div>
-            ) : (
-              <div>
-                {/* Blog Grid - Fully responsive with mobile-first approach */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10 lg:gap-12 xl:gap-14 mx-auto max-w-7xl">
-                  {allBlogs.map((blog) => (
-                    <div key={blog._id} className="flex w-full">
-                      <BlogCard
-                        blog={blog}
-                        className="w-full h-full"
-                        variant="default"
-                      />
-                    </div>
-                  ))}
-                </div>
-
-                {/* Pagination Component */}
-                {!loading && allBlogs.length > 0 && (
-                  <div className="mt-6 sm:mt-8 md:mt-12 lg:mt-16">
-                    <Pagination
-                      totalPages={totalPages}
-                      currentPage={currentPage}
-                      setCurrentPage={handlePageChange}
-                      totalBlogs={filteredBlogsCount}
-                      paginationThreshold={9}
+              <button
+                onClick={() => handleCategorySelect("all")}
+                className="px-3 sm:px-4 py-2 text-xs sm:text-sm font-medium bg-primary text-primary-foreground rounded-md hover:bg-primary/90 transition-colors touch-manipulation"
+              >
+                View All Articles
+              </button>
+            </div>
+          ) : (
+            <div>
+              {/* Blog Grid - Fully responsive with mobile-first approach */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8 md:gap-10 lg:gap-12 xl:gap-14 mx-auto max-w-7xl">
+                {allBlogs.map((blog) => (
+                  <div key={blog._id} className="flex w-full">
+                    <BlogCard
+                      blog={blog}
+                      className="w-full h-full"
+                      variant="default"
                     />
                   </div>
-                )}
+                ))}
               </div>
-            )}
-          </div>
-        </section>
-      )}
+
+              {/* Pagination Component */}
+              {allBlogs.length > 0 && (
+                <div className="mt-6 sm:mt-8 md:mt-12 lg:mt-16">
+                  <Pagination
+                    totalPages={totalPages}
+                    currentPage={currentPage}
+                    setCurrentPage={handlePageChange}
+                    totalBlogs={filteredBlogsCount}
+                    paginationThreshold={9}
+                  />
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </section>
     </div>
   );
 };

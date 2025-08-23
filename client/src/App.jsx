@@ -6,7 +6,6 @@ import { ThemeProvider } from "./utils/ThemeContext.jsx";
 import { SidebarProvider } from "./components/ui/sidebar";
 import { NotificationProvider } from "./utils/NotificationContext";
 import AppRouter from "./utils/AppRouter";
-import LoadingSpinner from "./components/common/LoadingSpinner";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { getCurrentUser } from "./features/auth/authSlice";
@@ -29,7 +28,7 @@ const AuthInitializer = ({ children }) => {
 
 function App() {
   return (
-    <PersistGate loading={<LoadingSpinner />} persistor={persistor}>
+    <PersistGate persistor={persistor}>
       <Provider store={store}>
         <ThemeProvider>
           <SidebarProvider>
