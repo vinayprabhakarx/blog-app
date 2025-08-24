@@ -14,92 +14,101 @@ import { useAuth } from "../../hooks/useAuth";
 import { useCategories } from "../../hooks/useRedux";
 import { fetchAllCategories } from "../../features/category/categoriesSlice";
 import {
-  IoAnalyticsOutline,
-  IoAnalytics,
-  IoSettingsOutline,
-  IoSettings,
-} from "react-icons/io5";
-import { GrBlog } from "react-icons/gr";
-import { BiCategory, BiSolidCategory } from "react-icons/bi";
-import { FaRegComments, FaComments } from "react-icons/fa";
-import { HiOutlinePencilAlt, HiPencilAlt } from "react-icons/hi";
-import { MdOutlineLibraryBooks, MdLibraryBooks } from "react-icons/md";
-import { LuShield } from "react-icons/lu";
-import { RiDashboardLine, RiDashboardFill } from "react-icons/ri";
-import { HiOutlineUserGroup, HiUserGroup } from "react-icons/hi";
-import { Bell } from "lucide-react";
+  FaChartLine,
+  FaChartArea,
+  FaBlog,
+  FaShieldAlt,
+  FaUserCircle,
+  FaTachometerAlt,
+  FaPencilAlt,
+  FaThLarge,
+} from "react-icons/fa";
+import {
+  FaNewspaper,
+  FaTags,
+  FaTag,
+  FaComments,
+  FaComment,
+  FaPen,
+  FaBookOpen,
+  FaBook,
+  FaUsers,
+  FaBell,
+  FaRegBell,
+  FaUser,
+} from "react-icons/fa6";
 
 // Navigation configuration
 const NAVIGATION_CONFIG = {
   dashboard: {
     title: "Dashboard",
     path: "/dashboard",
-    icon: RiDashboardLine,
-    activeIcon: RiDashboardFill,
+    icon: FaThLarge,
+    activeIcon: FaTachometerAlt,
     roles: ["author", "admin"],
   },
   categories: {
     title: "Categories",
     path: "/categories",
-    icon: BiCategory,
-    activeIcon: BiSolidCategory,
+    icon: FaTag,
+    activeIcon: FaTags,
     roles: ["user", "author", "admin"],
   },
   blogs: {
     title: "All Blogs",
     path: "/blogs",
-    icon: GrBlog,
-    activeIcon: GrBlog,
+    icon: FaNewspaper,
+    activeIcon: FaBlog,
     roles: ["user", "author", "admin"],
   },
   comments: {
     title: "Comments",
     path: "/comments",
-    icon: FaRegComments,
+    icon: FaComment,
     activeIcon: FaComments,
     roles: ["admin", "author"],
   },
   notifications: {
     title: "Notifications",
     path: "/notifications",
-    icon: Bell,
-    activeIcon: Bell,
+    icon: FaRegBell,
+    activeIcon: FaBell,
     roles: ["user", "author", "admin"],
   },
 
   myBlogs: {
     title: "My Blogs",
     path: "/my-blogs",
-    icon: MdOutlineLibraryBooks,
-    activeIcon: MdLibraryBooks,
+    icon: FaBookOpen,
+    activeIcon: FaBook,
     roles: ["author", "admin"],
   },
   createBlog: {
     title: "Create Blog",
     path: "/blogs/create",
-    icon: HiOutlinePencilAlt,
-    activeIcon: HiPencilAlt,
+    icon: FaPencilAlt,
+    activeIcon: FaPen,
     roles: ["author", "admin"],
   },
   analytics: {
     title: "Analytics",
     path: "/analytics",
-    icon: IoAnalyticsOutline,
-    activeIcon: IoAnalytics,
+    icon: FaChartLine,
+    activeIcon: FaChartArea,
     roles: ["admin"],
   },
   users: {
     title: "User Management",
     path: "/users",
-    icon: HiOutlineUserGroup,
-    activeIcon: HiUserGroup,
+    icon: FaUsers,
+    activeIcon: FaUsers,
     roles: ["admin"],
   },
   profile: {
     title: "Profile",
     path: "/profile",
-    icon: IoSettingsOutline,
-    activeIcon: IoSettings,
+    icon: FaUser,
+    activeIcon: FaUserCircle,
     roles: ["user", "author", "admin"],
   },
 };
@@ -119,7 +128,7 @@ const NAVIGATION_SECTIONS = {
     label: "Admin Panel",
     items: ["analytics", "users"],
     showFor: ["admin"],
-    icon: LuShield,
+    icon: FaShieldAlt,
     className: "text-red-600 dark:text-red-400",
   },
   account: {
