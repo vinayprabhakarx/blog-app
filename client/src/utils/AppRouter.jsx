@@ -9,7 +9,7 @@ import Signup from "../features/auth/Signup";
 import ProfilePage from "../pages/ProfilePage";
 import EditProfile from "../features/settings/EditProfile";
 import ChangePassword from "../features/settings/ChangePassword";
-import UnifiedDashboard from "../features/dashboard/UnifiedDashboard";
+import Dashboard from "../features/dashboard/Dashboard";
 import CommentManagement from "../features/comment/CommentManagement";
 import NotificationDashboard from "../features/notification/NotificationDashboard";
 
@@ -60,7 +60,7 @@ const AppRouter = () => {
 
           {/* Private Routes */}
           <Route element={<PrivateRoute />}>
-            <Route path="dashboard" element={<UnifiedDashboard />} />
+            <Route path="dashboard" element={<Dashboard />} />
             <Route path="blogs" element={<BlogList />} />
             <Route path="blogs/create" element={<BlogForm />} />
             <Route path="blogs/edit/:slug" element={<BlogFormWrapper />} />

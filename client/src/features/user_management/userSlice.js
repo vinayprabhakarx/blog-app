@@ -92,6 +92,51 @@ export const changeUserRole = createAsyncThunk(
   }
 );
 
+// Async thunk to fetch admin statistics
+export const fetchAdminStats = createAsyncThunk(
+  "user/fetchAdminStats",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await userService.getAdminStats();
+      return response.stats;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch admin statistics"
+      );
+    }
+  }
+);
+
+// Async thunk to fetch monthly performance data
+export const fetchMonthlyPerformance = createAsyncThunk(
+  "user/fetchMonthlyPerformance",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await userService.getMonthlyPerformance();
+      return response.monthlyPerformance;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch monthly performance"
+      );
+    }
+  }
+);
+
+// Async thunk to fetch recent activities
+export const fetchRecentActivities = createAsyncThunk(
+  "user/fetchRecentActivities",
+  async (_, { rejectWithValue }) => {
+    try {
+      const response = await userService.getRecentActivities();
+      return response.activities;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Failed to fetch recent activities"
+      );
+    }
+  }
+);
+
 const initialState = {
   profile: null,
   loading: false,
@@ -119,6 +164,17 @@ const initialState = {
     hasNextPage: false,
     hasPrevPage: false,
   },
+
+  // Analytics state
+  adminStats: null,
+  adminStatsLoading: false,
+  adminStatsError: null,
+  monthlyPerformance: [],
+  monthlyPerformanceLoading: false,
+  monthlyPerformanceError: null,
+  recentActivities: [],
+  recentActivitiesLoading: false,
+  recentActivitiesError: null,
 
   // Cache settings
   cacheExpiryTime: 5 * 60 * 1000, // 5 minutes
@@ -339,6 +395,51 @@ const userSlice = createSlice({
         state.loading = false;
         state.error = action.payload;
       });
+
+    // Fetch admin statistics
+    builder
+      .addCase(fetchAdminStats.pending, (state) => {
+        state.adminStatsLoading = true;
+        state.adminStatsError = null;
+      })
+      .addCase(fetchAdminStats.fulfilled, (state, action) => {
+        state.adminStatsLoading = false;
+        state.adminStats = action.payload;
+      })
+      .addCase(fetchAdminStats.rejected, (state, action) => {
+        state.adminStatsLoading = false;
+        state.adminStatsError = action.payload;
+      });
+
+    // Fetch monthly performance
+    builder
+      .addCase(fetchMonthlyPerformance.pending, (state) => {
+        state.monthlyPerformanceLoading = true;
+        state.monthlyPerformanceError = null;
+      })
+      .addCase(fetchMonthlyPerformance.fulfilled, (state, action) => {
+        state.monthlyPerformanceLoading = false;
+        state.monthlyPerformance = action.payload;
+      })
+      .addCase(fetchMonthlyPerformance.rejected, (state, action) => {
+        state.monthlyPerformanceLoading = false;
+        state.monthlyPerformanceError = action.payload;
+      });
+
+    // Fetch recent activities
+    builder
+      .addCase(fetchRecentActivities.pending, (state) => {
+        state.recentActivitiesLoading = true;
+        state.recentActivitiesError = null;
+      })
+      .addCase(fetchRecentActivities.fulfilled, (state, action) => {
+        state.recentActivitiesLoading = false;
+        state.recentActivities = action.payload;
+      })
+      .addCase(fetchRecentActivities.rejected, (state, action) => {
+        state.recentActivitiesLoading = false;
+        state.recentActivitiesError = action.payload;
+      });
   },
 });
 
@@ -350,5 +451,21 @@ export const selectAllUsers = (state) => state.user.allUsers;
 export const selectAllUsersLoading = (state) => state.user.allUsersLoading;
 export const selectAllUsersError = (state) => state.user.allUsersError;
 export const selectUsersPagination = (state) => state.user.pagination;
+
+// Analytics selectors
+export const selectAdminStats = (state) => state.user.adminStats;
+export const selectAdminStatsLoading = (state) => state.user.adminStatsLoading;
+export const selectAdminStatsError = (state) => state.user.adminStatsError;
+export const selectMonthlyPerformance = (state) =>
+  state.user.monthlyPerformance;
+export const selectMonthlyPerformanceLoading = (state) =>
+  state.user.monthlyPerformanceLoading;
+export const selectMonthlyPerformanceError = (state) =>
+  state.user.monthlyPerformanceError;
+export const selectRecentActivities = (state) => state.user.recentActivities;
+export const selectRecentActivitiesLoading = (state) =>
+  state.user.recentActivitiesLoading;
+export const selectRecentActivitiesError = (state) =>
+  state.user.recentActivitiesError;
 
 export default userSlice.reducer;

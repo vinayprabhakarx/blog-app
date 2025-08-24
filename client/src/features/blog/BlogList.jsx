@@ -416,7 +416,8 @@ const BlogList = () => {
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
       <div className="flex flex-col space-y-3 sm:space-y-4 items-center">
         <div className="text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+          <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
+            <FileText className="h-8 w-8" />
             {isAdmin || isAuthor ? "Blog Management" : "All Blogs"}
           </h1>
           <div className="flex justify-center gap-4 text-sm text-muted-foreground">

@@ -9,6 +9,7 @@ import {
   deleteUser,
   getAdminStats,
   getRecentActivities,
+  getMonthlyPerformance,
   getCurrentUserProfile,
   changeUserRole,
   getAuthorStats,
@@ -164,6 +165,16 @@ router.get(
   authenticate,
   onlyAdmin,
   asyncHandler(getRecentActivities)
+);
+
+// @route   GET /api/users/admin/monthly-performance
+// @desc    Get monthly performance metrics for admin dashboard
+// @access  Private (Admin)
+router.get(
+  "/admin/monthly-performance",
+  authenticate,
+  onlyAdmin,
+  asyncHandler(getMonthlyPerformance)
 );
 
 // @route   GET /api/users/:userid

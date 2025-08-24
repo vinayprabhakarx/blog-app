@@ -511,6 +511,115 @@ export const getRecentActivities = async (req, res, next) => {
   });
 };
 
+// @route   GET /api/users/admin/monthly-performance
+// @desc    Get monthly performance metrics for admin dashboard
+// @access  Private (Admin)
+export const getMonthlyPerformance = async (req, res, next) => {
+  try {
+    // Get current date and calculate 4 months ago
+    const now = new Date();
+    const fourMonthsAgo = new Date();
+    fourMonthsAgo.setMonth(now.getMonth() - 4);
+
+    // Get monthly user registrations
+    const monthlyRegistrations = await User.aggregate([
+      { $match: { createdAt: { $gte: fourMonthsAgo } } },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
+    ]).catch((err) => {
+      throw databaseError("aggregating monthly registrations", err);
+    });
+
+    // Get monthly blog views (from blog activity)
+    const monthlyBlogViews = await Blog.aggregate([
+      { $match: { createdAt: { $gte: fourMonthsAgo } } },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$createdAt" },
+            month: { $month: "$createdAt" },
+          },
+          totalViews: { $sum: { $ifNull: ["$activity.total_reads", 0] } },
+          totalLikes: { $sum: { $ifNull: ["$likes", 0] } },
+          blogCount: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
+    ]).catch((err) => {
+      throw databaseError("aggregating monthly blog views", err);
+    });
+
+    // Get monthly comments
+    const monthlyComments = await Comment.aggregate([
+      { $match: { commented_at: { $gte: fourMonthsAgo } } },
+      {
+        $group: {
+          _id: {
+            year: { $year: "$commented_at" },
+            month: { $month: "$commented_at" },
+          },
+          count: { $sum: 1 },
+        },
+      },
+      { $sort: { "_id.year": 1, "_id.month": 1 } },
+    ]).catch((err) => {
+      throw databaseError("aggregating monthly comments", err);
+    });
+
+    // Create month labels for the last 4 months
+    const monthLabels = [];
+    for (let i = 3; i >= 0; i--) {
+      const date = new Date();
+      date.setMonth(date.getMonth() - i);
+      monthLabels.push({
+        year: date.getFullYear(),
+        month: date.getMonth() + 1,
+        label: date.toLocaleDateString("en-US", {
+          month: "long",
+          year: "numeric",
+        }),
+      });
+    }
+
+    // Combine all data into monthly performance array
+    const monthlyPerformance = monthLabels.map(({ year, month, label }) => {
+      const registration = monthlyRegistrations.find(
+        (item) => item._id.year === year && item._id.month === month
+      );
+      const blogData = monthlyBlogViews.find(
+        (item) => item._id.year === year && item._id.month === month
+      );
+      const comments = monthlyComments.find(
+        (item) => item._id.year === year && item._id.month === month
+      );
+
+      return {
+        period: label,
+        views: blogData?.totalViews || 0,
+        users: registration?.count || 0,
+        comments: comments?.count || 0,
+        blogs: blogData?.blogCount || 0,
+        likes: blogData?.totalLikes || 0,
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      monthlyPerformance,
+    });
+  } catch (error) {
+    next(error);
+  }
+};
+
 // @route   GET /api/users/me
 // @desc    Get current user's own profile
 // @access  Private

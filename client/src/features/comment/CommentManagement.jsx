@@ -222,8 +222,6 @@ const CommentManagement = () => {
     }
   };
 
-
-
   // Ensure only admin and author users can access this component
   if (!["admin", "author"].includes(user?.role)) {
     return (
@@ -252,7 +250,10 @@ const CommentManagement = () => {
     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
       {/* Header */}
       <div className="text-center space-y-3">
-        <h1 className="text-3xl md:text-4xl font-bold">Comment Management</h1>
+        <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2">
+          <MessageSquare className="h-8 w-8" />
+          Comment Management
+        </h1>
         <div className="flex justify-center gap-4 text-sm text-muted-foreground">
           <span>{stats.total} comments</span>
           <span>•</span>

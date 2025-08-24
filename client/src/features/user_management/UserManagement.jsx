@@ -312,7 +312,8 @@ const UserManagement = () => {
     return (
       <div className="p-6 space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl md:text-4xl font-bold mb-2">
+          <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
+            <Users className="h-8 w-8" />
             User Management
           </h1>
         </div>
@@ -336,7 +337,10 @@ const UserManagement = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2">User Management</h1>
+        <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
+          <Users className="h-8 w-8" />
+          User Management
+        </h1>
         <div className="flex justify-center gap-4 text-sm text-muted-foreground">
           <span>{analytics.total} users</span>
           <span>•</span>

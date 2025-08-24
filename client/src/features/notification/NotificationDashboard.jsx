@@ -142,7 +142,8 @@ const NotificationDashboard = () => {
         {/* Header */}
         <div className="text-center space-y-6">
           <div className="space-y-3">
-            <h1 className="text-3xl sm:text-4xl font-bold bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-transparent">
+            <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2">
+              <Bell className="h-8 w-8" />
               Notification Center
             </h1>
           </div>

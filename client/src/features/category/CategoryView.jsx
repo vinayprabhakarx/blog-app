@@ -110,10 +110,12 @@ const CategoriesView = () => {
     return (
       <div className="p-6 space-y-6">
         <div className="text-center p-8">
-          <Tag className="h-16 w-16 mx-auto mb-4 text-muted-foreground/60" />
-          <h2 className="text-xl font-semibold mb-2 text-muted-foreground">
-            No Categories Yet
-          </h2>
+          <div className="flex items-center justify-center gap-3 mb-4">
+            <Tag className="h-8 w-8 text-muted-foreground/60" />
+            <h2 className="text-xl font-semibold text-muted-foreground">
+              No Categories Yet
+            </h2>
+          </div>
           <p className="text-muted-foreground max-w-md mx-auto">
             Categories will appear here once they are created. Check back later
             for organized content.
@@ -126,8 +128,11 @@ const CategoriesView = () => {
   return (
     <div className="p-6 space-y-6">
       {/* Header with Stats */}
-      <div className="text-center">
-        <h1 className="text-3xl md:text-4xl font-bold mb-2">Categories</h1>
+      <div className="text-center mb-8">
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <Tag className="h-8 w-8" />
+          <h1 className="text-3xl md:text-4xl font-bold">Categories</h1>
+        </div>
         <div className="flex justify-center gap-4 text-sm text-muted-foreground">
           <span>{categoryStats.total} categories</span>
           <span>•</span>
@@ -219,20 +224,25 @@ const CategoriesView = () => {
       {/* Categories Cards - Mobile/Tablet */}
       <div className="lg:hidden space-y-4">
         {sortedCategories.map((category) => (
-          <Card key={category._id} className="hover:shadow-md transition-shadow">
+          <Card
+            key={category._id}
+            className="hover:shadow-md transition-shadow"
+          >
             <CardContent className="p-4">
               <div className="space-y-3">
                 {/* Category Header */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
                     <Tag className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                    <span 
+                    <span
                       className="font-medium text-lg hover:text-primary transition-colors cursor-pointer"
                       onClick={() => handleCategoryClick(category.slug)}
                       onKeyDown={(e) => handleKeyDown(e, category.slug)}
                       tabIndex={0}
                       role="button"
-                      aria-label={`Navigate to ${category.name} category with ${category.articleCount || 0} articles`}
+                      aria-label={`Navigate to ${category.name} category with ${
+                        category.articleCount || 0
+                      } articles`}
                       title={`View all posts in ${category.name}`}
                     >
                       {category.name}
@@ -246,8 +256,12 @@ const CategoriesView = () => {
                 {/* Category Stats */}
                 <div className="flex items-center justify-between text-sm text-muted-foreground">
                   <div className="flex items-center gap-1">
-                    <span className="font-medium">{category.articleCount || 0}</span>
-                    <span>{category.articleCount === 1 ? "article" : "articles"}</span>
+                    <span className="font-medium">
+                      {category.articleCount || 0}
+                    </span>
+                    <span>
+                      {category.articleCount === 1 ? "article" : "articles"}
+                    </span>
                   </div>
                   {category.featured && (
                     <span className="text-amber-600 font-medium">Featured</span>

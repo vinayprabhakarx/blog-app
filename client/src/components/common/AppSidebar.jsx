@@ -129,7 +129,6 @@ const NAVIGATION_SECTIONS = {
     items: ["analytics", "users"],
     showFor: ["admin"],
     icon: FaShieldAlt,
-    className: "text-red-600 dark:text-red-400",
   },
   account: {
     label: "Account",
@@ -250,18 +249,18 @@ const AppSidebar = () => {
             to={item.path}
             className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${
               isActive
-                ? "bg-red-50 text-red-600 dark:bg-red-900/20 dark:text-red-400 font-medium shadow-sm"
+                ? "bg-primary/10 font-medium shadow-sm"
                 : "text-foreground/80 hover:text-foreground"
             }`}
           >
             <IconComponent
               className={`w-5 h-5 ${
-                isActive
-                  ? "text-red-600 dark:text-red-400"
-                  : "text-foreground/70"
+                isActive ? "text-red-500" : "text-foreground/70"
               }`}
             />
-            <span className="text-sm">{item.title}</span>
+            <span className={`text-sm ${isActive ? "text-primary" : ""}`}>
+              {item.title}
+            </span>
           </Link>
         </SidebarMenuButton>
       </SidebarMenuItem>

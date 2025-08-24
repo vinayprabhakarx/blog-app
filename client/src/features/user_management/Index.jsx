@@ -1,6 +1,6 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
-import AdminHome from "./AdminHome";
+import { Navigate } from "react-router-dom";
 import { fetchAllBlogs as fetchBlogs } from "../blog/blogSlice";
 import { Link } from "react-router-dom";
 import {
@@ -22,9 +22,9 @@ const Index = () => {
     dispatch(fetchBlogs({ page: 1, limit: 6 })); // Load first 6 blogs
   }, [dispatch]);
 
-  // If user is logged in and is admin, show admin home
+  // If user is logged in and is admin, redirect to dashboard
   if (user.isLoggedIn && user.user?.role === "admin") {
-    return <AdminHome />;
+    return <Navigate to="/dashboard" replace />;
   }
 
   // For regular users and non-logged-in users, show regular home

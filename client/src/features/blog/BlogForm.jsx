@@ -14,6 +14,7 @@ import BlogEditor from "./BlogEditor";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { createBlog, updateBlog } from "./blogSlice";
+import { FaPen } from "react-icons/fa";
 import { fetchAllCategories } from "../category/categoriesSlice";
 import { useCategories } from "../../hooks/useRedux";
 import LoadingButton from "../../components/common/LoadingButton";
@@ -369,11 +370,16 @@ const BlogForm = ({ existingBlog }) => {
   const isSavingDraft = Boolean(formData.draft === true);
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-6 text-center">
-        {isEditing ? "Edit Blog" : "Add Blog"}
-      </h1>
-      <Card className="pt-5">
+    <div className="p-6">
+      <div className="text-center mb-8">
+        <div className="flex items-center justify-center gap-3 mb-2">
+          <FaPen className="h-6 w-6 md:h-8 md:w-8" />
+          <h1 className="text-2xl md:text-3xl font-bold">
+            {isEditing ? "Edit Blog" : "Create Blog"}
+          </h1>
+        </div>
+      </div>
+      <Card>
         <CardContent>
           <form onSubmit={handleSubmit}>
             <div className="mb-3">

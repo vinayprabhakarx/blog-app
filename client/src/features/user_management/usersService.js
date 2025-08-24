@@ -59,6 +59,24 @@ const userService = {
     const response = await api.delete(`/users/remove-profile-image/${userId}`);
     return response.data;
   },
+
+  // Get admin statistics
+  getAdminStats: async () => {
+    const response = await api.get("/users/admin/stats");
+    return response.data;
+  },
+
+  // Get monthly performance data
+  getMonthlyPerformance: async () => {
+    const response = await api.get("/users/admin/monthly-performance");
+    return response.data;
+  },
+
+  // Get recent activities
+  getRecentActivities: async () => {
+    const response = await api.get("/users/admin/recent-activities");
+    return response.data;
+  },
 };
 
 export default userService;
