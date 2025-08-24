@@ -39,11 +39,27 @@ const Topbar = React.memo(() => {
 
   const { theme } = useTheme();
 
+  // Memoize user data to prevent unnecessary re-renders
+  const userData = useMemo(() => ({
+    name: getUserName(),
+    email: getUserEmail(),
+    avatar: getUserAvatar()
+  }), [getUserName, getUserEmail, getUserAvatar]);
+
   // Memoize logo based on theme
   const currentLogoMemo = useMemo(
     () => (theme === "dark" ? logoDark : logoLight),
     [theme]
   );
+
+  // Memoize logo style to prevent recreation
+  const logoStyle = useMemo(() => ({
+    height: "80px",
+    minHeight: "80px",
+    width: "auto",
+    minWidth: "auto",
+    maxWidth: "none",
+  }), []);
 
   useEffect(() => {
     setCurrentLogo(currentLogoMemo);
@@ -89,13 +105,7 @@ const Topbar = React.memo(() => {
               src={currentLogo}
               alt="Logo"
               className="object-contain transition-opacity duration-300"
-              style={{
-                height: "80px",
-                minHeight: "80px",
-                width: "auto",
-                minWidth: "auto",
-                maxWidth: "none",
-              }}
+              style={logoStyle}
             />
           </Link>
 
@@ -108,13 +118,7 @@ const Topbar = React.memo(() => {
               src={currentLogo}
               alt="Logo"
               className="object-contain transition-opacity duration-300"
-              style={{
-                height: "80px",
-                minHeight: "80px",
-                width: "auto",
-                minWidth: "auto",
-                maxWidth: "none",
-              }}
+              style={logoStyle}
             />
           </Link>
         </div>

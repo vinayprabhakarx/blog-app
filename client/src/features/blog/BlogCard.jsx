@@ -1,8 +1,12 @@
 import React, { useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Avatar } from "../../components/ui/avatar";
-import { Calendar, Clock, User2 } from "lucide-react";
+import { Calendar, Clock, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import {
+  Avatar,
+  AvatarFallback,
+  AvatarImage,
+} from "../../components/ui/avatar";
 
 const BlogCard = React.memo(
   ({ blog, variant = "default", showAuthor = true, className, ...props }) => {
@@ -29,6 +33,52 @@ const BlogCard = React.memo(
       return cleanText.substring(0, maxLength).trim() + "...";
     }, []);
 
+    // Memoize computed values
+    const blogSlug = useMemo(() => blog?.slug, [blog?.slug]);
+    const blogTitle = useMemo(() => blog?.title, [blog?.title]);
+    const blogBanner = useMemo(() => blog?.banner, [blog?.banner]);
+    const blogCreatedAt = useMemo(() => blog?.createdAt, [blog?.createdAt]);
+    const blogContent = useMemo(() => blog?.content, [blog?.content]);
+    const blogExcerpt = useMemo(() => blog?.excerpt, [blog?.excerpt]);
+
+    // Memoize author data
+    const authorData = useMemo(
+      () => ({
+        avatar:
+          blog?.author?.personal_info?.profile_img || blog?.author?.avatar,
+        username:
+          blog?.author?.personal_info?.username ||
+          blog?.author?.username ||
+          "anonymous",
+        displayName:
+          blog?.author?.name ||
+          blog?.author?.personal_info?.username ||
+          "Anonymous",
+        altText: blog?.author?.personal_info?.username || "Author",
+      }),
+      [blog?.author]
+    );
+
+    // Memoize computed display values
+    const formattedDate = useMemo(
+      () => formatDate(blogCreatedAt),
+      [formatDate, blogCreatedAt]
+    );
+    const readTime = useMemo(
+      () => calculateReadTime(blogContent),
+      [calculateReadTime, blogContent]
+    );
+    const excerptText = useMemo(() => {
+      const maxLength = variant === "compact" ? 100 : 150;
+      return truncateText(blogExcerpt || blogContent, maxLength);
+    }, [truncateText, blogExcerpt, blogContent, variant]);
+
+    // Memoize image source
+    const imageSrc = useMemo(() => {
+      if (!blogBanner) return null;
+      return blogBanner.startsWith("http") ? blogBanner : `/api${blogBanner}`;
+    }, [blogBanner]);
+
     // Memoize image variants
     const imageVariants = useMemo(
       () => ({
@@ -50,8 +100,8 @@ const BlogCard = React.memo(
         {...props}
       >
         {/* Featured Image */}
-        {blog.banner && (
-          <Link to={`/blog/${blog.slug}`} className="block">
+        {blogBanner && imageSrc && (
+          <Link to={`/blog/${blogSlug}`} className="block">
             <div
               className={cn(
                 "relative overflow-hidden bg-muted rounded-lg border border-border/50 mb-3 sm:mb-4 cursor-pointer",
@@ -59,12 +109,8 @@ const BlogCard = React.memo(
               )}
             >
               <img
-                src={
-                  blog.banner.startsWith("http")
-                    ? blog.banner
-                    : `/api${blog.banner}`
-                }
-                alt={blog.title}
+                src={imageSrc}
+                alt={blogTitle}
                 className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
                 loading="lazy"
                 onError={handleImageError}
@@ -97,9 +143,7 @@ const BlogCard = React.memo(
         {/* Read time on mobile (since it's hidden in image overlay) */}
         <div className="flex items-center gap-1 sm:hidden mb-2">
           <Clock className="w-3 h-3" />
-          <span className="text-xs text-muted-foreground">
-            {calculateReadTime(blog.content)}
-          </span>
+          <span className="text-xs text-muted-foreground">{readTime}</span>
         </div>
 
         {/* Content */}
@@ -110,7 +154,7 @@ const BlogCard = React.memo(
           )}
         >
           {/* Title - Clickable */}
-          <Link to={`/blog/${blog.slug}`} className="block">
+          <Link to={`/blog/${blogSlug}`} className="block">
             <h3
               className={cn(
                 "font-bold text-foreground line-clamp-2 group-hover:text-primary transition-colors duration-200 cursor-pointer",
@@ -121,7 +165,7 @@ const BlogCard = React.memo(
                 variant === "compact" && "text-base sm:text-lg lg:text-xl"
               )}
             >
-              {blog.title}
+              {blogTitle}
             </h3>
           </Link>
 
@@ -131,36 +175,19 @@ const BlogCard = React.memo(
               <div className="flex items-center gap-2 sm:gap-3">
                 {/* Author Avatar */}
                 <Avatar className="h-5 w-5 sm:h-6 sm:w-6">
-                  {blog.author?.personal_info?.profile_img ||
-                  blog.author?.avatar ? (
-                    <img
-                      src={
-                        blog.author?.personal_info?.profile_img ||
-                        blog.author?.avatar
-                      }
-                      alt={blog.author.personal_info.username || "Author"}
-                      className="h-full w-full object-cover"
-                    />
-                  ) : (
-                    <div className="h-full w-full bg-primary/10 flex items-center justify-center">
-                      <User2 className="h-3 w-3 sm:h-3 sm:w-3 text-primary" />
-                    </div>
-                  )}
+                  <AvatarImage src={authorData.avatar} />
+                  <AvatarFallback>
+                    <User className="h-3 w-3 sm:h-3 sm:w-3" />
+                  </AvatarFallback>
                 </Avatar>
 
                 {/* Author Name */}
                 <Link
-                  to={`/${
-                    blog.author?.personal_info?.username ||
-                    blog.author?.username ||
-                    "anonymous"
-                  }`}
+                  to={`/${authorData.username}`}
                   className="text-xs sm:text-sm font-medium text-muted-foreground truncate hover:text-primary transition-colors duration-200"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  {blog.author?.name ||
-                    blog.author?.personal_info?.username ||
-                    "Anonymous"}
+                  {authorData.displayName}
                 </Link>
               </div>
 
@@ -168,7 +195,7 @@ const BlogCard = React.memo(
               <div className="flex items-center gap-1 flex-shrink-0">
                 <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
                 <span className="text-xs sm:text-sm text-muted-foreground">
-                  {formatDate(blog.createdAt)}
+                  {formattedDate}
                 </span>
               </div>
             </div>
@@ -181,10 +208,7 @@ const BlogCard = React.memo(
               variant === "compact" && "line-clamp-2 text-sm"
             )}
           >
-            {truncateText(
-              blog.excerpt || blog.content,
-              variant === "compact" ? 100 : 150
-            )}
+            {excerptText}
           </p>
         </div>
 

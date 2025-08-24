@@ -11,7 +11,6 @@ import { useDispatch, useSelector } from "react-redux";
 import { Filter } from "lucide-react";
 import BlogCard from "../features/blog/BlogCard";
 import Pagination from "../components/common/Pagination";
-import LoadingSpinner from "../components/common/LoadingSpinner";
 
 import {
   fetchAllBlogs,
@@ -40,7 +39,9 @@ const HomePage = React.memo(() => {
   const initialPage = parseInt(searchParams.get("page"), 10) || 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
   const [showCategoryMenu, setShowCategoryMenu] = useState(false);
-  const postsPerPage = 9;
+
+  // Memoize constants to prevent recreation
+  const postsPerPage = useMemo(() => 9, []);
 
   // Memoize refs to prevent recreation
   const hasFetchedCategoriesRef = useRef(false);
@@ -55,6 +56,35 @@ const HomePage = React.memo(() => {
     () => blogPagination?.totalBlogs || allBlogs.length,
     [blogPagination?.totalBlogs, allBlogs.length]
   );
+
+  // Memoize URL parameter extraction
+  const urlParams = useMemo(
+    () => ({
+      page: parseInt(searchParams.get("page"), 10) || 1,
+      category: searchParams.get("category") || "all",
+    }),
+    [searchParams]
+  );
+
+  // Memoize selected category data
+  const selectedCategoryData = useMemo(() => {
+    if (selectedCategory === "all") return null;
+    return categories.find((cat) => cat.slug === selectedCategory);
+  }, [categories, selectedCategory]);
+
+  // Memoize API parameters for blog fetching
+  const blogFetchParams = useMemo(() => {
+    const params = {
+      page: currentPage,
+      limit: postsPerPage,
+    };
+
+    if (selectedCategoryData) {
+      params.category = selectedCategoryData._id;
+    }
+
+    return params;
+  }, [currentPage, postsPerPage, selectedCategoryData]);
 
   useEffect(() => {
     // Fetch categories only once on mount
@@ -72,59 +102,40 @@ const HomePage = React.memo(() => {
       hasFetchedCategoriesRef.current = true;
     }
 
-    // Fetch blogs with current parameters
-    const params = {
-      page: currentPage,
-      limit: postsPerPage,
-    };
-
-    if (selectedCategory !== "all") {
-      const categoryData = categories.find(
-        (cat) => cat.slug === selectedCategory
-      );
-      if (categoryData) {
-        params.category = categoryData._id;
-      }
-    }
-
-    dispatch(fetchAllBlogs(params));
-  }, [
-    dispatch,
-    currentPage,
-    selectedCategory,
-    postsPerPage,
-    categories,
-  ]);
+    // Use memoized parameters for blog fetching
+    dispatch(fetchAllBlogs(blogFetchParams));
+  }, [dispatch, blogFetchParams, categories]);
 
   useEffect(() => {
     setCurrentPage(1);
   }, [selectedCategory]);
 
   useEffect(() => {
-    const pageFromUrl = parseInt(searchParams.get("page"), 10) || 1;
-    const categoryFromUrl = searchParams.get("category") || "all";
-
-    // Only update state if the URL values are different from current state
-    if (pageFromUrl !== currentPage) {
-      setCurrentPage(pageFromUrl);
+    // Use memoized URL parameters
+    if (urlParams.page !== currentPage) {
+      setCurrentPage(urlParams.page);
     }
-    if (categoryFromUrl !== selectedCategory) {
-      setSelectedCategory(categoryFromUrl);
+    if (urlParams.category !== selectedCategory) {
+      setSelectedCategory(urlParams.category);
     }
-  }, [searchParams]); // Remove currentPage and selectedCategory from dependencies
+  }, [urlParams, currentPage, selectedCategory]);
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
+  // Memoize click outside handler
+  const handleClickOutside = useCallback(
+    (event) => {
       if (showCategoryMenu && !event.target.closest("[data-dropdown]")) {
         setShowCategoryMenu(false);
       }
-    };
+    },
+    [showCategoryMenu]
+  );
 
+  useEffect(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => {
       document.removeEventListener("mousedown", handleClickOutside);
     };
-  }, [showCategoryMenu]);
+  }, [handleClickOutside]);
 
   // Simplified pagination handler - no need to update URL since it's handled by state sync
   const handlePageChange = useCallback(
@@ -167,16 +178,11 @@ const HomePage = React.memo(() => {
     return displayCategories.filter((category) => category.articleCount > 0);
   }, [displayCategories]);
 
-  // Show loading spinner while data is being fetched
-  if (blogLoading.allBlogs || categoriesLoading) {
-    return (
-      <div className="min-h-screen bg-background text-foreground">
-        <div className="flex justify-center items-center min-h-[50vh]">
-          <LoadingSpinner size="lg" message="Loading content..." />
-        </div>
-      </div>
-    );
-  }
+  // Memoize selected category display name for mobile dropdown
+  const selectedCategoryDisplayName = useMemo(() => {
+    if (selectedCategory === "all") return "All Categories";
+    return selectedCategoryData?.name || "Select Category";
+  }, [selectedCategory, selectedCategoryData]);
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -229,12 +235,7 @@ const HomePage = React.memo(() => {
                   data-dropdown
                 >
                   <Filter className="w-4 h-4" />
-                  <span>
-                    {selectedCategory === "all"
-                      ? "All Categories"
-                      : categories.find((cat) => cat.slug === selectedCategory)
-                          ?.name || "Select Category"}
-                  </span>
+                  <span>{selectedCategoryDisplayName}</span>
                 </button>
                 {showCategoryMenu && (
                   <div
@@ -289,7 +290,13 @@ const HomePage = React.memo(() => {
       <main className="container mx-auto px-6 py-8">
         {/* Blog Grid */}
         <section className="mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div
+            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-300 ${
+              blogLoading.allBlogs
+                ? "opacity-50 pointer-events-none"
+                : "opacity-100"
+            }`}
+          >
             {allBlogs.map((blog) => (
               <BlogCard key={blog._id} blog={blog} />
             ))}

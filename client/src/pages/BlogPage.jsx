@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
-import { useParams } from "react-router-dom";
+import { useParams, Link } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { cn } from "@/lib/utils";
 // Redux and hooks
@@ -11,7 +11,6 @@ import { MessageCircle, MessageCircleOff } from "lucide-react";
 import BlogHeader from "../features/blog/BlogHeader";
 import BlogDisplay from "../features/blog/BlogDisplay";
 import { CommentSection } from "../features/comment";
-import LoadingSpinner from "../components/common/LoadingSpinner";
 import NotFound from "../components/common/NotFound";
 
 const BlogPage = React.memo(() => {
@@ -21,15 +20,38 @@ const BlogPage = React.memo(() => {
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const [showComments, setShowComments] = useState(false);
 
+  // Memoize blog data for stable references
+  const blogData = useMemo(() => ({
+    id: currentBlog?._id,
+    title: currentBlog?.title,
+    category: currentBlog?.category,
+    author: currentBlog?.author,
+    activity: currentBlog?.activity,
+    draft: currentBlog?.draft
+  }), [currentBlog]);
+
   // Memoize user authentication check
   const isAuthorized = useMemo(() => {
-    if (!currentBlog?.draft) return true;
+    if (!blogData.draft) return true;
     if (!isAuthenticated || !user) return false;
     return (
       user.role === "admin" ||
-      (user._id || user.id) === (currentBlog.author?._id || currentBlog.author)
+      (user._id || user.id) === (blogData.author?._id || blogData.author)
     );
-  }, [currentBlog?.draft, currentBlog?.author, isAuthenticated, user]);
+  }, [blogData.draft, blogData.author, isAuthenticated, user]);
+
+  // Memoize comment data
+  const commentData = useMemo(() => ({
+    count: blogData.activity?.total_comments || 0,
+    categoryId: blogData.category?._id || blogData.category || "uncategorized"
+  }), [blogData.activity, blogData.category]);
+
+  // Memoize breadcrumb data
+  const breadcrumbData = useMemo(() => ({
+    categoryName: blogData.category?.name || blogData.category?.slug || "Category",
+    categorySlug: blogData.category?.slug || blogData.category,
+    title: blogData.title
+  }), [blogData.category, blogData.title]);
 
   useEffect(() => {
     if (id) {
@@ -41,26 +63,40 @@ const BlogPage = React.memo(() => {
   }, [slug, id, dispatch]);
 
   // Memoize callback functions
-  const toggleComments = useCallback(() => {
+  const toggleComments = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
     setShowComments((prev) => !prev);
   }, []);
 
-  const handleCommentClick = useCallback(() => {
+  const handleCommentClick = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    // Always show comments when clicked from header
     if (!showComments) {
       setShowComments(true);
+      // Scroll to comments after they're shown
+      setTimeout(() => {
+        const commentSection = document.getElementById("comment-section");
+        if (commentSection) {
+          commentSection.scrollIntoView({
+            behavior: "smooth",
+            block: "start",
+          });
+        }
+      }, 200);
+    } else {
+      // If comments are already shown, just scroll to them
+      const commentSection = document.getElementById("comment-section");
+      if (commentSection) {
+        commentSection.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
+      }
     }
   }, [showComments]);
-
-  // Loading state
-  if (currentBlogLoading) {
-    return (
-      <div className="min-h-screen bg-background">
-        <div className="flex justify-center items-center min-h-[50vh]">
-          <LoadingSpinner size="lg" message="Loading blog post..." />
-        </div>
-      </div>
-    );
-  }
 
   // Error state
   if (currentBlogError) {
@@ -74,12 +110,12 @@ const BlogPage = React.memo(() => {
     );
   }
 
-  // No blog found (show loader first navigation frame to avoid flicker)
+  // No blog found - just return null or empty div instead of loading spinner
   if (!currentBlog) {
     return (
       <div className="min-h-screen bg-background">
         <div className="flex justify-center items-center min-h-[50vh]">
-          <LoadingSpinner size="lg" message="Loading blog post..." />
+          {/* Blog content will appear here once loaded */}
         </div>
       </div>
     );
@@ -108,36 +144,32 @@ const BlogPage = React.memo(() => {
         >
           <ol className="flex items-center gap-2 text-muted-foreground">
             <li>
-              <a href="/" className="hover:underline">
+              <Link to="/" className="hover:underline">
                 Home
-              </a>
+              </Link>
             </li>
             <li>/</li>
             <li>
-              <a href="/blogs" className="hover:underline">
+              <Link to="/blogs" className="hover:underline">
                 Blogs
-              </a>
+              </Link>
             </li>
-            {currentBlog?.category && (
+            {blogData.category && (
               <>
                 <li>/</li>
                 <li>
-                  <a
-                    href={`/category/${
-                      currentBlog.category?.slug || currentBlog.category
-                    }`}
+                  <Link
+                    to={`/category/${breadcrumbData.categorySlug}`}
                     className="hover:underline"
                   >
-                    {currentBlog.category?.name ||
-                      currentBlog.category?.slug ||
-                      "Category"}
-                  </a>
+                    {breadcrumbData.categoryName}
+                  </Link>
                 </li>
               </>
             )}
             <li>/</li>
-            <li className="truncate max-w-[40ch]" title={currentBlog?.title}>
-              {currentBlog?.title}
+            <li className="truncate max-w-[40ch]" title={breadcrumbData.title}>
+              {breadcrumbData.title}
             </li>
           </ol>
         </nav>
@@ -155,9 +187,7 @@ const BlogPage = React.memo(() => {
                 aria-label={
                   showComments
                     ? "Hide comments"
-                    : `Show ${
-                        currentBlog?.activity?.total_comments || 0
-                      } comments`
+                    : `Show ${commentData.count} comments`
                 }
               >
                 {showComments ? (
@@ -169,10 +199,7 @@ const BlogPage = React.memo(() => {
                   <>
                     <MessageCircle className="w-5 h-5" />
                     <span>
-                      {currentBlog?.activity?.total_comments || 0}{" "}
-                      {currentBlog?.activity?.total_comments === 1
-                        ? "Comment"
-                        : "Comments"}
+                      {commentData.count} {commentData.count === 1 ? "Comment" : "Comments"}
                     </span>
                   </>
                 )}
@@ -186,12 +213,8 @@ const BlogPage = React.memo(() => {
       {showComments && (
         <div id="comment-section" className="w-full px-4 sm:px-6 pb-8 sm:pb-12">
           <CommentSection
-            blogId={currentBlog._id}
-            categoryId={
-              currentBlog.category?._id ||
-              currentBlog.category ||
-              "uncategorized"
-            }
+            blogId={blogData.id}
+            categoryId={commentData.categoryId}
             showCreateForm={true}
             maxNestingLevel={2}
             className="border-border p-6"

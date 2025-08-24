@@ -8,8 +8,6 @@ import { refreshNotificationsAfterAction } from "../../utils/notificationRefresh
 import {
   createComment,
   updateComment,
-  selectCreateCommentLoading,
-  selectUpdateCommentLoading,
   clearCreateError,
   clearUpdateError,
 } from "./commentsSlice";
@@ -25,10 +23,7 @@ const CommentForm = ({
   onSuccess = null,
 }) => {
   const dispatch = useDispatch();
-  const createLoading = useSelector(selectCreateCommentLoading);
-  const updateLoading = useSelector((state) =>
-    selectUpdateCommentLoading(state, commentId)
-  );
+  // Removed loading selectors for instant UI updates
 
   const [content, setContent] = useState(initialContent);
   const [userSuggestions, setUserSuggestions] = useState([]);
@@ -37,7 +32,8 @@ const CommentForm = ({
   const [mentionStartPos, setMentionStartPos] = useState(-1);
   const textareaRef = useRef(null);
 
-  const isLoading = mode === "edit" ? updateLoading : createLoading;
+  // Removed loading states for instant UI updates
+  const isLoading = false; // Always false for instant interactions
   const isValid = content.trim().length > 0 && content.trim().length <= 1000;
 
   useEffect(() => {
@@ -164,7 +160,7 @@ const CommentForm = ({
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!isValid || isLoading) {
+    if (!isValid) {
       return;
     }
 
@@ -213,7 +209,7 @@ const CommentForm = ({
   };
 
   return (
-    <div className="relative flex items-center gap-2 w-full max-w-md">
+    <form onSubmit={handleSubmit} className="relative flex items-center gap-2 w-full max-w-md">
       <div className="flex-1 min-w-0 bg-muted rounded-full flex items-center pr-1 sm:pr-2 h-8 sm:h-9">
         <input
           ref={textareaRef}
@@ -224,15 +220,15 @@ const CommentForm = ({
           placeholder={placeholder}
           className="flex-1 min-w-0 text-sm px-3 py-1 sm:px-4 sm:py-1.5 bg-transparent border-none outline-none placeholder-muted-foreground text-foreground"
           maxLength={1000}
-          disabled={isLoading}
+          disabled={false}
         />
         {content.trim() && (
           <button
-            onClick={handleSubmit}
-            disabled={!isValid || isLoading}
+            type="submit"
+            disabled={!isValid}
             className={cn(
               "p-1 sm:p-1.5 rounded-full transition-all touch-manipulation flex-shrink-0",
-              isValid && !isLoading
+              isValid
                 ? "text-primary hover:text-primary/80 hover:bg-primary/10 active:scale-95"
                 : "text-muted-foreground cursor-not-allowed"
             )}
@@ -279,7 +275,7 @@ const CommentForm = ({
           ))}
         </div>
       )}
-    </div>
+    </form>
   );
 };
 

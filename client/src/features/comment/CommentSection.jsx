@@ -9,14 +9,13 @@ import {
   AvatarImage,
   AvatarFallback,
 } from "../../components/ui/avatar";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
+// Removed LoadingSpinner for instant updates
 
 import Comment from "./Comment";
 import CommentForm from "./CommentForm";
 import {
   fetchBlogComments,
   selectCommentsByBlog,
-  selectCommentsLoading,
   selectCommentsError,
   selectTotalCommentsCount,
 } from "./commentsSlice";
@@ -30,18 +29,19 @@ const CommentSection = ({
 }) => {
   const dispatch = useDispatch();
   const comments = useSelector((state) => selectCommentsByBlog(state, blogId));
-  const loading = useSelector((state) => selectCommentsLoading(state, blogId));
+  // Removed loading state for instant updates
   const error = useSelector((state) => selectCommentsError(state, blogId));
   const totalComments = useSelector((state) =>
     selectTotalCommentsCount(state, blogId)
   );
   const currentUser = useSelector((state) => state.auth.user);
 
+  // Load comments immediately when component mounts, but only if not already cached
   useEffect(() => {
-    if (blogId) {
+    if (blogId && comments.length === 0) {
       dispatch(fetchBlogComments({ blogId }));
     }
-  }, [dispatch, blogId]);
+  }, [dispatch, blogId, comments.length]);
 
   const topLevelComments = comments.filter((comment) => !comment.parent);
 
@@ -55,15 +55,7 @@ const CommentSection = ({
       .slice(0, 2);
   };
 
-  if (loading) {
-    return (
-      <div className={cn("py-6", className)}>
-        <div className="flex items-center justify-center py-12">
-          <LoadingSpinner size="sm" />
-        </div>
-      </div>
-    );
-  }
+  // No loading spinners - comments appear instantly
 
   return (
     <div className={cn("w-full space-y-4", className)}>
@@ -153,8 +145,7 @@ const CommentSection = ({
             ))}
         </div>
       ) : (
-        !loading && (
-          <div className="py-6">
+        <div className="py-6">
             <div className="flex flex-col items-center text-center">
               <div className="w-14 h-14 mb-3 rounded-full bg-muted/50 dark:bg-muted/20 flex items-center justify-center">
                 <Link to="/login">
@@ -174,7 +165,6 @@ const CommentSection = ({
               </Link>
             </div>
           </div>
-        )
       )}
     </div>
   );

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { formatDistanceToNow } from "date-fns";
 import {
@@ -31,10 +31,8 @@ import ReportDialog from "./ReportDialog";
 import {
   selectEditingComment,
   selectReplyingTo,
-  selectDeleteCommentLoading,
   selectCommentLikeCount,
   selectCommentUserLikeStatus,
-  selectCommentLikeLoading,
   selectCommentUserReportStatus,
   toggleCommentLike,
   setEditingComment,
@@ -42,7 +40,7 @@ import {
   deleteComment,
 } from "./commentsSlice";
 
-const Comment = ({
+const Comment = React.memo(({
   comment,
   blogId,
   categoryId = "uncategorized",
@@ -52,6 +50,44 @@ const Comment = ({
 }) => {
   const dispatch = useDispatch();
   const currentUser = useSelector((state) => state.auth.user);
+
+  // Memoize comment data for stable references
+  const commentData = useMemo(() => ({
+    id: comment._id,
+    content: comment.content,
+    commentedAt: comment.commented_at,
+    taggedUsers: comment.tagged_users || [],
+    commentedBy: comment.commented_by,
+    children: comment.children || [],
+    blogId: comment.blog_id,
+    reports: comment.reports || []
+  }), [comment]);
+
+  // Memoize author data
+  const authorData = useMemo(() => {
+    const author = commentData.commentedBy;
+    return {
+      id: author?._id,
+      username: author?.personal_info?.username,
+      name: author?.personal_info?.name,
+      profileImg: author?.personal_info?.profile_img,
+      displayName: author?.personal_info?.name || author?.personal_info?.username || "User"
+    };
+  }, [commentData.commentedBy]);
+
+  // Memoize permissions
+  const permissions = useMemo(() => {
+    const canEdit = currentUser && commentData.commentedBy && 
+      commentData.commentedBy._id === currentUser._id;
+    
+    const canDelete = currentUser && commentData.commentedBy && (
+      commentData.commentedBy._id === currentUser._id ||
+      currentUser.role === "admin" ||
+      (currentUser.role === "author" && commentData.blogId?.author === currentUser._id)
+    );
+    
+    return { canEdit, canDelete };
+  }, [currentUser, commentData.commentedBy, commentData.blogId]);
 
   // Render comment content with clickable @mentions
   const renderCommentContent = (content, taggedUsers = []) => {
@@ -106,17 +142,11 @@ const Comment = ({
   };
   const editingComment = useSelector(selectEditingComment);
   const replyingTo = useSelector(selectReplyingTo);
-  const deleteLoading = useSelector((state) =>
-    selectDeleteCommentLoading(state, comment._id)
-  );
   const isLiked = useSelector((state) =>
     selectCommentUserLikeStatus(state, comment._id)
   );
   const likeCount = useSelector((state) =>
     selectCommentLikeCount(state, comment._id)
-  );
-  const likeLoading = useSelector((state) =>
-    selectCommentLikeLoading(state, comment._id)
   );
   const hasReported = useSelector((state) =>
     selectCommentUserReportStatus(state, comment._id)
@@ -125,66 +155,24 @@ const Comment = ({
   const [showReportDialog, setShowReportDialog] = useState(false);
   const [showReplies, setShowReplies] = useState(false);
 
-  const isEditing = editingComment === comment._id;
-  const isReplying = replyingTo === comment._id;
-  // Edit permissions: Only comment owner can edit their own comments
-  const canEdit =
-    currentUser &&
-    comment.commented_by &&
-    comment.commented_by._id === currentUser._id;
+  // Memoize computed state values
+  const computedState = useMemo(() => ({
+    isEditing: editingComment === commentData.id,
+    isReplying: replyingTo === commentData.id,
+    hasReplies: commentData.children.length > 0
+  }), [editingComment, replyingTo, commentData.id, commentData.children.length]);
 
-  // Delete permissions: More complex based on role and context
-  const canDelete =
-    currentUser &&
-    comment.commented_by &&
-    (comment.commented_by._id === currentUser._id || // Own comment
-      currentUser.role === "admin" || // Admin can delete any comment
-      (currentUser.role === "author" &&
-        comment.blog_id?.author === currentUser._id)); // Author can delete comments on their own blogs
-  const hasReplies = comment.children && comment.children.length > 0;
-
-  const handleLike = () => {
-    if (!currentUser) return;
-    dispatch(
-      toggleCommentLike({
-        commentId: comment._id,
-      })
-    );
-    // Refresh notifications after like action
-    refreshNotificationsAfterAction();
-  };
-
-  const handleReply = () => {
-    if (isReplying) {
-      dispatch(setReplyingTo(null));
-    } else {
-      dispatch(setReplyingTo(comment._id));
-    }
-  };
-
-  const handleEdit = () => {
-    dispatch(setEditingComment(comment._id));
-  };
-
-  const handleDelete = () => {
-    dispatch(deleteComment(comment._id));
-  };
-
-  const handleReport = () => {
-    if (hasReported) return;
-    setShowReportDialog(true);
-  };
-
-  const getInitials = (name) => {
+  // Memoize utility functions
+  const getInitials = useCallback((name) => {
     return name
       .split(" ")
       .map((word) => word[0])
       .join("")
       .toUpperCase()
       .slice(0, 2);
-  };
+  }, []);
 
-  const formatTimeAgo = (date) => {
+  const formatTimeAgo = useCallback((date) => {
     if (!date || isNaN(new Date(date))) return "now";
 
     const timeAgo = formatDistanceToNow(new Date(date), { addSuffix: true });
@@ -203,12 +191,59 @@ const Comment = ({
       .replace("months", "mo")
       .replace("year", "y")
       .replace("years", "y");
-  };
+  }, []);
 
-  // Instagram-style minimal indentation
-  const getIndentClass = (level) => {
+  const getIndentClass = useCallback((level) => {
     return level > 0 ? "ml-6 sm:ml-8 md:ml-10" : "";
-  };
+  }, []);
+
+  // Memoize event handlers
+  const handleLike = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!currentUser) return;
+    dispatch(
+      toggleCommentLike({
+        commentId: commentData.id,
+      })
+    );
+    refreshNotificationsAfterAction();
+  }, [currentUser, dispatch, commentData.id]);
+
+  const handleReply = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (computedState.isReplying) {
+      dispatch(setReplyingTo(null));
+    } else {
+      dispatch(setReplyingTo(commentData.id));
+    }
+  }, [dispatch, computedState.isReplying, commentData.id]);
+
+  const handleEdit = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch(setEditingComment(commentData.id));
+  }, [dispatch, commentData.id]);
+
+  const handleDelete = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    dispatch(deleteComment(commentData.id));
+  }, [dispatch, commentData.id]);
+
+  const handleReport = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    if (hasReported) return;
+    setShowReportDialog(true);
+  }, [hasReported]);
+
+  const handleShowReplies = useCallback((e) => {
+    e.preventDefault();
+    e.stopPropagation();
+    setShowReplies(prev => !prev);
+  }, []);
 
   return (
     <div className={cn("group relative", getIndentClass(level))}>
@@ -265,7 +300,7 @@ const Comment = ({
 
         {/* Content Container */}
         <div className="flex-1 min-w-0 w-full">
-          {isEditing ? (
+          {computedState.isEditing ? (
             /* Edit Mode */
             <div className="space-y-2">
               <CommentForm
@@ -302,11 +337,12 @@ const Comment = ({
                   </div>
 
                   {/* Like Button - positioned on username line */}
-                  {!isEditing && (
+                  {!computedState.isEditing && (
                     <div className="flex-shrink-0 flex items-center">
                       <button
+                        type="button"
                         onClick={handleLike}
-                        disabled={!currentUser || likeLoading}
+                        disabled={!currentUser}
                         className={cn(
                           "p-1.5 rounded-full transition-all duration-200 hover:bg-muted/50 cursor-pointer",
                           "disabled:cursor-not-allowed disabled:opacity-50",
@@ -373,10 +409,11 @@ const Comment = ({
                 {(instagramStyle || (!instagramStyle && level < maxLevel)) &&
                   currentUser && (
                     <button
+                      type="button"
                       onClick={handleReply}
                       className={cn(
                         "font-medium transition-colors hover:text-foreground cursor-pointer",
-                        isReplying && "text-foreground"
+                        computedState.isReplying && "text-foreground"
                       )}
                     >
                       Reply
@@ -387,13 +424,13 @@ const Comment = ({
                 {currentUser && (
                   <DropdownMenu>
                     <DropdownMenuTrigger asChild>
-                      <button className="p-1 rounded-full hover:bg-muted/50 transition-colors cursor-pointer">
+                      <button type="button" className="p-1 rounded-full hover:bg-muted/50 transition-colors cursor-pointer">
                         <MoreHorizontal className="h-4 w-4" />
                       </button>
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end" className="w-36">
                       {/* Edit option - only for comment owner */}
-                      {canEdit && (
+                      {permissions.canEdit && (
                         <DropdownMenuItem
                           onClick={handleEdit}
                           className="cursor-pointer text-sm"
@@ -404,19 +441,18 @@ const Comment = ({
                       )}
 
                       {/* Delete option - for comment owner or admin */}
-                      {canDelete && (
+                      {permissions.canDelete && (
                         <DropdownMenuItem
                           onClick={handleDelete}
                           className="cursor-pointer text-destructive focus:text-destructive text-sm"
-                          disabled={deleteLoading}
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
-                          {deleteLoading ? "Deleting..." : "Delete"}
+                          Delete
                         </DropdownMenuItem>
                       )}
 
                       {/* Report option - only for users who can't delete */}
-                      {!canDelete && (
+                      {!permissions.canDelete && (
                         <DropdownMenuItem
                           onClick={handleReport}
                           disabled={hasReported}
@@ -439,7 +475,7 @@ const Comment = ({
           )}
 
           {/* Reply Form */}
-          {isReplying && (
+          {computedState.isReplying && (
             <div className="mt-3 flex items-start gap-2">
               <Avatar className="h-8 w-8 flex-shrink-0">
                 <AvatarImage
@@ -469,10 +505,11 @@ const Comment = ({
       </div>
 
       {/* View/Hide Replies Toggle */}
-      {hasReplies && (
+      {computedState.hasReplies && (
         <div className="ml-8 mt-2">
           <button
-            onClick={() => setShowReplies(!showReplies)}
+            type="button"
+            onClick={handleShowReplies}
             className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors group cursor-pointer"
           >
             <div className="w-6 h-px bg-border group-hover:bg-muted-foreground/50 transition-colors" />
@@ -486,7 +523,7 @@ const Comment = ({
       )}
 
       {/* Instagram-style Replies */}
-      {hasReplies && showReplies && (
+      {computedState.hasReplies && showReplies && (
         <div className="mt-2 space-y-1">
           {comment.children?.map((reply) => {
             if (!reply || !reply._id) {
@@ -543,6 +580,6 @@ const Comment = ({
       />
     </div>
   );
-};
+});
 
 export default Comment;
