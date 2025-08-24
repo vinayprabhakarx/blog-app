@@ -305,7 +305,7 @@ const AppSidebar = () => {
 
   return (
     <Sidebar>
-      <SidebarContent className="bg-background text-foreground pt-20">
+      <SidebarContent className="bg-background text-foreground pt-4">
         {renderNavigationSection("main")}
         {renderNavigationSection("contentManagement")}
         {renderNavigationSection("admin")}

@@ -20,6 +20,7 @@ import ThemeToggle from "./ThemeToggle";
 import { logout } from "../../features/auth/authSlice";
 import { showToast } from "../../utils/showToast";
 import { AiOutlineMenu } from "react-icons/ai";
+import { IoClose } from "react-icons/io5";
 import { useSidebar } from "../ui/sidebar";
 import { RouteIndex, RouteProfile, RouteSignIn } from "../../utils/RouteName";
 import { useTheme } from "../../utils/ThemeContext";
@@ -28,7 +29,7 @@ import { Bell, Search } from "lucide-react";
 import NotificationDropdown from "../../features/notification/NotificationDropdown";
 
 const Topbar = React.memo(() => {
-  const { toggleSidebar } = useSidebar();
+  const { toggleSidebar, isMobile, openMobile } = useSidebar();
   const [showSearch, setShowSearch] = useState(false);
   const [currentLogo, setCurrentLogo] = useState(logoLight);
   const dispatch = useDispatch();
@@ -87,16 +88,20 @@ const Topbar = React.memo(() => {
 
   return (
     <>
-      <div className="flex justify-between items-center h-16 fixed w-full z-20 bg-background/95 backdrop-blur-sm text-foreground px-4 sm:px-6 md:px-8 border-b border-border/20 shadow-sm no-print">
+      <div className="flex justify-between items-center h-16 fixed w-full z-[100] bg-background/95 backdrop-blur-sm text-foreground px-4 sm:px-6 md:px-8 border-b border-border/20 shadow-sm no-print">
         <div className="flex items-center gap-2 sm:gap-4">
           {isAuthenticated && (
             <button
               onClick={handleSidebarToggle}
-              className="p-2 rounded-lg hover:bg-accent/80 transition-all duration-200 ease-in-out flex-shrink-0 md:hidden"
+              className="p-2 rounded-lg hover:bg-accent/80 transition-all duration-200 ease-in-out flex-shrink-0 md:hidden cursor-pointer"
               type="button"
-              aria-label="Toggle sidebar"
+              aria-label={isMobile && openMobile ? "Close sidebar" : "Open sidebar"}
             >
-              <AiOutlineMenu className="w-5 h-5" />
+              {isMobile && openMobile ? (
+                <IoClose className="w-5 h-5" />
+              ) : (
+                <AiOutlineMenu className="w-5 h-5" />
+              )}
             </button>
           )}
 
@@ -194,7 +199,7 @@ const Topbar = React.memo(() => {
       </div>
 
       {showSearch && (
-        <div className="fixed top-16 left-0 right-0 z-30 md:hidden bg-background/95 backdrop-blur-sm border-b border-border/20 shadow-sm">
+        <div className="fixed top-16 left-0 right-0 z-[110] md:hidden bg-background/95 backdrop-blur-sm border-b border-border/20 shadow-sm">
           <div className="px-4 py-3">
             <SearchBar />
           </div>
@@ -203,7 +208,7 @@ const Topbar = React.memo(() => {
 
       {showSearch && (
         <div
-          className="fixed inset-0 bg-black/20 z-20 md:hidden"
+          className="fixed inset-0 bg-black/20 z-[105] md:hidden"
           onClick={() => setShowSearch(false)}
           aria-label="Close search"
         />
