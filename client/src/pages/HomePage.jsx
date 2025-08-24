@@ -44,8 +44,6 @@ const HomePage = React.memo(() => {
 
   // Memoize refs to prevent recreation
   const hasFetchedCategoriesRef = useRef(false);
-  const hasFetchedBlogsRef = useRef(false);
-  const lastFetchParamsRef = useRef(null);
 
   // Memoize pagination data
   const blogPagination = useSelector((state) => state.blog.allBlogsPagination);
@@ -57,24 +55,6 @@ const HomePage = React.memo(() => {
     () => blogPagination?.totalBlogs || allBlogs.length,
     [blogPagination?.totalBlogs, allBlogs.length]
   );
-
-  // Memoize current parameters
-  const currentParams = useMemo(
-    () => ({
-      currentPage,
-      selectedCategory,
-      postsPerPage,
-    }),
-    [currentPage, selectedCategory, postsPerPage]
-  );
-
-  // Memoize params changed check
-  const paramsChanged = useMemo(() => {
-    return (
-      JSON.stringify(currentParams) !==
-      JSON.stringify(lastFetchParamsRef.current)
-    );
-  }, [currentParams]);
 
   useEffect(() => {
     // Fetch categories only once on mount
@@ -92,37 +72,28 @@ const HomePage = React.memo(() => {
       hasFetchedCategoriesRef.current = true;
     }
 
-    // Always fetch on first load or when params change
-    if (!hasFetchedBlogsRef.current || paramsChanged) {
-      // Fetch blogs with current parameters
-      const params = {
-        page: currentPage,
-        limit: postsPerPage,
-      };
+    // Fetch blogs with current parameters
+    const params = {
+      page: currentPage,
+      limit: postsPerPage,
+    };
 
-      if (selectedCategory !== "all") {
-        const categoryData = categories.find(
-          (cat) => cat.slug === selectedCategory
-        );
-        if (categoryData) {
-          params.category = categoryData._id;
-        }
+    if (selectedCategory !== "all") {
+      const categoryData = categories.find(
+        (cat) => cat.slug === selectedCategory
+      );
+      if (categoryData) {
+        params.category = categoryData._id;
       }
-
-      // Mark as fetched and update last params
-      hasFetchedBlogsRef.current = true;
-      lastFetchParamsRef.current = currentParams;
-
-      dispatch(fetchAllBlogs(params));
     }
+
+    dispatch(fetchAllBlogs(params));
   }, [
     dispatch,
     currentPage,
     selectedCategory,
     postsPerPage,
     categories,
-    paramsChanged,
-    currentParams,
   ]);
 
   useEffect(() => {
@@ -133,13 +104,14 @@ const HomePage = React.memo(() => {
     const pageFromUrl = parseInt(searchParams.get("page"), 10) || 1;
     const categoryFromUrl = searchParams.get("category") || "all";
 
+    // Only update state if the URL values are different from current state
     if (pageFromUrl !== currentPage) {
       setCurrentPage(pageFromUrl);
     }
     if (categoryFromUrl !== selectedCategory) {
       setSelectedCategory(categoryFromUrl);
     }
-  }, [searchParams, currentPage, selectedCategory]);
+  }, [searchParams]); // Remove currentPage and selectedCategory from dependencies
 
   useEffect(() => {
     const handleClickOutside = (event) => {
@@ -154,37 +126,36 @@ const HomePage = React.memo(() => {
     };
   }, [showCategoryMenu]);
 
-  // Memoize callback functions
-  const updateURL = useCallback(
-    (page, category) => {
+  // Simplified pagination handler - no need to update URL since it's handled by state sync
+  const handlePageChange = useCallback(
+    (newPage) => {
+      // Update URL which will trigger state update via searchParams effect
       const newSearchParams = new URLSearchParams(searchParams);
-      newSearchParams.set("page", page);
-      if (category === "all") {
+      newSearchParams.set("page", newPage);
+      if (selectedCategory === "all") {
         newSearchParams.delete("category");
       } else {
-        newSearchParams.set("category", category);
+        newSearchParams.set("category", selectedCategory);
       }
       setSearchParams(newSearchParams);
     },
-    [searchParams, setSearchParams]
-  );
-
-  const handlePageChange = useCallback(
-    (newPage) => {
-      setCurrentPage(newPage);
-      updateURL(newPage, selectedCategory);
-    },
-    [selectedCategory, updateURL]
+    [searchParams, setSearchParams, selectedCategory]
   );
 
   const handleCategorySelect = useCallback(
     (categorySlug) => {
-      setSelectedCategory(categorySlug);
-      setCurrentPage(1);
-      updateURL(1, categorySlug);
+      // Update URL which will trigger state updates via searchParams effect
+      const newSearchParams = new URLSearchParams(searchParams);
+      newSearchParams.set("page", 1); // Always reset to page 1 when changing category
+      if (categorySlug === "all") {
+        newSearchParams.delete("category");
+      } else {
+        newSearchParams.set("category", categorySlug);
+      }
+      setSearchParams(newSearchParams);
       setShowCategoryMenu(false);
     },
-    [updateURL]
+    [searchParams, setSearchParams]
   );
 
   const toggleCategoryMenu = useCallback(() => {
