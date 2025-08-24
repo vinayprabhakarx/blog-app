@@ -14,8 +14,10 @@ import Pagination from "../components/common/Pagination";
 
 import {
   fetchAllBlogs,
+  searchBlogs,
   selectAllBlogs,
   selectBlogLoading,
+  selectBlogFilters,
 } from "../features/blog/blogSlice";
 import {
   fetchAllCategories,
@@ -62,9 +64,15 @@ const HomePage = React.memo(() => {
     () => ({
       page: parseInt(searchParams.get("page"), 10) || 1,
       category: searchParams.get("category") || "all",
+      search: searchParams.get("search") || "",
     }),
     [searchParams]
   );
+
+  // Check if this is a search query
+  const isSearchMode = useMemo(() => {
+    return urlParams.search.trim().length > 0;
+  }, [urlParams.search]);
 
   // Memoize selected category data
   const selectedCategoryData = useMemo(() => {
@@ -92,6 +100,17 @@ const HomePage = React.memo(() => {
   }, [dispatch]);
 
   useEffect(() => {
+    // Handle search queries
+    if (isSearchMode) {
+      const searchParams = {
+        page: currentPage,
+        limit: postsPerPage,
+      };
+      
+      dispatch(searchBlogs({ query: urlParams.search, params: searchParams }));
+      return;
+    }
+
     // Only fetch blogs if categories have been loaded
     if (!hasFetchedCategoriesRef.current && categories.length === 0) {
       return; // Wait for categories to load first
@@ -104,7 +123,7 @@ const HomePage = React.memo(() => {
 
     // Use memoized parameters for blog fetching
     dispatch(fetchAllBlogs(blogFetchParams));
-  }, [dispatch, blogFetchParams, categories]);
+  }, [dispatch, blogFetchParams, categories, isSearchMode, urlParams.search, currentPage, postsPerPage]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -288,6 +307,23 @@ const HomePage = React.memo(() => {
 
       {/* Main Content */}
       <main className="container mx-auto px-6 py-8">
+        {/* Search Results Header */}
+        {isSearchMode && (
+          <section className="mb-6">
+            <div className="">
+              <h1 className="text-xl font-semibold text-foreground mb-2">
+                Search Results for "{urlParams.search}"
+              </h1>
+              <p className="text-sm text-muted-foreground">
+                {blogLoading.allBlogs
+                  ? "Searching..."
+                  : `Found ${filteredBlogsCount} ${filteredBlogsCount === 1 ? 'article' : 'articles'} matching your query`
+                }
+              </p>
+            </div>
+          </section>
+        )}
+        
         {/* Blog Grid */}
         <section className="mb-8">
           <div
@@ -304,11 +340,28 @@ const HomePage = React.memo(() => {
         </section>
 
         {/* No Articles Found */}
-        {allBlogs.length === 0 && !blogLoading ? (
+        {allBlogs.length === 0 && !blogLoading.allBlogs ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">
-              No articles found for the selected category.
+              {isSearchMode 
+                ? `No articles found matching "${urlParams.search}". Try different keywords or check the spelling.`
+                : "No articles found for the selected category."
+              }
             </p>
+            {isSearchMode && (
+              <div className="mt-4">
+                <button
+                  onClick={() => {
+                    const newSearchParams = new URLSearchParams(searchParams);
+                    newSearchParams.delete('search');
+                    setSearchParams(newSearchParams);
+                  }}
+                  className="text-sm text-primary hover:text-primary/80 underline transition-colors"
+                >
+                  Browse all articles
+                </button>
+              </div>
+            )}
           </div>
         ) : null}
 

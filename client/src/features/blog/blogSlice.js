@@ -72,6 +72,20 @@ export const fetchBlogsByAuthor = createAsyncThunk(
   }
 );
 
+export const searchBlogs = createAsyncThunk(
+  "blog/searchBlogs",
+  async ({ query, params = {} }, { rejectWithValue }) => {
+    try {
+      const data = await blogService.advancedSearch(query, params);
+      return { ...data, searchQuery: query };
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Search failed"
+      );
+    }
+  }
+);
+
 export const createBlog = createAsyncThunk(
   "blog/createBlog",
   async (blogData, { rejectWithValue }) => {
@@ -319,6 +333,24 @@ const blogSlice = createSlice({
       .addCase(fetchBlogsByAuthor.rejected, (state, action) => {
         state.authorBlogsLoading = false;
         state.authorBlogsError = action.payload;
+      });
+
+    // Search Blogs
+    builder
+      .addCase(searchBlogs.pending, (state) => {
+        state.allBlogsLoading = true;
+        state.allBlogsError = null;
+      })
+      .addCase(searchBlogs.fulfilled, (state, action) => {
+        state.allBlogsLoading = false;
+        state.allBlogs = action.payload.blogs || [];
+        state.allBlogsPagination = action.payload.pagination;
+        // Update search filter with current search query
+        state.filters.search = action.payload.searchQuery || "";
+      })
+      .addCase(searchBlogs.rejected, (state, action) => {
+        state.allBlogsLoading = false;
+        state.allBlogsError = action.payload;
       });
 
     // Create Blog

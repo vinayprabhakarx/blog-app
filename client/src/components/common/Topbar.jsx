@@ -30,7 +30,6 @@ import NotificationDropdown from "../../features/notification/NotificationDropdo
 const Topbar = React.memo(() => {
   const { toggleSidebar } = useSidebar();
   const [showSearch, setShowSearch] = useState(false);
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [currentLogo, setCurrentLogo] = useState(logoLight);
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -40,11 +39,14 @@ const Topbar = React.memo(() => {
   const { theme } = useTheme();
 
   // Memoize user data to prevent unnecessary re-renders
-  const userData = useMemo(() => ({
-    name: getUserName(),
-    email: getUserEmail(),
-    avatar: getUserAvatar()
-  }), [getUserName, getUserEmail, getUserAvatar]);
+  const userData = useMemo(
+    () => ({
+      name: getUserName(),
+      email: getUserEmail(),
+      avatar: getUserAvatar(),
+    }),
+    [getUserName, getUserEmail, getUserAvatar]
+  );
 
   // Memoize logo based on theme
   const currentLogoMemo = useMemo(
@@ -53,13 +55,16 @@ const Topbar = React.memo(() => {
   );
 
   // Memoize logo style to prevent recreation
-  const logoStyle = useMemo(() => ({
-    height: "80px",
-    minHeight: "80px",
-    width: "auto",
-    minWidth: "auto",
-    maxWidth: "none",
-  }), []);
+  const logoStyle = useMemo(
+    () => ({
+      height: "80px",
+      minHeight: "80px",
+      width: "auto",
+      minWidth: "auto",
+      maxWidth: "none",
+    }),
+    []
+  );
 
   useEffect(() => {
     setCurrentLogo(currentLogoMemo);
@@ -77,7 +82,6 @@ const Topbar = React.memo(() => {
   }, []);
 
   const handleSidebarToggle = useCallback(() => {
-    setIsSidebarOpen((prev) => !prev);
     toggleSidebar();
   }, [toggleSidebar]);
 
@@ -153,18 +157,10 @@ const Topbar = React.memo(() => {
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild className="cursor-pointer">
-                  <Avatar className="w-8 h-8 sm:w-9 sm:h-9">
-                    <AvatarImage
-                      src={getUserAvatar() || undefined}
-                      alt={getUserName()}
-                      crossOrigin="anonymous"
-                    />
+                  <Avatar className="w-7 h-7 sm:w-8 sm:h-8">
+                    <AvatarImage src={userData.avatar} />
                     <AvatarFallback>
-                      <img
-                        src="https://github.com/shadcn.png"
-                        alt="Fallback"
-                        className="w-full h-full object-cover rounded-full"
-                      />
+                      <FaRegUser className="w-3 h-3" />
                     </AvatarFallback>
                   </Avatar>
                 </DropdownMenuTrigger>
