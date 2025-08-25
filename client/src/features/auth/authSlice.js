@@ -21,7 +21,8 @@ export const registerUser = createAsyncThunk(
   async (userData, { rejectWithValue }) => {
     try {
       const data = await authService.register(userData);
-      localStorage.setItem("token", data.token);
+      // Do not auto-login on register; require email verification
+      localStorage.removeItem("token");
       return data;
     } catch (error) {
       return rejectWithValue(
@@ -89,6 +90,8 @@ const authSlice = createSlice({
     error: null,
     passwordChangeLoading: false,
     passwordChangeSuccess: false,
+    verificationRequired: false,
+    verifyMessage: null,
   },
   reducers: {
     logout: (state) => {
@@ -157,10 +160,14 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = null; // Register only returns token, user data loaded separately
-        state.token = action.payload.token;
-        state.isAuthenticated = true;
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
         state.error = null;
+        state.verificationRequired = true;
+        state.verifyMessage =
+          action.payload?.message ||
+          "Registration successful. Please verify your email to activate your account.";
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;

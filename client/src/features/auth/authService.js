@@ -17,6 +17,18 @@ const authService = {
     return response.data;
   },
 
+  // Verify email
+  verifyEmail: async (token) => {
+    const response = await api.post("/auth/verify-email", { token });
+    return response.data;
+  },
+
+  // Resend verification
+  resendVerification: async (email) => {
+    const response = await api.post("/auth/resend-verification", { email });
+    return response.data;
+  },
+
   // Google authentication
   googleAuth: async (tokenData) => {
     const response = await api.post("/auth/google", tokenData);

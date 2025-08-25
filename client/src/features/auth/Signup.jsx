@@ -61,17 +61,18 @@ const SignUp = () => {
 
   async function onSubmit(values) {
     try {
-      const { ...userData } = values;
+      const { confirmPassword, ...userData } = values;
 
       await dispatch(registerUser(userData)).unwrap();
-      const userResult = await dispatch(getCurrentUser()).unwrap();
-      const redirectPath = getRoleBasedRedirect(userResult.user);
 
-      showToast("success", "Registration successful! You are now logged in.");
-      navigate(redirectPath);
+      showToast(
+        "success",
+        "Registration successful. Please verify your email before logging in."
+      );
+      navigate(RouteSignIn);
     } catch (error) {
       console.error("Signup error:", error);
-      showToast("error", error.message || "Registration failed");
+      showToast("error", error || "Registration failed");
     }
   }
 

@@ -22,6 +22,7 @@ import { showToast } from "../../utils/showToast";
 import GoogleAuth from "./GoogleAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { loginUser, getCurrentUser } from "../auth/authSlice";
+import authService from "./authService";
 import InputBox from "../../components/common/InputBox";
 import LoadingButton from "../../components/common/LoadingButton";
 import { FaEnvelope, FaLock } from "react-icons/fa6";
@@ -55,6 +56,30 @@ const Login = () => {
       showToast("error", error || "Login failed");
     }
   }
+
+  const [resendLoading, setResendLoading] = React.useState(false);
+  const handleResendVerification = async () => {
+    const email = form.getValues("email");
+    if (!email) {
+      showToast("error", "Please enter your email first");
+      return;
+    }
+    try {
+      setResendLoading(true);
+      const res = await authService.resendVerification(email);
+      showToast(
+        "success",
+        res?.message || "Verification email sent (if the account exists)"
+      );
+    } catch (e) {
+      showToast(
+        "error",
+        e?.response?.data?.message || "Failed to resend verification email"
+      );
+    } finally {
+      setResendLoading(false);
+    }
+  };
 
   const { theme } = useTheme();
 
@@ -126,6 +151,18 @@ const Login = () => {
               >
                 Sign In
               </LoadingButton>
+
+              <div className="mt-3 text-xs flex justify-between items-center">
+                <span>Didn't get verification email?</span>
+                <button
+                  type="button"
+                  onClick={handleResendVerification}
+                  className="text-blue-500 hover:underline disabled:opacity-60 cursor-pointer"
+                  disabled={resendLoading}
+                >
+                  {resendLoading ? "Resending..." : "Resend"}
+                </button>
+              </div>
 
               <div className="mt-5 text-sm flex justify-center items-center gap-2">
                 <p>Don&apos;t have account?</p>

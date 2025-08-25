@@ -116,6 +116,14 @@ const userSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    verificationEmailSentCount: {
+      type: Number,
+      default: 0,
+    },
+    lastVerificationEmailSentAt: {
+      type: Date,
+      default: null,
+    },
     lastLogin: {
       type: Date,
       default: null,

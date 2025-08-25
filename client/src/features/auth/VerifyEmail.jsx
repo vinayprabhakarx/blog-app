@@ -1,0 +1,150 @@
+import React from "react";
+import { useSearchParams, Link } from "react-router-dom";
+import authService from "./authService";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { useTheme } from "../../utils/ThemeContext";
+import {
+  FaCheckCircle,
+  FaExclamationTriangle,
+  FaTimesCircle,
+} from "react-icons/fa";
+
+const VerifyEmail = () => {
+  const { theme } = useTheme();
+  const [searchParams] = useSearchParams();
+  const token = searchParams.get("token");
+  const statusParam = searchParams.get("status");
+
+  const [status, setStatus] = React.useState("loading");
+  const [message, setMessage] = React.useState("");
+
+  React.useEffect(() => {
+    // If backend redirected with status param, show it without further API calls
+    if (statusParam) {
+      if (statusParam === "success") {
+        setStatus("success");
+        setMessage("Email verified successfully");
+      } else if (statusParam === "already") {
+        setStatus("already");
+        setMessage("Email is already verified");
+      } else if (statusParam === "expired") {
+        setStatus("expired");
+        setMessage("Verification link expired");
+      } else {
+        setStatus("invalid");
+        setMessage("Invalid verification link");
+      }
+      return;
+    }
+
+    const run = async () => {
+      if (!token) {
+        setStatus("invalid");
+        setMessage("Invalid verification link");
+        return;
+      }
+      try {
+        const res = await authService.verifyEmail(token);
+        setStatus("success");
+        setMessage(res?.message || "Email verified successfully");
+      } catch (e) {
+        const apiMsg = e?.response?.data?.message || "Verification failed";
+        if (/expired/i.test(apiMsg)) {
+          setStatus("expired");
+          setMessage("Verification link expired");
+        } else if (/invalid/i.test(apiMsg)) {
+          setStatus("invalid");
+          setMessage("Invalid verification link");
+        } else {
+          setStatus("error");
+          setMessage(apiMsg);
+        }
+      }
+    };
+    run();
+  }, [token, statusParam]);
+
+  const Wrapper = ({ children }) => (
+    <div
+      className={`min-h-screen w-full flex items-center justify-center px-4 ${
+        theme === "dark" ? "bg-background" : "bg-white"
+      }`}
+    >
+      <div className="max-w-xl w-full text-center text-foreground">
+        {children}
+      </div>
+    </div>
+  );
+
+  if (status === "loading") {
+    return (
+      <Wrapper>
+        <div className="flex flex-col items-center gap-4">
+          <LoadingSpinner />
+          <p className="text-base opacity-80">Verifying your email...</p>
+        </div>
+      </Wrapper>
+    );
+  }
+
+  if (status === "success") {
+    return (
+      <Wrapper>
+        <div className="flex flex-col items-center gap-4">
+          <FaCheckCircle className="text-green-500" size={64} />
+          <h1 className="text-3xl font-semibold">Email verified</h1>
+          <p className="opacity-80">{message}</p>
+          <Link to="/login" className="text-blue-500 hover:underline">
+            Continue to login
+          </Link>
+        </div>
+      </Wrapper>
+    );
+  }
+
+  if (status === "already") {
+    return (
+      <Wrapper>
+        <div className="flex flex-col items-center gap-4">
+          <FaCheckCircle className="text-green-500" size={64} />
+          <h1 className="text-3xl font-semibold">Email already verified</h1>
+          <p className="opacity-80">{message}</p>
+          <Link to="/login" className="text-blue-500 hover:underline">
+            Continue to login
+          </Link>
+        </div>
+      </Wrapper>
+    );
+  }
+
+  if (status === "expired") {
+    return (
+      <Wrapper>
+        <div className="flex flex-col items-center gap-4">
+          <FaExclamationTriangle className="text-yellow-500" size={64} />
+          <h1 className="text-3xl font-semibold">Verification link expired</h1>
+          <p className="opacity-80">{message}</p>
+          <Link to="/login" className="text-blue-500 hover:underline">
+            Resend from login page
+          </Link>
+        </div>
+      </Wrapper>
+    );
+  }
+
+  // invalid or general error
+  return (
+    <Wrapper>
+      <div className="flex flex-col items-center gap-4">
+        <FaTimesCircle className="text-red-500" size={64} />
+        <h1 className="text-3xl font-semibold">Verification failed</h1>
+        <p className="opacity-80">{message || "Invalid verification link"}</p>
+        <Link to="/login" className="text-blue-500 hover:underline">
+          Go to login
+        </Link>
+      </div>
+    </Wrapper>
+  );
+};
+
+export default VerifyEmail;

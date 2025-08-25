@@ -223,4 +223,3 @@ The app uses **React Router v6** with a centralized `RouteName.js` for route con
 
 **Made with ❤️ and using React 19**
 
----

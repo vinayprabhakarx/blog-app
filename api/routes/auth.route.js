@@ -8,6 +8,9 @@ import {
   getCurrentUser,
   changePassword,
   forgotPassword,
+  verifyEmail,
+  verifyEmailLink,
+  resendVerification,
 } from "../controllers/auth.controller.js";
 import asyncHandler from "../utils/asyncHandler.js"; // Assuming you have this utility
 import upload from "../config/multer.js"; // Assuming a multer setup for file uploads
@@ -99,5 +102,20 @@ router.post(
   forgotPasswordValidation,
   asyncHandler(forgotPassword)
 );
+
+// @route   POST /api/auth/verify-email
+// @desc    Verify email with token
+// @access  Public
+router.post("/verify-email", asyncHandler(verifyEmail));
+
+// @route   GET /api/auth/verify-email
+// @desc    Verify email via link token (redirects to client)
+// @access  Public
+router.get("/verify-email", asyncHandler(verifyEmailLink));
+
+// @route   POST /api/auth/resend-verification
+// @desc    Resend verification email
+// @access  Public
+router.post("/resend-verification", asyncHandler(resendVerification));
 
 export default router;

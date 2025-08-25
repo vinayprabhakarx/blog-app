@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import {
@@ -34,6 +34,7 @@ import userService from "../user_management/usersService";
 
 const EditProfile = () => {
   const { user, loading: authLoading } = useAuth();
+  const navigate = useNavigate();
   const dispatch = useDispatch();
   const {
     profileUpdateLoading,
@@ -67,6 +68,13 @@ const EditProfile = () => {
   });
 
   const [profileImage, setProfileImage] = useState(null);
+  const currentEmail = user?.email || user?.personal_info?.email || "";
+  const emailChanged =
+    (formData.email || "") && (formData.email || "") !== currentEmail;
+  const [emailChangeLoading, setEmailChangeLoading] = useState(false);
+  const [emailChangeMessage, setEmailChangeMessage] = useState("");
+  const [lastActionWasEmailChange, setLastActionWasEmailChange] =
+    useState(false);
   const [imagePreview, setImagePreview] = useState("");
   const [showCropper, setShowCropper] = useState(false);
   const [selectedImageUrl, setSelectedImageUrl] = useState("");
@@ -252,15 +260,26 @@ const EditProfile = () => {
   // Handle profile update success and error
   useEffect(() => {
     if (profileUpdateSuccess) {
-      showToast("success", "Profile updated successfully!");
+      if (!lastActionWasEmailChange) {
+        showToast("success", "Profile updated successfully!");
+      }
       dispatch(clearProfileUpdateStatus());
+      if (lastActionWasEmailChange) setLastActionWasEmailChange(false);
     }
 
     if (profileUpdateError) {
-      showToast("error", profileUpdateError);
+      if (!lastActionWasEmailChange) {
+        showToast("error", profileUpdateError);
+      }
       dispatch(clearProfileUpdateStatus());
+      if (lastActionWasEmailChange) setLastActionWasEmailChange(false);
     }
-  }, [profileUpdateSuccess, profileUpdateError, dispatch]);
+  }, [
+    profileUpdateSuccess,
+    profileUpdateError,
+    dispatch,
+    lastActionWasEmailChange,
+  ]);
 
   // Clear status when component unmounts
   useEffect(() => {
@@ -361,7 +380,7 @@ const EditProfile = () => {
           "username",
           formData.username.trim().toLowerCase()
         );
-      if (formData.email) formDataToSend.append("email", formData.email);
+      // email is handled separately
       if (formData.bio) formDataToSend.append("bio", formData.bio);
 
       const socialLinksData = {};
@@ -377,45 +396,67 @@ const EditProfile = () => {
         })
       ).unwrap();
 
+      // If server indicates email change, force logout and redirect
+      if (result?.requireReauth) {
+        showToast(
+          "success",
+          "Email updated. Please verify your new email and sign in again."
+        );
+        // Clear token and redirect to login
+        localStorage.removeItem("token");
+        // Also clear any user state via auth slice logout if available
+        try {
+          const { logout } = await import("../auth/authSlice");
+          dispatch(logout());
+        } catch (_) {}
+        navigate("/login");
+        return;
+      }
+
       showToast("success", "Profile updated successfully!");
 
-      if (result) {
+      if (result?.user) {
         setFormData((prev) => ({
           ...prev,
-          name: result.personal_info?.name || prev.name,
-          username: result.personal_info?.username || prev.username,
-          bio: result.personal_info?.bio || prev.bio,
+          name: result.user.personal_info?.name || prev.name,
+          username: result.user.personal_info?.username || prev.username,
+          bio: result.user.personal_info?.bio || prev.bio,
           social_links: {
-            website: result.social_links?.website ?? prev.social_links.website,
+            website:
+              result.user.social_links?.website ?? prev.social_links.website,
             facebook:
-              result.social_links?.facebook ?? prev.social_links.facebook,
-            twitter: result.social_links?.twitter ?? prev.social_links.twitter,
+              result.user.social_links?.facebook ?? prev.social_links.facebook,
+            twitter:
+              result.user.social_links?.twitter ?? prev.social_links.twitter,
             instagram:
-              result.social_links?.instagram ?? prev.social_links.instagram,
+              result.user.social_links?.instagram ??
+              prev.social_links.instagram,
             linkedin:
-              result.social_links?.linkedin ?? prev.social_links.linkedin,
-            github: result.social_links?.github ?? prev.social_links.github,
-            youtube: result.social_links?.youtube ?? prev.social_links.youtube,
+              result.user.social_links?.linkedin ?? prev.social_links.linkedin,
+            github:
+              result.user.social_links?.github ?? prev.social_links.github,
+            youtube:
+              result.user.social_links?.youtube ?? prev.social_links.youtube,
           },
         }));
 
         dispatch(
           updateUserProfile({
             personal_info: {
-              ...result.personal_info,
-              name: result.personal_info?.name,
-              username: result.personal_info?.username,
-              email: result.personal_info?.email,
-              bio: result.personal_info?.bio,
-              profile_img: result.personal_info?.profile_img,
+              ...result.user.personal_info,
+              name: result.user.personal_info?.name,
+              username: result.user.personal_info?.username,
+              email: result.user.personal_info?.email,
+              bio: result.user.personal_info?.bio,
+              profile_img: result.user.personal_info?.profile_img,
             },
-            social_links: result.social_links,
-            avatar: result.personal_info?.profile_img || user?.avatar,
+            social_links: result.user.social_links,
+            avatar: result.user.personal_info?.profile_img || user?.avatar,
           })
         );
 
-        if (result.personal_info?.profile_img) {
-          setImagePreview(result.personal_info.profile_img);
+        if (result.user.personal_info?.profile_img) {
+          setImagePreview(result.user.personal_info.profile_img);
         }
       }
     } catch (error) {
@@ -627,15 +668,177 @@ const EditProfile = () => {
                   />
                 </div>
                 <div>
-                  <InputBox
-                    name="email"
-                    type="email"
-                    value={formData.email}
-                    onChange={handleInputChange}
-                    placeholder="Email"
-                    disabled={user?.authProvider === "google"}
-                    icon={FaEnvelope}
-                  />
+                  <div className="flex flex-col sm:flex-row gap-2 items-stretch sm:items-start">
+                    <div className="flex-1">
+                      <InputBox
+                        name="email"
+                        type="email"
+                        value={formData.email}
+                        onChange={handleInputChange}
+                        onKeyDown={async (e) => {
+                          if (e.key === "Enter") {
+                            e.preventDefault();
+                            // Trigger the change email action instead of form submit
+                            if (
+                              !emailChanged ||
+                              user?.authProvider === "google"
+                            )
+                              return;
+                            try {
+                              setEmailChangeLoading(true);
+                              setEmailChangeMessage("");
+                              setLastActionWasEmailChange(true);
+                              const emailTrimmed = (formData.email || "")
+                                .trim()
+                                .toLowerCase();
+                              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                              if (!emailRegex.test(emailTrimmed)) {
+                                setEmailChangeMessage(
+                                  "Please enter a valid email address"
+                                );
+                                return;
+                              }
+                              const fd = new FormData();
+                              fd.append("email", emailTrimmed);
+                              const result = await dispatch(
+                                updateProfile({
+                                  userId: user._id,
+                                  profileData: fd,
+                                })
+                              ).unwrap();
+                              if (result?.requireReauth) {
+                                showToast(
+                                  "success",
+                                  "Email changed successfully. Please verify your email."
+                                );
+                                setEmailChangeMessage(
+                                  "Email updated. Please verify your new email and sign in again."
+                                );
+                                localStorage.removeItem("token");
+                                try {
+                                  const { logout } = await import(
+                                    "../auth/authSlice"
+                                  );
+                                  dispatch(logout());
+                                } catch (_) {}
+                                navigate("/login");
+                                return;
+                              }
+                              showToast(
+                                "success",
+                                "Email changed successfully. Please verify your email."
+                              );
+                            } catch (error) {
+                              setEmailChangeMessage(
+                                (error && (error.message || error)) ||
+                                  "Failed to change email"
+                              );
+                            } finally {
+                              setEmailChangeLoading(false);
+                            }
+                          }
+                        }}
+                        placeholder="Email"
+                        disabled={user?.authProvider === "google"}
+                        inputMode="email"
+                        autoComplete="email"
+                        pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
+                        icon={FaEnvelope}
+                      />
+                    </div>
+                    {!user?.authProvider || user?.authProvider !== "google" ? (
+                      emailChanged ? (
+                        <button
+                          type="button"
+                          className="text-blue-500 hover:underline text-sm sm:text-base whitespace-nowrap px-0 py-2 sm:py-0 bg-transparent cursor-pointer w-full sm:w-auto text-center sm:text-left disabled:opacity-60"
+                          disabled={emailChangeLoading}
+                          onClick={async () => {
+                            try {
+                              setEmailChangeLoading(true);
+                              setEmailChangeMessage("");
+                              setLastActionWasEmailChange(true);
+                              if (
+                                !formData.email ||
+                                formData.email ===
+                                  (user.email || user.personal_info?.email)
+                              ) {
+                                setEmailChangeMessage(
+                                  "Enter a new email to change"
+                                );
+                                return;
+                              }
+                              const emailTrimmed = (formData.email || "")
+                                .trim()
+                                .toLowerCase();
+                              const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                              if (!emailRegex.test(emailTrimmed)) {
+                                setEmailChangeMessage(
+                                  "Please enter a valid email address"
+                                );
+                                return;
+                              }
+                              const fd = new FormData();
+                              fd.append("email", emailTrimmed);
+                              const result = await dispatch(
+                                updateProfile({
+                                  userId: user._id,
+                                  profileData: fd,
+                                })
+                              ).unwrap();
+                              if (result?.requireReauth) {
+                                showToast(
+                                  "success",
+                                  "Email changed successfully. Please verify your email."
+                                );
+                                setEmailChangeMessage(
+                                  "Email updated. Please verify your new email and sign in again."
+                                );
+                                localStorage.removeItem("token");
+                                try {
+                                  const { logout } = await import(
+                                    "../auth/authSlice"
+                                  );
+                                  dispatch(logout());
+                                } catch (_) {}
+                                navigate("/login");
+                                return;
+                              }
+                              showToast(
+                                "success",
+                                "Email changed successfully. Please verify your email."
+                              );
+                            } catch (error) {
+                              setEmailChangeMessage(
+                                (error && (error.message || error)) ||
+                                  "Failed to change email"
+                              );
+                            } finally {
+                              setEmailChangeLoading(false);
+                            }
+                          }}
+                        >
+                          Change email
+                        </button>
+                      ) : null
+                    ) : null}
+                  </div>
+                  {emailChanged && (
+                    <p
+                      className="text-xs mt-2"
+                      style={{ color: "var(--muted-foreground)" }}
+                    >
+                      You will be logged out after changing your email and must
+                      verify the new email.
+                    </p>
+                  )}
+                  {!!emailChangeMessage && (
+                    <p
+                      className="text-xs mt-1"
+                      style={{ color: "var(--foreground)" }}
+                    >
+                      {emailChangeMessage}
+                    </p>
+                  )}
                 </div>
               </div>
 

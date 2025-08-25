@@ -14,6 +14,25 @@ import {
   validationError,
 } from "../utils/handleError.js";
 import { uploadImage, deleteImage } from "../config/cloudinary.js";
+import jwt from "jsonwebtoken";
+import sendEmail from "../utils/sendEmail.js";
+import { buildVerifyNewEmail } from "../templates/email/verificationTemplates.js";
+
+// Build verification link for email
+const buildEmailVerificationLink = (token) => {
+  const baseUrl =
+    process.env.CLIENT_URL || process.env.APP_URL || "http://localhost:5173";
+  const apiBase =
+    process.env.API_URL || process.env.SERVER_URL || "http://localhost:3000";
+  return {
+    linkForEmail: `${apiBase}/api/auth/verify-email?token=${encodeURIComponent(
+      token
+    )}`,
+    clientTokenLink: `${baseUrl}/verify-email?token=${encodeURIComponent(
+      token
+    )}`,
+  };
+};
 
 // @route   GET /api/users/public-profile/:username
 // @desc    Get public user profile by username
@@ -213,6 +232,20 @@ export const updateUser = async (req, res, next) => {
     }
   }
 
+  // Detect if email changed
+  const newEmail = updateData["personal_info.email"];
+  const emailChanged = Boolean(
+    newEmail && newEmail !== user.personal_info.email
+  );
+
+  // If email changed, mark unverified and prepare counters
+  if (emailChanged) {
+    updateData.emailVerified = false;
+    updateData.verificationEmailSentCount =
+      (user.verificationEmailSentCount || 0) + 1;
+    updateData.lastVerificationEmailSentAt = new Date();
+  }
+
   const updatedUser = await User.findByIdAndUpdate(
     userid,
     { $set: updateData },
@@ -223,10 +256,43 @@ export const updateUser = async (req, res, next) => {
       throw databaseError("updating user", err);
     });
 
+  // If email changed for non-Google users, send verification email
+  if (emailChanged && !(user.google_auth || user.authProvider === "google")) {
+    try {
+      const verifyToken = jwt.sign(
+        { id: user._id, purpose: "verify_email" },
+        process.env.JWT_SECRET,
+        { expiresIn: "24h" }
+      );
+      const { linkForEmail } = buildEmailVerificationLink(verifyToken);
+      const { subject, html, text } = buildVerifyNewEmail(
+        updatedUser.personal_info?.name,
+        linkForEmail
+      );
+      await sendEmail({
+        to: updatedUser.personal_info.email,
+        subject,
+        html,
+        text,
+      });
+    } catch (e) {
+      return next(
+        handleError(
+          500,
+          "Failed to send verification email for new address",
+          e.message
+        )
+      );
+    }
+  }
+
   res.status(200).json({
     success: true,
-    message: "Profile updated successfully",
+    message: emailChanged
+      ? "Profile updated. We sent a verification link to your new email."
+      : "Profile updated successfully",
     user: updatedUser,
+    requireReauth: !!emailChanged,
   });
 };
 

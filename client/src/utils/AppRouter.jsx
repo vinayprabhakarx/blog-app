@@ -6,6 +6,7 @@ import AppLayout from "../components/layout/AppLayout";
 import HomePage from "../pages/HomePage";
 import Login from "../features/auth/Login";
 import Signup from "../features/auth/Signup";
+import VerifyEmail from "../features/auth/VerifyEmail";
 import ProfilePage from "../pages/ProfilePage";
 import EditProfile from "../features/settings/EditProfile";
 import ChangePassword from "../features/settings/ChangePassword";
@@ -45,6 +46,7 @@ const AppRouter = () => {
           {/* Auth Routes */}
           <Route path="login" element={<Login />} />
           <Route path="register" element={<Signup />} />
+          <Route path="verify-email" element={<VerifyEmail />} />
 
           {/* Home Page */}
           <Route index element={<HomePage />} />

@@ -8,7 +8,8 @@ export const updateProfile = createAsyncThunk(
   async ({ userId, profileData }, { rejectWithValue }) => {
     try {
       const response = await userService.updateProfile(userId, profileData);
-      return response.user;
+      // Return full response so caller can act on flags like requireReauth
+      return response;
     } catch (error) {
       return rejectWithValue(
         error.response?.data?.message || "Failed to update profile"
