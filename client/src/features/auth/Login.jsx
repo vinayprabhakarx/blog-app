@@ -137,6 +137,15 @@ const Login = () => {
                       />
                     </FormControl>
                     <FormMessage />
+
+                    <div className="text-right text-sm mt-1">
+                      <Link
+                        to="/forgot-password"
+                        className="text-primary hover:underline"
+                      >
+                        Forgot Password?
+                      </Link>
+                    </div>
                   </FormItem>
                 )}
               />
@@ -152,24 +161,21 @@ const Login = () => {
                 Sign In
               </LoadingButton>
 
-              <div className="mt-3 text-xs flex justify-between items-center">
+              <div className="mt-3 text-sm text-muted-foreground flex justify-between items-center">
                 <span>Didn't get verification email?</span>
                 <button
                   type="button"
                   onClick={handleResendVerification}
-                  className="text-blue-500 hover:underline disabled:opacity-60 cursor-pointer"
+                  className="text-primary hover:underline cursor-pointer"
                   disabled={resendLoading}
                 >
                   {resendLoading ? "Resending..." : "Resend"}
                 </button>
               </div>
 
-              <div className="mt-5 text-sm flex justify-center items-center gap-2">
+              <div className="mt-5 text-sm text-muted-foreground flex justify-center items-center gap-2">
                 <p>Don&apos;t have account?</p>
-                <Link
-                  className="text-blue-500 hover:underline"
-                  to={RouteSignUp}
-                >
+                <Link className="text-primary hover:underline" to={RouteSignUp}>
                   Sign Up
                 </Link>
               </div>

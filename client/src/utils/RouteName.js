@@ -1,8 +1,11 @@
 export const RouteIndex = "/";
 export const RouteProfile = "/profile";
 export const RouteUserHome = "/dashboard";
+export const RouteLogin = "/login";
 export const RouteSignIn = "/login";
 export const RouteSignUp = "/register";
+export const RouteForgotPassword = "/forgot-password";
+export const RouteResetPassword = "/reset-password";
 
 // Public Category & Blog routes (for users)
 export const RouteCategories = "/categories";

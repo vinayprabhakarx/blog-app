@@ -1,12 +1,15 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import PrivateRoute from "./PrivateRoute";
+import PublicRoute from "./PublicRoute";
 import AdminRoute from "./AdminRoute";
 import AppLayout from "../components/layout/AppLayout";
 import HomePage from "../pages/HomePage";
 import Login from "../features/auth/Login";
 import Signup from "../features/auth/Signup";
 import VerifyEmail from "../features/auth/VerifyEmail";
+import ForgotPassword from "../features/auth/ForgotPassword";
+import ResetPassword from "../features/auth/ResetPassword";
 import ProfilePage from "../pages/ProfilePage";
 import EditProfile from "../features/settings/EditProfile";
 import ChangePassword from "../features/settings/ChangePassword";
@@ -44,9 +47,14 @@ const AppRouter = () => {
       <Routes>
         <Route path="/" element={<AppLayout />}>
           {/* Auth Routes */}
-          <Route path="login" element={<Login />} />
-          <Route path="register" element={<Signup />} />
-          <Route path="verify-email" element={<VerifyEmail />} />
+          {/* Public Auth Routes - Only accessible when not logged in */}
+          <Route element={<PublicRoute />}>
+            <Route path="login" element={<Login />} />
+            <Route path="register" element={<Signup />} />
+            <Route path="forgot-password" element={<ForgotPassword />} />
+            <Route path="reset-password" element={<ResetPassword />} />
+            <Route path="verify-email" element={<VerifyEmail />} />
+          </Route>
 
           {/* Home Page */}
           <Route index element={<HomePage />} />

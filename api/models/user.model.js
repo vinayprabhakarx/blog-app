@@ -101,6 +101,15 @@ const userSchema = new mongoose.Schema(
       github: { type: String, default: "", validate: socialLinkValidator },
       website: { type: String, trim: true, default: "" },
     },
+    // Password reset fields
+    passwordResetToken: {
+      type: String,
+      select: false,
+    },
+    passwordResetExpires: {
+      type: Date,
+      select: false,
+    },
     account_info: {
       total_posts: {
         type: Number,

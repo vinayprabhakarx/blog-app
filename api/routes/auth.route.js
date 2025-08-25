@@ -8,6 +8,8 @@ import {
   getCurrentUser,
   changePassword,
   forgotPassword,
+  resetPassword,
+  validateResetToken,
   verifyEmail,
   verifyEmailLink,
   resendVerification,
@@ -44,6 +46,14 @@ const loginValidation = [
 
 const changePasswordValidation = [
   check("currentPassword", "Current password is required.").not().isEmpty(),
+  check(
+    "newPassword",
+    "New password must be at least 8 characters long."
+  ).isLength({ min: 8 })
+];
+
+const resetPasswordValidation = [
+  check("token", "Reset token is required.").not().isEmpty(),
   check(
     "newPassword",
     "New password must be at least 8 characters long."
@@ -97,11 +107,17 @@ router.put(
 // @route   POST /api/auth/forgot-password
 // @desc    Send password reset token
 // @access  Public
-router.post(
-  "/forgot-password",
-  forgotPasswordValidation,
-  asyncHandler(forgotPassword)
-);
+router.post("/forgot-password", forgotPasswordValidation, asyncHandler(forgotPassword));
+
+// @route   POST /api/auth/reset-password
+// @desc    Reset password
+// @access  Public
+router.post("/reset-password", resetPasswordValidation, asyncHandler(resetPassword));
+
+// @route   GET /api/auth/validate-reset-token/:token
+// @desc    Validate reset token
+// @access  Public
+router.get("/validate-reset-token/:token", asyncHandler(validateResetToken));
 
 // @route   POST /api/auth/verify-email
 // @desc    Verify email with token
