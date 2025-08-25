@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
-import { Calendar, Clock, User } from "lucide-react";
+import { Calendar, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import {
   Avatar,
@@ -17,14 +17,6 @@ const BlogCard = React.memo(
         day: "numeric",
         year: "numeric",
       });
-    }, []);
-
-    const calculateReadTime = useCallback((content) => {
-      const wordsPerMinute = 200;
-      const wordCount =
-        content?.replace(/<[^>]*>/g, "").split(/\s+/).length || 0;
-      const readTime = Math.ceil(wordCount / wordsPerMinute);
-      return `${readTime} min read`;
     }, []);
 
     const truncateText = useCallback((text, maxLength = 120) => {
@@ -64,10 +56,18 @@ const BlogCard = React.memo(
       () => formatDate(blogCreatedAt),
       [formatDate, blogCreatedAt]
     );
-    const readTime = useMemo(
-      () => calculateReadTime(blogContent),
-      [calculateReadTime, blogContent]
-    );
+    // Extract category information with fallbacks
+    const categoryInfo = useMemo(() => {
+      const primaryCategory =
+        blog?.category || blog?.categories?.[0] || blog?.Category;
+      const name =
+        primaryCategory?.name ||
+        primaryCategory?.title ||
+        primaryCategory?.slug ||
+        null;
+      const slug = primaryCategory?.slug || null;
+      return { name, slug };
+    }, [blog?.category, blog?.categories, blog?.Category]);
     const excerptText = useMemo(() => {
       const maxLength = variant === "compact" ? 100 : 150;
       return truncateText(blogExcerpt || blogContent, maxLength);
@@ -140,11 +140,12 @@ const BlogCard = React.memo(
           </Link>
         )}
 
-        {/* Read time on mobile (since it's hidden in image overlay) */}
-        <div className="flex items-center gap-1 sm:hidden mb-2">
-          <Clock className="w-3 h-3" />
-          <span className="text-xs text-muted-foreground">{readTime}</span>
-        </div>
+        {/* Category pill - visible on all breakpoints */}
+        {categoryInfo?.name && (
+          <div className="mb-2 text-xs text-muted-foreground">
+            {categoryInfo.name}
+          </div>
+        )}
 
         {/* Content */}
         <div

@@ -40,7 +40,7 @@ const HomePage = React.memo(() => {
   );
   const initialPage = parseInt(searchParams.get("page"), 10) || 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
-  const [showCategoryMenu, setShowCategoryMenu] = useState(false);
+  // Removed mobile dropdown state; using a unified category bar across breakpoints
 
   // Memoize constants to prevent recreation
   const postsPerPage = useMemo(() => 9, []);
@@ -106,7 +106,7 @@ const HomePage = React.memo(() => {
         page: currentPage,
         limit: postsPerPage,
       };
-      
+
       dispatch(searchBlogs({ query: urlParams.search, params: searchParams }));
       return;
     }
@@ -123,7 +123,15 @@ const HomePage = React.memo(() => {
 
     // Use memoized parameters for blog fetching
     dispatch(fetchAllBlogs(blogFetchParams));
-  }, [dispatch, blogFetchParams, categories, isSearchMode, urlParams.search, currentPage, postsPerPage]);
+  }, [
+    dispatch,
+    blogFetchParams,
+    categories,
+    isSearchMode,
+    urlParams.search,
+    currentPage,
+    postsPerPage,
+  ]);
 
   useEffect(() => {
     setCurrentPage(1);
@@ -139,22 +147,7 @@ const HomePage = React.memo(() => {
     }
   }, [urlParams, currentPage, selectedCategory]);
 
-  // Memoize click outside handler
-  const handleClickOutside = useCallback(
-    (event) => {
-      if (showCategoryMenu && !event.target.closest("[data-dropdown]")) {
-        setShowCategoryMenu(false);
-      }
-    },
-    [showCategoryMenu]
-  );
-
-  useEffect(() => {
-    document.addEventListener("mousedown", handleClickOutside);
-    return () => {
-      document.removeEventListener("mousedown", handleClickOutside);
-    };
-  }, [handleClickOutside]);
+  // Removed dropdown and related outside click handler for a simpler unified UI
 
   // Simplified pagination handler - no need to update URL since it's handled by state sync
   const handlePageChange = useCallback(
@@ -183,35 +176,28 @@ const HomePage = React.memo(() => {
         newSearchParams.set("category", categorySlug);
       }
       setSearchParams(newSearchParams);
-      setShowCategoryMenu(false);
     },
     [searchParams, setSearchParams]
   );
 
-  const toggleCategoryMenu = useCallback(() => {
-    setShowCategoryMenu((prev) => !prev);
-  }, []);
+  // Removed dropdown toggle; unified bar does not require it
 
   // Memoize filtered categories for display
   const filteredDisplayCategories = useMemo(() => {
     return displayCategories.filter((category) => category.articleCount > 0);
   }, [displayCategories]);
 
-  // Memoize selected category display name for mobile dropdown
-  const selectedCategoryDisplayName = useMemo(() => {
-    if (selectedCategory === "all") return "All Categories";
-    return selectedCategoryData?.name || "Select Category";
-  }, [selectedCategory, selectedCategoryData]);
+  // No selected category display name needed without dropdown
 
   return (
     <div className="min-h-screen bg-background text-foreground">
-      {/* Category Navigation Bar - Fully responsive with mobile-first approach */}
+      {/* Category Navigation Bar - Unified across breakpoints with horizontal scroll */}
       <section className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/40">
         <div className="w-full">
           <div className="container mx-auto px-6 sm:px-6">
             <nav className="py-2 sm:py-3">
-              {/* Centered Navigation for larger devices (764px and above) - Horizontal scrollable */}
-              <div className="hidden tablet-nav:flex justify-center">
+              {/* Unified horizontal, scrollable list for all viewports */}
+              <div className="flex justify-center">
                 <div className="flex items-center space-x-2 max-w-full overflow-x-auto scrollbar-hide">
                   <button
                     onClick={() => handleCategorySelect("all")}
@@ -245,61 +231,6 @@ const HomePage = React.memo(() => {
                   ))}
                 </div>
               </div>
-
-              {/* Mobile Category Dropdown (below 764px) */}
-              <div className="tablet-nav:hidden flex justify-center relative">
-                <button
-                  onClick={toggleCategoryMenu}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-secondary/50 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 focus:ring-offset-background touch-manipulation"
-                  data-dropdown
-                >
-                  <Filter className="w-4 h-4" />
-                  <span>{selectedCategoryDisplayName}</span>
-                </button>
-                {showCategoryMenu && (
-                  <div
-                    className="absolute top-full mt-2 w-48 bg-card border border-border rounded-lg shadow-lg z-20"
-                    data-dropdown
-                  >
-                    <div className="py-1">
-                      <button
-                        onClick={() => handleCategorySelect("all")}
-                        className={`w-full px-4 py-3 text-left text-sm hover:bg-secondary/50 transition-colors rounded-t-lg touch-manipulation ${
-                          selectedCategory === "all"
-                            ? "bg-primary/10 text-primary font-medium"
-                            : "text-foreground"
-                        }`}
-                      >
-                        All Categories
-                        {selectedCategory === "all" && (
-                          <span className="text-xs text-primary ml-2">✓</span>
-                        )}
-                      </button>
-                      {/* Show only featured categories with articles */}
-                      {filteredDisplayCategories.map((category, index) => (
-                        <button
-                          key={category._id}
-                          onClick={() => handleCategorySelect(category.slug)}
-                          className={`w-full px-4 py-3 text-left text-sm hover:bg-secondary/50 transition-colors touch-manipulation ${
-                            selectedCategory === category.slug
-                              ? "bg-primary/10 text-primary font-medium"
-                              : "text-foreground"
-                          } ${
-                            index === filteredDisplayCategories.length - 1
-                              ? "rounded-b-lg"
-                              : ""
-                          }`}
-                        >
-                          {category.name}
-                          {selectedCategory === category.slug && (
-                            <span className="text-xs text-primary ml-2">✓</span>
-                          )}
-                        </button>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </div>
             </nav>
           </div>
         </div>
@@ -317,13 +248,14 @@ const HomePage = React.memo(() => {
               <p className="text-sm text-muted-foreground">
                 {blogLoading.allBlogs
                   ? "Searching..."
-                  : `Found ${filteredBlogsCount} ${filteredBlogsCount === 1 ? 'article' : 'articles'} matching your query`
-                }
+                  : `Found ${filteredBlogsCount} ${
+                      filteredBlogsCount === 1 ? "article" : "articles"
+                    } matching your query`}
               </p>
             </div>
           </section>
         )}
-        
+
         {/* Blog Grid */}
         <section className="mb-8">
           <div
@@ -343,17 +275,16 @@ const HomePage = React.memo(() => {
         {allBlogs.length === 0 && !blogLoading.allBlogs ? (
           <div className="text-center py-12">
             <p className="text-muted-foreground text-lg">
-              {isSearchMode 
+              {isSearchMode
                 ? `No articles found matching "${urlParams.search}". Try different keywords or check the spelling.`
-                : "No articles found for the selected category."
-              }
+                : "No articles found for the selected category."}
             </p>
             {isSearchMode && (
               <div className="mt-4">
                 <button
                   onClick={() => {
                     const newSearchParams = new URLSearchParams(searchParams);
-                    newSearchParams.delete('search');
+                    newSearchParams.delete("search");
                     setSearchParams(newSearchParams);
                   }}
                   className="text-sm text-primary hover:text-primary/80 underline transition-colors"

@@ -89,13 +89,15 @@ const Topbar = React.memo(() => {
   return (
     <>
       <div className="flex justify-between items-center h-16 fixed w-full z-[100] bg-background/95 backdrop-blur-sm text-foreground px-4 sm:px-6 md:px-8 border-b border-border/20 shadow-sm no-print">
-        <div className="flex items-center gap-2 sm:gap-4">
+        <div className="flex items-center gap-2 sm:gap-4 -ml-3 sm:ml-0">
           {isAuthenticated && (
             <button
               onClick={handleSidebarToggle}
               className="p-2 rounded-lg hover:bg-accent/80 transition-all duration-200 ease-in-out flex-shrink-0 md:hidden cursor-pointer"
               type="button"
-              aria-label={isMobile && openMobile ? "Close sidebar" : "Open sidebar"}
+              aria-label={
+                isMobile && openMobile ? "Close sidebar" : "Open sidebar"
+              }
             >
               {isMobile && openMobile ? (
                 <IoClose className="w-5 h-5" />
@@ -107,7 +109,7 @@ const Topbar = React.memo(() => {
 
           <Link
             to={RouteIndex}
-            className="hidden md:flex items-center hover:opacity-80 transition-opacity duration-200 p-1 rounded-lg"
+            className="hidden md:flex items-center hover:opacity-80 transition-opacity duration-200 rounded-lg"
           >
             <img
               key={`logo-desktop-${theme}`}
@@ -120,7 +122,7 @@ const Topbar = React.memo(() => {
 
           <Link
             to={RouteIndex}
-            className="flex md:hidden items-center hover:opacity-80 transition-opacity duration-200 p-1 rounded-lg"
+            className="flex md:hidden items-center hover:opacity-80 transition-opacity duration-200 rounded-lg -ml-4 md:ml-0"
           >
             <img
               key={`logo-mobile-${theme}`}
