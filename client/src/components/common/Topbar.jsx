@@ -89,7 +89,7 @@ const Topbar = React.memo(() => {
   return (
     <>
       <div className="flex justify-between items-center h-16 fixed w-full z-[100] bg-background/95 backdrop-blur-sm text-foreground px-4 sm:px-6 md:px-8 border-b border-border/20 shadow-sm no-print">
-        <div className="flex items-center gap-2 sm:gap-4 -ml-3 sm:ml-0">
+        <div className="flex items-center gap-2 sm:gap-4">
           {isAuthenticated && (
             <button
               onClick={handleSidebarToggle}
@@ -122,7 +122,9 @@ const Topbar = React.memo(() => {
 
           <Link
             to={RouteIndex}
-            className="flex md:hidden items-center hover:opacity-80 transition-opacity duration-200 rounded-lg -ml-4 md:ml-0"
+            className={`flex md:hidden items-center hover:opacity-80 transition-opacity duration-200 rounded-lg ${
+              isAuthenticated ? "-ml-4" : "ml-0"
+            } md:ml-0`}
           >
             <img
               key={`logo-mobile-${theme}`}
