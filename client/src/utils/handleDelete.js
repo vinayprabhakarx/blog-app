@@ -8,7 +8,7 @@ export const deleteData = async (endpoint) => {
   try {
     // Remove API base URL from endpoint for cleaner API call
     const endpointPath = endpoint.replace(
-      import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
+      `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api`,
       ""
     );
 

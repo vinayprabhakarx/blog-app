@@ -157,8 +157,15 @@ export const register = async (req, res, next) => {
       linkForEmail
     );
     await sendEmail({ to: user.personal_info.email, subject, html, text });
-  } catch (e) {
-    return next(serverError("Failed to send verification email", e));
+  } catch (emailError) {
+    // Delete the user if email fails to avoid orphaned accounts
+    await User.findByIdAndDelete(user._id);
+    return res.status(500).json({
+      success: false,
+      message:
+        emailError.message ||
+        "Failed to send verification email. Please try again.",
+    });
   }
 
   // For development, return token to facilitate testing
@@ -387,8 +394,13 @@ export const resendVerification = async (req, res, next) => {
         linkForEmail
       );
       await sendEmail({ to: user.personal_info.email, subject, html, text });
-    } catch (e) {
-      return next(serverError("Failed to send verification email", e));
+    } catch (emailError) {
+      return res.status(500).json({
+        success: false,
+        message:
+          emailError.message ||
+          "Failed to send verification email. Please try again.",
+      });
     }
 
     return res.status(200).json({
@@ -632,18 +644,34 @@ export const forgotPassword = async (req, res, next) => {
       user.personal_info.name,
       resetUrl
     );
-    await sendEmail({
-      to: user.personal_info.email,
-      subject: emailContent.subject,
-      html: emailContent.html,
-      text: emailContent.text,
-    });
 
-    // Send success response
-    res.status(200).json({
-      success: true,
-      message: "If your email exists, you will receive a password reset link",
-    });
+    try {
+      await sendEmail({
+        to: user.personal_info.email,
+        subject: emailContent.subject,
+        html: emailContent.html,
+        text: emailContent.text,
+      });
+
+      // Send success response
+      res.status(200).json({
+        success: true,
+        message: "If your email exists, you will receive a password reset link",
+      });
+    } catch (emailError) {
+      // Clear the reset token if email fails
+      user.passwordResetToken = undefined;
+      user.passwordResetExpires = undefined;
+      await user.save({ validateBeforeSave: false });
+
+      // Return specific error message for email failures
+      return res.status(500).json({
+        success: false,
+        message:
+          emailError.message ||
+          "Failed to send password reset email. Please try again.",
+      });
+    }
   } catch (error) {
     next(serverError("Failed to process forgot password request", error));
   }
@@ -779,7 +807,10 @@ export const resetPassword = async (req, res, next) => {
           text: emailContent.text,
         });
       } catch (emailError) {
-        // Continue even if email fails
+        // If success email fails, throw the error
+        throw new Error(
+          `Password reset successful but failed to send confirmation email: ${emailError.message}`
+        );
       }
 
       await session.commitTransaction();

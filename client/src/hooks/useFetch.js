@@ -18,7 +18,7 @@ export const useFetch = (url, options = {}) => {
 
       // Extract the endpoint from the full URL
       const endpoint = url.replace(
-        import.meta.env.VITE_API_BASE_URL || "http://localhost:5000/api",
+        `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api`,
         ""
       );
 

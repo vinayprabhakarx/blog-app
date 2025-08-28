@@ -258,38 +258,43 @@ export const updateUser = async (req, res, next) => {
 
   // If email changed for non-Google users, send verification email
   if (emailChanged && !(user.google_auth || user.authProvider === "google")) {
-    try {
-      const verifyToken = jwt.sign(
-        { id: user._id, purpose: "verify_email" },
-        process.env.JWT_SECRET,
-        { expiresIn: "24h" }
-      );
-      const { linkForEmail } = buildEmailVerificationLink(verifyToken);
-      const { subject, html, text } = buildVerifyNewEmail(
-        updatedUser.personal_info?.name,
-        linkForEmail
-      );
-      await sendEmail({
-        to: updatedUser.personal_info.email,
-        subject,
-        html,
-        text,
-      });
-    } catch (e) {
-      return next(
-        handleError(
-          500,
-          "Failed to send verification email for new address",
-          e.message
-        )
-      );
+    // Only send verification email if user is not already verified
+    if (!user.emailVerified) {
+      try {
+        const verifyToken = jwt.sign(
+          { id: user._id, purpose: "verify_email" },
+          process.env.JWT_SECRET,
+          { expiresIn: "24h" }
+        );
+        const { linkForEmail } = buildEmailVerificationLink(verifyToken);
+        const { subject, html, text } = buildVerifyNewEmail(
+          updatedUser.personal_info?.name,
+          linkForEmail
+        );
+        await sendEmail({
+          to: updatedUser.personal_info.email,
+          subject,
+          html,
+          text,
+        });
+      } catch (e) {
+        return next(
+          handleError(
+            500,
+            "Failed to send verification email for new address",
+            e.message
+          )
+        );
+      }
     }
   }
 
   res.status(200).json({
     success: true,
     message: emailChanged
-      ? "Profile updated. We sent a verification link to your new email."
+      ? user.emailVerified
+        ? "Profile updated. Your email has been changed successfully."
+        : "Profile updated. We sent a verification link to your new email."
       : "Profile updated successfully",
     user: updatedUser,
     requireReauth: !!emailChanged,

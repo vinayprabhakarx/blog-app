@@ -1,4 +1,10 @@
-import React, { useState, useCallback, useMemo, useRef, useEffect } from "react";
+import React, {
+  useState,
+  useCallback,
+  useMemo,
+  useRef,
+  useEffect,
+} from "react";
 import { Input } from "../ui/input";
 import { Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -12,7 +18,7 @@ const SearchBar = React.memo(() => {
   const [showResults, setShowResults] = useState(false);
   const [searchCache, setSearchCache] = useState(new Map());
   const navigate = useNavigate();
-  
+
   // Refs for cleanup and optimization
   const debounceTimeoutRef = useRef(null);
   const throttleTimeoutRef = useRef(null);
@@ -20,7 +26,7 @@ const SearchBar = React.memo(() => {
   const lastSearchTimeRef = useRef(0);
   const searchCountRef = useRef(0);
   const isThrottledRef = useRef(false);
-  
+
   // Configuration constants
   const DEBOUNCE_DELAY = 300;
   const THROTTLE_DELAY = 100;
@@ -49,26 +55,29 @@ const SearchBar = React.memo(() => {
   const isRateLimited = useCallback(() => {
     const now = Date.now();
     const oneMinuteAgo = now - 60000;
-    
+
     // Reset counter if it's been more than a minute
     if (lastSearchTimeRef.current < oneMinuteAgo) {
       searchCountRef.current = 0;
     }
-    
+
     return searchCountRef.current >= MAX_REQUESTS_PER_MINUTE;
   }, []);
 
   // Cache management
-  const getCachedResult = useCallback((query) => {
-    const cached = searchCache.get(query.toLowerCase());
-    if (cached && Date.now() - cached.timestamp < CACHE_EXPIRY) {
-      return cached.data;
-    }
-    return null;
-  }, [searchCache]);
+  const getCachedResult = useCallback(
+    (query) => {
+      const cached = searchCache.get(query.toLowerCase());
+      if (cached && Date.now() - cached.timestamp < CACHE_EXPIRY) {
+        return cached.data;
+      }
+      return null;
+    },
+    [searchCache]
+  );
 
   const setCachedResult = useCallback((query, data) => {
-    setSearchCache(prev => {
+    setSearchCache((prev) => {
       const newCache = new Map(prev);
       // Limit cache size to 50 entries
       if (newCache.size >= 50) {
@@ -77,7 +86,7 @@ const SearchBar = React.memo(() => {
       }
       newCache.set(query.toLowerCase(), {
         data,
-        timestamp: Date.now()
+        timestamp: Date.now(),
       });
       return newCache;
     });
@@ -86,7 +95,7 @@ const SearchBar = React.memo(() => {
   // Load top blogs when component mounts or when search is cleared
   const loadTopBlogs = useCallback(async () => {
     try {
-      const cachedTopBlogs = getCachedResult('__top_blogs__');
+      const cachedTopBlogs = getCachedResult("__top_blogs__");
       if (cachedTopBlogs) {
         setSearchResults(cachedTopBlogs);
         setShowResults(true);
@@ -97,157 +106,172 @@ const SearchBar = React.memo(() => {
       const results = response.blogs || [];
       setSearchResults(results);
       setShowResults(true);
-      
+
       // Cache top blogs
-      setCachedResult('__top_blogs__', results);
+      setCachedResult("__top_blogs__", results);
     } catch (error) {
       console.error("Error loading top blogs:", error);
     }
   }, [getCachedResult, setCachedResult]);
 
   // Enhanced search function with error handling and caching
-  const performSearch = useCallback(async (query, signal) => {
-    const trimmedQuery = query.trim();
-    
-    if (!trimmedQuery || trimmedQuery.length < MIN_SEARCH_LENGTH) {
-      // Load top blogs when search is cleared
-      loadTopBlogs();
-      return;
-    }
+  const performSearch = useCallback(
+    async (query, signal) => {
+      const trimmedQuery = query.trim();
 
-    // Check rate limiting
-    if (isRateLimited()) {
-      showToast("error", "Too many search requests. Please wait a moment.");
-      return;
-    }
-
-    // Check cache first
-    const cachedResult = getCachedResult(trimmedQuery);
-    if (cachedResult) {
-      setSearchResults(cachedResult);
-      setShowResults(true);
-      setIsSearching(false);
-      return;
-    }
-
-    try {
-      setIsSearching(true);
-      searchCountRef.current++;
-      lastSearchTimeRef.current = Date.now();
-      
-      // Create timeout promise
-      const timeoutPromise = new Promise((_, reject) => {
-        setTimeout(() => reject(new Error('Request timeout')), REQUEST_TIMEOUT);
-      });
-      
-      // Try advanced search first, fallback to regular search
-      let searchPromise;
-      try {
-        searchPromise = blogService.advancedSearch(trimmedQuery, { limit: 5 });
-      } catch {
-        searchPromise = blogService.search(trimmedQuery, { limit: 5 });
-      }
-      const response = await Promise.race([searchPromise, timeoutPromise]);
-      
-      // Check if request was aborted
-      if (signal?.aborted) {
+      if (!trimmedQuery || trimmedQuery.length < MIN_SEARCH_LENGTH) {
+        // Load top blogs when search is cleared
+        loadTopBlogs();
         return;
       }
-      
-      const results = response.blogs || [];
-      setSearchResults(results);
-      setShowResults(true);
-      
-      // Cache the result
-      setCachedResult(trimmedQuery, results);
-      
-    } catch (error) {
-      if (error.name === 'AbortError' || signal?.aborted) {
-        return; // Request was intentionally aborted
+
+      // Check rate limiting
+      if (isRateLimited()) {
+        showToast("error", "Too many search requests. Please wait a moment.");
+        return;
       }
-      
-      console.error("Search error:", error);
-      
-      if (error.message === 'Request timeout') {
-        showToast("error", "Search request timed out. Please try again.");
-      } else {
-        showToast("error", "Search failed. Please try again.");
+
+      // Check cache first
+      const cachedResult = getCachedResult(trimmedQuery);
+      if (cachedResult) {
+        setSearchResults(cachedResult);
+        setShowResults(true);
+        setIsSearching(false);
+        return;
       }
-      
-      setSearchResults([]);
-      setShowResults(false);
-    } finally {
-      setIsSearching(false);
-    }
-  }, [isRateLimited, getCachedResult, setCachedResult, loadTopBlogs]);
+
+      try {
+        setIsSearching(true);
+        searchCountRef.current++;
+        lastSearchTimeRef.current = Date.now();
+
+        // Create timeout promise
+        const timeoutPromise = new Promise((_, reject) => {
+          setTimeout(
+            () => reject(new Error("Request timeout")),
+            REQUEST_TIMEOUT
+          );
+        });
+
+        // Try advanced search first, fallback to regular search
+        let searchPromise;
+        try {
+          searchPromise = blogService.advancedSearch(trimmedQuery, {
+            limit: 5,
+          });
+        } catch {
+          searchPromise = blogService.search(trimmedQuery, { limit: 5 });
+        }
+        const response = await Promise.race([searchPromise, timeoutPromise]);
+
+        // Check if request was aborted
+        if (signal?.aborted) {
+          return;
+        }
+
+        const results = response.blogs || [];
+        setSearchResults(results);
+        setShowResults(true);
+
+        // Cache the result
+        setCachedResult(trimmedQuery, results);
+      } catch (error) {
+        if (error.name === "AbortError" || signal?.aborted) {
+          return; // Request was intentionally aborted
+        }
+
+        console.error("Search error:", error);
+
+        if (error.message === "Request timeout") {
+          showToast("error", "Search request timed out. Please try again.");
+        } else {
+          showToast("error", "Search failed. Please try again.");
+        }
+
+        setSearchResults([]);
+        setShowResults(false);
+      } finally {
+        setIsSearching(false);
+      }
+    },
+    [isRateLimited, getCachedResult, setCachedResult, loadTopBlogs]
+  );
 
   // Debounced search handler
-  const debouncedSearch = useCallback((query) => {
-    // Clear existing timeouts
-    cleanup();
-    
-    if (!query.trim() || query.trim().length < MIN_SEARCH_LENGTH) {
-      loadTopBlogs();
-      return;
-    }
+  const debouncedSearch = useCallback(
+    (query) => {
+      // Clear existing timeouts
+      cleanup();
 
-    debounceTimeoutRef.current = setTimeout(() => {
-      // Create new abort controller for this request
-      abortControllerRef.current = new AbortController();
-      performSearch(query, abortControllerRef.current.signal);
-    }, DEBOUNCE_DELAY);
-  }, [performSearch, cleanup, loadTopBlogs]);
+      if (!query.trim() || query.trim().length < MIN_SEARCH_LENGTH) {
+        loadTopBlogs();
+        return;
+      }
+
+      debounceTimeoutRef.current = setTimeout(() => {
+        // Create new abort controller for this request
+        abortControllerRef.current = new AbortController();
+        performSearch(query, abortControllerRef.current.signal);
+      }, DEBOUNCE_DELAY);
+    },
+    [performSearch, cleanup, loadTopBlogs]
+  );
 
   // Simplified input change handler
-  const handleInputChange = useCallback((e) => {
-    const value = e.target.value;
-    setSearchQuery(value);
-    
-    // Clear existing timeouts
-    if (debounceTimeoutRef.current) {
-      clearTimeout(debounceTimeoutRef.current);
-      debounceTimeoutRef.current = null;
-    }
-    
-    // Show results dropdown immediately when typing
-    setShowResults(true);
-    
-    // Immediate UI update for empty query
-    if (!value.trim()) {
-      setShowResults(false);
-      setSearchResults([]);
-      return;
-    }
+  const handleInputChange = useCallback(
+    (e) => {
+      const value = e.target.value;
+      setSearchQuery(value);
 
-    // If query is too short, don't show anything
-    if (value.trim().length < MIN_SEARCH_LENGTH) {
-      setShowResults(false);
-      setSearchResults([]);
-      return;
-    }
-    
-    // Set up debounced search
-    debounceTimeoutRef.current = setTimeout(() => {
-      // Create new abort controller for this request
-      if (abortControllerRef.current) {
-        abortControllerRef.current.abort();
+      // Clear existing timeouts
+      if (debounceTimeoutRef.current) {
+        clearTimeout(debounceTimeoutRef.current);
+        debounceTimeoutRef.current = null;
       }
-      abortControllerRef.current = new AbortController();
-      performSearch(value, abortControllerRef.current.signal);
-    }, DEBOUNCE_DELAY);
-    
-  }, [loadTopBlogs, performSearch]);
+
+      // Show results dropdown immediately when typing
+      setShowResults(true);
+
+      // Immediate UI update for empty query
+      if (!value.trim()) {
+        setShowResults(false);
+        setSearchResults([]);
+        return;
+      }
+
+      // If query is too short, don't show anything
+      if (value.trim().length < MIN_SEARCH_LENGTH) {
+        setShowResults(false);
+        setSearchResults([]);
+        return;
+      }
+
+      // Set up debounced search
+      debounceTimeoutRef.current = setTimeout(() => {
+        // Create new abort controller for this request
+        if (abortControllerRef.current) {
+          abortControllerRef.current.abort();
+        }
+        abortControllerRef.current = new AbortController();
+        performSearch(value, abortControllerRef.current.signal);
+      }, DEBOUNCE_DELAY);
+    },
+    [loadTopBlogs, performSearch]
+  );
 
   // Enhanced result click handler
-  const handleResultClick = useCallback((blog) => {
-    // Clean up any pending searches
-    cleanup();
-    
-    navigate(`/blog/${blog.slug}`);
-    setSearchQuery("");
-    setShowResults(false);
-    setSearchResults([]);
-  }, [navigate, cleanup]);
+  const handleResultClick = useCallback(
+    (blog) => {
+      // Clean up any pending searches
+      cleanup();
+
+      navigate(`/blog/${blog.slug}`);
+      setSearchQuery("");
+      setShowResults(false);
+      setSearchResults([]);
+    },
+    [navigate, cleanup]
+  );
 
   // Enhanced clear search handler
   const handleClearSearch = useCallback(() => {
@@ -258,17 +282,20 @@ const SearchBar = React.memo(() => {
   }, [cleanup]);
 
   // Form submit handler - navigate to home page with search results
-  const handleFormSubmit = useCallback((e) => {
-    e.preventDefault();
-    
-    const trimmedQuery = searchQuery.trim();
-    if (trimmedQuery.length >= MIN_SEARCH_LENGTH) {
-      // Navigate to home page with search query
-      cleanup();
-      setShowResults(false);
-      navigate(`/?search=${encodeURIComponent(trimmedQuery)}`);
-    }
-  }, [searchQuery, navigate, cleanup]);
+  const handleFormSubmit = useCallback(
+    (e) => {
+      e.preventDefault();
+
+      const trimmedQuery = searchQuery.trim();
+      if (trimmedQuery.length >= MIN_SEARCH_LENGTH) {
+        // Navigate to home page with search query
+        cleanup();
+        setShowResults(false);
+        navigate(`/?search=${encodeURIComponent(trimmedQuery)}`);
+      }
+    },
+    [searchQuery, navigate, cleanup]
+  );
 
   // Handle input focus - don't show anything by default
   const handleInputFocus = useCallback(() => {
@@ -288,19 +315,20 @@ const SearchBar = React.memo(() => {
   // Hide results when clicking outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (!event.target.closest('[data-search-container]')) {
+      if (!event.target.closest("[data-search-container]")) {
         setShowResults(false);
       }
     };
 
-    document.addEventListener('mousedown', handleClickOutside);
-    return () => document.removeEventListener('mousedown', handleClickOutside);
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   // Memoize search status text
   const searchStatusText = useMemo(() => {
     if (isSearching) return "Searching...";
-    if (searchResults.length === 0) return `No blogs found for "${searchQuery}"`;
+    if (searchResults.length === 0)
+      return `No blogs found for "${searchQuery}"`;
     return null;
   }, [isSearching, searchResults.length, searchQuery]);
 
@@ -342,7 +370,9 @@ const SearchBar = React.memo(() => {
           ) : (
             <div className="py-2">
               <div className="px-3 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                {searchQuery.trim() ? `Search Results (${searchResults.length})` : `Top Blogs (${searchResults.length})`}
+                {searchQuery.trim()
+                  ? `Search Results (${searchResults.length})`
+                  : `Top Blogs (${searchResults.length})`}
               </div>
               {searchResults.slice(0, 8).map((blog) => (
                 <button
@@ -356,9 +386,10 @@ const SearchBar = React.memo(() => {
                         src={
                           blog.banner.startsWith("http")
                             ? blog.banner
-                            : `${import.meta.env.VITE_API_BASE_URL}/${
-                                blog.banner
-                              }`
+                            : `${
+                                import.meta.env.VITE_API_BASE_URL ||
+                                "http://localhost:5000"
+                              }/${blog.banner}`
                         }
                         alt={blog.title}
                         className="w-12 h-12 object-cover rounded flex-shrink-0"
