@@ -234,8 +234,7 @@ const Dashboard = () => {
     <div className="min-h-screen bg-background">
       {/* Header */}
       <div className="text-center mb-8 p-6">
-        <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2">
-          <BarChart3 className="h-8 w-8" />
+        <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
           {isAdmin
             ? "Admin Dashboard"
             : isAuthor

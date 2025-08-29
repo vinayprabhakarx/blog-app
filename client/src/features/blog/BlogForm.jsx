@@ -373,8 +373,7 @@ const BlogForm = ({ existingBlog }) => {
     <div className="p-6">
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-3 mb-2">
-          <FaPen className="h-6 w-6 md:h-8 md:w-8" />
-          <h1 className="text-2xl md:text-3xl font-bold">
+          <h1 className="text-2xl md:text-2xl font-bold">
             {isEditing ? "Edit Blog" : "Create Blog"}
           </h1>
         </div>

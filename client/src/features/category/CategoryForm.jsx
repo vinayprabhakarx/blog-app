@@ -1,6 +1,12 @@
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
+import { z } from "zod";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import slugify from "slugify";
+
+// UI Components
 import {
   Form,
   FormControl,
@@ -9,23 +15,26 @@ import {
   FormLabel,
   FormMessage,
 } from "../../components/ui/form";
-import { z } from "zod";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "../../components/ui/input";
 import { Textarea } from "../../components/ui/textarea";
-import { Card, CardHeader, CardTitle } from "../../components/ui/card";
-import { getEnv } from "../../utils/getEnv";
-import { showToast } from "../../utils/showToast";
-import slugify from "slugify";
+import { Card } from "../../components/ui/card";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import LoadingButton from "../../components/common/LoadingButton";
-import { useFetch } from "../../hooks/useFetch";
+
+// Redux
 import {
+  fetchCategoryById,
+  clearCurrentCategory,
   createCategory,
   updateCategory,
   selectOperationLoading,
+  selectCurrentCategory,
+  selectCategoriesLoading,
+  selectCurrentCategoryError,
 } from "./categoriesSlice";
+
+// Utils
+import { showToast } from "../../utils/showToast";
 
 const formSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters long."),
@@ -34,28 +43,23 @@ const formSchema = z.object({
 });
 
 const CategoryForm = () => {
+  const navigate = useNavigate();
   const { id } = useParams();
   const dispatch = useDispatch();
+
+  // Get state from Redux
+  const currentCategory = useSelector(selectCurrentCategory);
+  const loading = useSelector(selectCategoriesLoading);
+  const error = useSelector(selectCurrentCategoryError);
   const operationLoading = useSelector(selectOperationLoading);
 
+  // Check if in edit mode
   const isEditMode = Boolean(id);
   const isSubmitting = isEditMode
     ? operationLoading.update
     : operationLoading.create;
 
-  const {
-    data: categoryData,
-    loading,
-    error,
-  } = useFetch(
-    isEditMode ? `${getEnv("VITE_API_BASE_URL")}/categories/show/${id}` : null,
-    {
-      method: "GET",
-      credentials: "include",
-    },
-    [id]
-  );
-
+  // Initialize form with default values
   const form = useForm({
     resolver: zodResolver(formSchema),
     defaultValues: {
@@ -68,13 +72,36 @@ const CategoryForm = () => {
   const name = form.watch("name");
   const slug = slugify(name || "", { lower: true });
 
+  // Fetch category data when in edit mode
   useEffect(() => {
-    if (isEditMode && categoryData?.category) {
-      form.setValue("name", categoryData.category.name);
-      form.setValue("description", categoryData.category.description || "");
-      form.setValue("featured", categoryData.category.featured || false);
+    if (isEditMode && id) {
+      dispatch(fetchCategoryById(id));
     }
-  }, [categoryData, form, isEditMode]);
+    return () => {
+      if (isEditMode) {
+        dispatch(clearCurrentCategory());
+      }
+    };
+  }, [dispatch, id, isEditMode]);
+
+  // Update form when currentCategory changes
+  useEffect(() => {
+    if (isEditMode && currentCategory) {
+      const { name, description, featured } = currentCategory;
+      form.reset({
+        name: name || "",
+        description: description || "",
+        featured: !!featured,
+      });
+    } else if (!isEditMode) {
+      // Reset form when switching to create mode
+      form.reset({
+        name: "",
+        description: "",
+        featured: false,
+      });
+    }
+  }, [currentCategory, form, isEditMode]);
 
   const onSubmit = async (values) => {
     if (isSubmitting) {
@@ -153,7 +180,7 @@ const CategoryForm = () => {
 
   return (
     <div>
-      <h1 className="text-3xl md:text-4xl font-bold mb-4 text-center">
+      <h1 className="text-2xl font-bold mb-4 text-center">
         {isEditMode ? "Edit Category" : "Add New Category"}
       </h1>
       <Card className="pt-5 max-w-screen-md mx-auto p-6">

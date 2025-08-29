@@ -33,6 +33,7 @@ import { cn } from "../../lib/utils";
 import CommentForm from "./CommentForm";
 import { Link } from "react-router-dom";
 import { showToast } from "../../utils/showToast";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 // New, minimal management view aligned with app design
 const CommentManagement = () => {
@@ -241,7 +242,7 @@ const CommentManagement = () => {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <LoadingSpinner />
       </div>
     );
   }
@@ -250,8 +251,7 @@ const CommentManagement = () => {
     <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
       {/* Header */}
       <div className="text-center space-y-3">
-        <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2">
-          <MessageSquare className="h-8 w-8" />
+        <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
           Comment Management
         </h1>
         <div className="flex justify-center gap-4 text-sm text-muted-foreground">
@@ -319,7 +319,7 @@ const CommentManagement = () => {
             <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search comments, users, or blogs..."
+              placeholder="Search comments"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 w-full h-10 sm:h-9 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring text-foreground placeholder:text-muted-foreground"

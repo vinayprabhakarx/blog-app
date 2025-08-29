@@ -7,8 +7,14 @@ const categoryService = {
     return response.data;
   },
 
-  // Get category by slug
-  getById: async (categorySlug) => {
+  // Get category by ID (for editing)
+  getById: async (categoryId) => {
+    const response = await api.get(`/categories/show/${categoryId}`);
+    return response.data;
+  },
+
+  // Get category by slug (for public viewing)
+  getBySlug: async (categorySlug) => {
     const response = await api.get(`/categories/${categorySlug}`);
     return response.data;
   },

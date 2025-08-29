@@ -102,32 +102,23 @@ const HomePage = React.memo(() => {
     dispatch(fetchAllCategories());
   }, [dispatch]);
 
-  // Track initial load vs pagination changes
+  // Track initial load state
   useEffect(() => {
-    if (
-      (blogLoading.allBlogs || categoriesLoading) &&
-      isInitialLoadRef.current
-    ) {
+    if (blogLoading.allBlogs || categoriesLoading) {
       // This is the initial load, keep showing loading
       hasShownInitialLoadingRef.current = true;
-    } else if (
-      !blogLoading.allBlogs &&
-      !categoriesLoading &&
-      isInitialLoadRef.current
-    ) {
+    } else if (hasShownInitialLoadingRef.current) {
       // Initial load is complete
       isInitialLoadRef.current = false;
     }
   }, [blogLoading.allBlogs, categoriesLoading]);
 
-  // Show loading spinner on initial load or when no blogs are loaded yet
+  // Show loading spinner during initial load or when categories are loading
   const shouldShowInitialLoading = useMemo(() => {
     return (
-      (blogLoading.allBlogs && isInitialLoadRef.current) ||
-      (categoriesLoading && isInitialLoadRef.current) ||
-      (allBlogs.length === 0 && !hasShownInitialLoadingRef.current)
+      isInitialLoadRef.current && (blogLoading.allBlogs || categoriesLoading)
     );
-  }, [blogLoading.allBlogs, categoriesLoading, allBlogs.length]);
+  }, [blogLoading.allBlogs, categoriesLoading]);
 
   useEffect(() => {
     // Handle search queries
@@ -316,16 +307,20 @@ const HomePage = React.memo(() => {
                 <p className="text-muted-foreground text-lg">
                   {isSearchMode
                     ? `No articles found matching "${urlParams.search}". Try different keywords or check the spelling.`
-                    : "No articles found for the selected category."}
+                    : selectedCategory !== "all"
+                    ? "No published articles found in this category yet."
+                    : "No articles available yet."}
                 </p>
-                {isSearchMode && (
+                {(isSearchMode || selectedCategory !== "all") && (
                   <div className="mt-4">
                     <button
                       onClick={() => {
                         const newSearchParams = new URLSearchParams(
                           searchParams
                         );
-                        newSearchParams.delete("search");
+                        if (isSearchMode) newSearchParams.delete("search");
+                        if (selectedCategory !== "all")
+                          newSearchParams.delete("category");
                         setSearchParams(newSearchParams);
                       }}
                       className="text-sm text-primary hover:text-primary/80 underline transition-colors"

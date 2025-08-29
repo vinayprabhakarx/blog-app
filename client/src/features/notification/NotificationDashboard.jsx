@@ -3,13 +3,9 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   Bell,
   MessageSquare,
-  Flag,
-  User,
   RefreshCw,
   Trash2,
-  Heart,
   CheckCircle,
-  Shield,
 } from "lucide-react";
 import {
   Avatar,
@@ -32,6 +28,7 @@ import { useNotifications } from "../../hooks/useNotifications";
 import { cn } from "../../lib/utils";
 import { Link } from "react-router-dom";
 import CommentForm from "../comment/CommentForm";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const NotificationDashboard = () => {
   const dispatch = useDispatch();
@@ -122,7 +119,7 @@ const NotificationDashboard = () => {
   if (loading) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+        <LoadingSpinner />
       </div>
     );
   }
@@ -142,8 +139,7 @@ const NotificationDashboard = () => {
         {/* Header */}
         <div className="text-center space-y-6">
           <div className="space-y-3">
-            <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2">
-              <Bell className="h-8 w-8" />
+            <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
               Notification Center
             </h1>
           </div>

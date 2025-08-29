@@ -26,25 +26,20 @@ import {
   fetchMonthlyPerformance,
   fetchRecentActivities,
   selectAdminStats,
-  selectAdminStatsLoading,
   selectMonthlyPerformance,
   selectMonthlyPerformanceLoading,
-  selectRecentActivities,
-  selectRecentActivitiesLoading,
 } from "./userSlice";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const Analytics = () => {
   const dispatch = useDispatch();
 
   // Redux selectors
   const adminStats = useSelector(selectAdminStats);
-  const adminStatsLoading = useSelector(selectAdminStatsLoading);
   const monthlyPerformance = useSelector(selectMonthlyPerformance);
   const monthlyPerformanceLoading = useSelector(
     selectMonthlyPerformanceLoading
   );
-  const recentActivities = useSelector(selectRecentActivities);
-  const recentActivitiesLoading = useSelector(selectRecentActivitiesLoading);
 
   const [analytics, setAnalytics] = useState({
     totalViews: 0,
@@ -167,13 +162,8 @@ const Analytics = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-background p-6">
-        <div className="max-w-7xl mx-auto">
-          <div className="text-center py-8">
-            <Activity className="h-16 w-16 text-muted-foreground mx-auto mb-4 animate-pulse" />
-            <p className="text-muted-foreground">Loading analytics...</p>
-          </div>
-        </div>
+      <div className="flex items-center justify-center min-h-[400px]">
+        <LoadingSpinner />
       </div>
     );
   }
@@ -183,8 +173,7 @@ const Analytics = () => {
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2">
-            <BarChart3 className="h-8 w-8" />
+          <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
             Analytics Dashboard
           </h1>
         </div>

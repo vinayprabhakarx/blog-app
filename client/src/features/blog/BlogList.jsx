@@ -1,4 +1,10 @@
-import React, { useState, useEffect, useMemo, useCallback } from "react";
+import React, {
+  useState,
+  useEffect,
+  useMemo,
+  useCallback,
+  useRef,
+} from "react";
 import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Card, CardContent } from "../../components/ui/card";
@@ -45,6 +51,8 @@ const BlogList = () => {
   const { slug, username } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
+  const [isInitialLoad, setIsInitialLoad] = useState(true);
+  const isInitialFetch = useRef(true);
 
   const { user, isAuthenticated } = useAuth();
 
@@ -70,10 +78,6 @@ const BlogList = () => {
     dispatch: categoriesDispatch,
   } = useCategories();
 
-  const [searchTerm, setSearchTerm] = useState(filters.search || "");
-  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState(
-    filters.search || ""
-  );
   const [selectedCategory, setSelectedCategory] = useState(
     slug || filters.category || "all"
   );
@@ -82,15 +86,6 @@ const BlogList = () => {
 
   const [draftFilter, setDraftFilter] = useState("all");
   const [selectedAuthor, setSelectedAuthor] = useState("all");
-
-  // Debounce search to prevent excessive API calls
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedSearchTerm(searchTerm);
-    }, 500);
-
-    return () => clearTimeout(timer);
-  }, [searchTerm]);
 
   const [currentPage, setCurrentPage] = useState(1);
   const blogsPerPage = 10;
@@ -121,27 +116,30 @@ const BlogList = () => {
       }
     }
 
-    if (debouncedSearchTerm) {
-      params.search = debouncedSearchTerm;
-    }
 
     params.sortBy = sortBy;
     params.sortOrder = sortOrder;
 
-    if (isUserBlogsPage && username) {
-      params.username = username;
-    }
+    const fetchData = async () => {
+      try {
+        if (isMyBlogsPage) {
+          await blogDispatch(fetchMyBlogs(params));
+        } else {
+          await blogDispatch(fetchAllBlogs(params));
+        }
+      } finally {
+        if (isInitialFetch.current) {
+          isInitialFetch.current = false;
+          setIsInitialLoad(false);
+        }
+      }
+    };
 
-    if (isMyBlogsPage) {
-      blogDispatch(fetchMyBlogs(params));
-    } else {
-      blogDispatch(fetchAllBlogs(params));
-    }
+    fetchData();
   }, [
     blogDispatch,
     currentPage,
     selectedCategory,
-    debouncedSearchTerm,
     sortBy,
     sortOrder,
     categories,
@@ -151,21 +149,6 @@ const BlogList = () => {
     username,
   ]);
 
-  useEffect(() => {
-    const debounceTimer = setTimeout(() => {
-      blogDispatch(
-        setFilters({
-          search: debouncedSearchTerm,
-          category: selectedCategory,
-          sortBy,
-          sortOrder,
-        })
-      );
-    }, 300);
-
-    return () => clearTimeout(debounceTimer);
-  }, [debouncedSearchTerm, selectedCategory, sortBy, sortOrder, blogDispatch]);
-
   const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
@@ -174,7 +157,7 @@ const BlogList = () => {
     } else {
       setIsInitialized(true);
     }
-  }, [debouncedSearchTerm, selectedCategory, sortBy, sortOrder, isInitialized]);
+  }, [selectedCategory, sortBy, sortOrder, isInitialized]);
 
   const formatReadTime = (content) => {
     const wordsPerMinute = 200;
@@ -196,12 +179,8 @@ const BlogList = () => {
   const currentLoading = isMyBlogsPage ? myBlogsLoading : allBlogsLoading;
   const currentError = isMyBlogsPage ? myBlogsError : allBlogsError;
 
-  const shouldShowLoading =
-    currentLoading &&
-    (debouncedSearchTerm ||
-      selectedCategory !== "all" ||
-      sortBy !== "createdAt" ||
-      sortOrder !== "desc");
+  // Only show loading on initial page load, not during pagination/search/filter
+  const shouldShowInitialLoading = currentLoading && isInitialLoad;
 
   const totalBlogs = blogPagination?.totalBlogs || currentBlogs.length;
 
@@ -302,8 +281,6 @@ const BlogList = () => {
   }, [slug, selectedCategory]);
 
   const handleClearFilters = useCallback(() => {
-    setSearchTerm("");
-    setDebouncedSearchTerm("");
     setSelectedCategory("all");
     setSortBy("createdAt");
     setSortOrder("desc");
@@ -337,9 +314,6 @@ const BlogList = () => {
             }
           }
 
-          if (debouncedSearchTerm) {
-            params.search = debouncedSearchTerm;
-          }
 
           params.sortBy = sortBy;
           params.sortOrder = sortOrder;
@@ -358,7 +332,6 @@ const BlogList = () => {
       blogDispatch,
       currentPage,
       selectedCategory,
-      debouncedSearchTerm,
       sortBy,
       sortOrder,
       categories,
@@ -386,10 +359,10 @@ const BlogList = () => {
   const isAdmin = user?.role === "admin";
   const isAuthor = user?.role === "author";
 
-  if (shouldShowLoading) {
+  if (shouldShowInitialLoading) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <LoadingSpinner />
+      <div className="flex justify-center items-center min-h-[400px]">
+        <LoadingSpinner size="lg" />
       </div>
     );
   }
@@ -416,8 +389,7 @@ const BlogList = () => {
     <div className="p-4 sm:p-6 space-y-4 sm:space-y-6">
       <div className="flex flex-col space-y-3 sm:space-y-4 items-center">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
-            <FileText className="h-8 w-8" />
+          <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
             {isAdmin || isAuthor ? "Blog Management" : "All Blogs"}
           </h1>
           <div className="flex justify-center gap-4 text-sm text-muted-foreground">
@@ -477,41 +449,21 @@ const BlogList = () => {
 
       <div className="space-y-3 sm:space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
-          <div className="relative col-span-1 sm:col-span-2 lg:col-span-1">
-            <Search className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Search blogs..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              onKeyDown={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                  e.stopPropagation();
-                }
-              }}
-              onKeyPress={(e) => {
-                if (e.key === "Enter") {
-                  e.preventDefault();
-                }
-              }}
-              className="pl-10 w-full h-10 sm:h-9"
-            />
+          <div className="col-span-1">
+            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+              <SelectTrigger className="w-full h-10 sm:h-9 text-sm">
+                <SelectValue placeholder="All Categories" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Categories</SelectItem>
+                {categories.map((category) => (
+                  <SelectItem key={category._id} value={category.slug}>
+                    {category.name}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
-
-          <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-            <SelectTrigger className="w-full h-10 sm:h-9 text-sm">
-              <SelectValue placeholder="All Categories" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Categories</SelectItem>
-              {categories.map((category) => (
-                <SelectItem key={category._id} value={category.slug}>
-                  {category.name}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
 
           {isMyBlogsPage && (
             <Select value={draftFilter} onValueChange={setDraftFilter}>

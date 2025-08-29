@@ -9,13 +9,7 @@ import {
   selectAllUsersError,
   selectUsersPagination,
 } from "./userSlice";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "../../components/ui/card";
+import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { Input } from "../../components/ui/input";
@@ -70,9 +64,7 @@ import {
   UserCog,
   RefreshCw,
   Edit,
-  Mail,
   CheckCircle,
-  XCircle,
   AlertTriangle,
 } from "lucide-react";
 import { showToast } from "../../utils/showToast";
@@ -312,8 +304,7 @@ const UserManagement = () => {
     return (
       <div className="p-6 space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
-            <Users className="h-8 w-8" />
+          <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
             User Management
           </h1>
         </div>
@@ -337,8 +328,7 @@ const UserManagement = () => {
   return (
     <div className="p-6 space-y-6">
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
-          <Users className="h-8 w-8" />
+        <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
           User Management
         </h1>
         <div className="flex justify-center gap-4 text-sm text-muted-foreground">

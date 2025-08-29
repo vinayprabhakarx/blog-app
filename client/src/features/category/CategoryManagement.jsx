@@ -18,7 +18,7 @@ import {
   selectCategoriesLoading,
   selectOperationLoading,
 } from "./categoriesSlice";
-import { Tag, ChevronRight, Star, Edit, Trash2, Plus } from "lucide-react";
+import { Tag, Star, Edit, Trash2, Plus } from "lucide-react";
 
 const CategoryManagement = () => {
   const dispatch = useDispatch();
@@ -95,8 +95,7 @@ const CategoryManagement = () => {
     return (
       <div className="p-6 space-y-6">
         <div className="text-center">
-          <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
-            <Tag className="h-8 w-8" />
+          <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
             Category Management
           </h1>
         </div>
@@ -136,8 +135,7 @@ const CategoryManagement = () => {
     <div className="p-6 space-y-6">
       {/* Header with Stats */}
       <div className="text-center">
-        <h1 className="text-3xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
-          <Tag className="h-8 w-8" />
+        <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
           Category Management
         </h1>
         <div className="flex justify-center gap-4 text-sm text-muted-foreground">

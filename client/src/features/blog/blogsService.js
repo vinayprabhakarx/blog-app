@@ -16,10 +16,10 @@ const blogService = {
 
   // Advanced search across multiple fields (author, title, content, category, tags)
   advancedSearch: async (query, params = {}) => {
-    const searchParams = new URLSearchParams({ 
-      search: query, 
-      searchFields: 'title,content,author,category,tags',
-      ...params 
+    const searchParams = new URLSearchParams({
+      search: query,
+      searchFields: "title,content,author,category,tags",
+      ...params,
     });
     const response = await api.get(`/blogs?${searchParams.toString()}`);
     return response.data;
@@ -27,7 +27,9 @@ const blogService = {
 
   // Get top/popular blogs
   getTopBlogs: async (limit = 5) => {
-    const response = await api.get(`/blogs?limit=${limit}&sort=views,likes,createdAt&order=desc`);
+    const response = await api.get(
+      `/blogs?limit=${limit}&sort=views,likes,createdAt&order=desc`
+    );
     return response.data;
   },
 

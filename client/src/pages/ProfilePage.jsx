@@ -2,12 +2,10 @@ import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
 import userService from "../features/user_management/usersService";
-import { Skeleton } from "../components/ui/skeleton";
 import { Button } from "../components/ui/button";
 import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
 import {
   FaArrowLeft,
-  FaUser,
   FaGlobe,
   FaLinkedin,
   FaGithub,
@@ -575,14 +573,24 @@ const ProfilePage = React.memo(() => {
                       </div>
                     )}
 
-                    {/* Social Links - Below Author */}
+                    {/* Social Links - Desktop */}
                     {hasSocialLinks && (
-                      <div className="flex gap-3 mb-4">
+                      <div className="pt-2 space-y-2 mb-4">
                         {Object.entries(profile.social_links).map(
                           ([platform, username]) => {
                             if (!username) return null;
                             const IconComponent = getSocialIcon(platform);
                             const url = formatSocialUrl(platform, username);
+                            const displayName =
+                              platform === "github"
+                                ? username
+                                : platform === "linkedin"
+                                ? `${username}`
+                                : platform === "twitter"
+                                ? `${username}`
+                                : platform === "website"
+                                ? url.replace(/^https?:\/\//, "")
+                                : username;
 
                             return (
                               <a
@@ -590,10 +598,12 @@ const ProfilePage = React.memo(() => {
                                 href={url}
                                 target="_blank"
                                 rel="noopener noreferrer"
-                                className="text-muted-foreground hover:text-foreground transition-colors"
-                                title={platform}
+                                className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
                               >
-                                <IconComponent className="w-5 h-5" />
+                                <IconComponent className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
+                                <span className="text-sm truncate">
+                                  {displayName}
+                                </span>
                               </a>
                             );
                           }

@@ -24,7 +24,21 @@ export const fetchCategoryBySlug = createAsyncThunk(
   "categories/fetchCategoryBySlug",
   async (slug, { rejectWithValue }) => {
     try {
-      const data = await categoryService.getById(slug);
+      const data = await categoryService.getBySlug(slug);
+      return data.category || data;
+    } catch (error) {
+      return rejectWithValue(
+        error.response?.data?.message || "Category not found"
+      );
+    }
+  }
+);
+
+export const fetchCategoryById = createAsyncThunk(
+  "categories/fetchCategoryById",
+  async (id, { rejectWithValue }) => {
+    try {
+      const data = await categoryService.getById(id);
       return data.category || data;
     } catch (error) {
       return rejectWithValue(
@@ -135,6 +149,21 @@ const categoriesSlice = createSlice({
         state.currentCategory = action.payload;
       })
       .addCase(fetchCategoryBySlug.rejected, (state, action) => {
+        state.currentCategoryLoading = false;
+        state.currentCategoryError = action.payload;
+      });
+
+    // Fetch Category by ID (for editing)
+    builder
+      .addCase(fetchCategoryById.pending, (state) => {
+        state.currentCategoryLoading = true;
+        state.currentCategoryError = null;
+      })
+      .addCase(fetchCategoryById.fulfilled, (state, action) => {
+        state.currentCategoryLoading = false;
+        state.currentCategory = action.payload;
+      })
+      .addCase(fetchCategoryById.rejected, (state, action) => {
         state.currentCategoryLoading = false;
         state.currentCategoryError = action.payload;
       });
