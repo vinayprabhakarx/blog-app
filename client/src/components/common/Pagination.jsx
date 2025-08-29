@@ -55,43 +55,41 @@ const Pagination = ({
 
   return (
     <div className="flex items-center justify-center mt-16 mb-8">
-      <div className="flex items-center space-x-2">
+      <div className="flex items-center gap-0.5 sm:gap-1">
         {/* Left Arrow - Only show if not on first page */}
         {validCurrentPage > 1 && (
           <button
             onClick={() => handlePageChange(validCurrentPage - 1)}
-            className="p-2 rounded-full transition-all duration-200 text-foreground hover:bg-muted cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-full transition-all duration-200 text-foreground hover:bg-muted cursor-pointer"
             aria-label="Previous page"
           >
-            <ArrowLeft className="w-5 h-5" />
+            <ArrowLeft className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         )}
 
         {/* Page Numbers */}
-        <div className="flex items-center space-x-2">
-          {generatePageNumbers().map((page) => (
-            <button
-              key={page}
-              onClick={() => handlePageChange(page)}
-              className={`px-3 py-2 text-sm transition-all duration-200 rounded-md cursor-pointer ${
-                validCurrentPage === page
-                  ? "font-extrabold bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
-                  : "text-foreground hover:bg-muted"
-              }`}
-            >
-              {page}
-            </button>
-          ))}
-        </div>
+        {generatePageNumbers().map((page) => (
+          <button
+            key={page}
+            onClick={() => handlePageChange(page)}
+            className={`px-2 sm:px-3 py-1.5 sm:py-2 text-xs sm:text-sm transition-all duration-200 rounded-md cursor-pointer ${
+              validCurrentPage === page
+                ? "font-extrabold bg-primary text-primary-foreground shadow-sm hover:bg-primary/90"
+                : "text-foreground hover:bg-muted"
+            }`}
+          >
+            {page}
+          </button>
+        ))}
 
         {/* Right Arrow - Only show if not on last page */}
         {validCurrentPage < totalPages && (
           <button
             onClick={() => handlePageChange(validCurrentPage + 1)}
-            className="p-2 rounded-full transition-all duration-200 text-foreground hover:bg-muted cursor-pointer"
+            className="p-1.5 sm:p-2 rounded-full transition-all duration-200 text-foreground hover:bg-muted cursor-pointer"
             aria-label="Next page"
           >
-            <ArrowRight className="w-5 h-5" />
+            <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
           </button>
         )}
       </div>

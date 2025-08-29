@@ -264,167 +264,172 @@ const BlogHeader = React.memo(({ blog, onCommentClick }) => {
   );
 
   return (
-    <div className="w-full max-w-[75ch] md:max-w-[80ch] mx-auto px-4 sm:px-6 pb-8 sm:pb-12">
-      <header className="mb-8">
-        <h1
-          className="text-4xl font-bold mb-6 leading-tight"
-          style={{ color: "var(--foreground)" }}
-        >
-          {blogMetadata.title}
-        </h1>
-
-        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 gap-4">
-          <div
-            className="flex flex-wrap items-center gap-4 lg:gap-6 text-sm"
-            style={{ color: "var(--muted-foreground)" }}
+    <div className="w-full overflow-hidden">
+      <div
+        className="w-full mx-auto px-4 sm:px-6 pb-8 sm:pb-12"
+        style={{ maxWidth: "42rem", margin: "0 auto" }}
+      >
+        <header className="mb-8">
+          <h1
+            className="text-2xl sm:text-3xl md:text-4xl font-bold mb-6 leading-tight"
+            style={{ color: "var(--foreground)" }}
           >
-            <div className="flex items-center gap-2 whitespace-nowrap">
-              <Avatar className="h-5 w-5 sm:h-6 sm:w-6">
-                <AvatarImage src={authorInfo.profileImg} />
-                <AvatarFallback>
-                  <User className="h-3 w-3 sm:h-3 sm:w-3" />
-                </AvatarFallback>
-              </Avatar>
-              <Link
-                to={`/${authorInfo.username}`}
-                className="truncate hover:text-primary transition-colors duration-200 cursor-pointer"
-              >
-                {authorInfo.username}
-              </Link>
-            </div>
-            <div className="flex items-center gap-2 whitespace-nowrap">
-              <Calendar size={16} />
-              <span>{formattedDate}</span>
-            </div>
-            <div className="flex items-center gap-2 no-print whitespace-nowrap">
-              <Clock size={16} />
-              <span>{readTimeText}</span>
-            </div>
-          </div>
-          <div className="flex items-center gap-4 text-sm text-muted-foreground no-print flex-wrap lg:flex-nowrap">
-            <div className="flex items-center gap-1">
-              <Eye size={16} />
-              <span>{activityStats.totalReads}</span>
-            </div>
-            <button
-              type="button"
-              onClick={handleCommentClick}
-              className="flex items-center gap-1 hover:text-blue-500 dark:hover:text-blue-400 cursor-pointer transition-colors"
+            {blogMetadata.title}
+          </h1>
+
+          <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between mb-6 gap-4">
+            <div
+              className="flex flex-wrap items-center gap-4 lg:gap-6 text-sm"
+              style={{ color: "var(--muted-foreground)" }}
             >
-              <MessageCircle size={16} />
-              <span>{activityStats.totalComments}</span>
-            </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleLike();
-              }}
-              disabled={!user || isToggling}
-              className={`flex items-center gap-1 transition-colors ${
-                !user || isToggling
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:text-red-500 dark:hover:text-red-400 cursor-pointer"
-              }`}
-            >
-              <Heart
-                size={16}
-                className={isLiked ? "fill-red-500 text-red-500" : ""}
-              />
-              <span>{likeCount}</span>
-              {isToggling && <span className="text-xs">...</span>}
-            </button>
-            <div className="relative">
+              <div className="flex items-center gap-2 whitespace-nowrap">
+                <Avatar className="h-5 w-5 sm:h-6 sm:w-6">
+                  <AvatarImage src={authorInfo.profileImg} />
+                  <AvatarFallback>
+                    <User className="h-3 w-3 sm:h-3 sm:w-3" />
+                  </AvatarFallback>
+                </Avatar>
+                <Link
+                  to={`/${authorInfo.username}`}
+                  className="truncate hover:text-primary transition-colors duration-200 cursor-pointer"
+                >
+                  {authorInfo.username}
+                </Link>
+              </div>
+              <div className="flex items-center gap-2 whitespace-nowrap">
+                <Calendar size={16} />
+                <span>{formattedDate}</span>
+              </div>
+              <div className="flex items-center gap-2 no-print whitespace-nowrap">
+                <Clock size={16} />
+                <span>{readTimeText}</span>
+              </div>
+            </div>
+            <div className="flex items-center gap-4 text-sm text-muted-foreground no-print flex-wrap lg:flex-nowrap">
+              <div className="flex items-center gap-1">
+                <Eye size={16} />
+                <span>{activityStats.totalReads}</span>
+              </div>
               <button
                 type="button"
-                ref={shareButtonRef}
-                onClick={handleShare}
-                onMouseEnter={handleShareMouseEnter}
-                onMouseLeave={handleShareMouseLeave}
+                onClick={handleCommentClick}
                 className="flex items-center gap-1 hover:text-blue-500 dark:hover:text-blue-400 cursor-pointer transition-colors"
               >
-                <Share2 size={16} />
-                <span>Share</span>
+                <MessageCircle size={16} />
+                <span>{activityStats.totalComments}</span>
               </button>
-              <ShareDropdown
-                isOpen={isShareDropdownOpen}
-                onClose={() => setIsShareDropdownOpen(false)}
-                onMouseEnter={handleDropdownMouseEnter}
-                onMouseLeave={handleDropdownMouseLeave}
-                url={shareData.url}
-                title={shareData.title}
-                description={shareData.description}
-                buttonRef={shareButtonRef}
-              />
-            </div>
-            {canEdit &&
-              (blogMetadata.draft ? (
-                <Link
-                  to={`/editor/${blog._id}`}
+              <button
+                type="button"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  handleLike();
+                }}
+                disabled={!user || isToggling}
+                className={`flex items-center gap-1 transition-colors ${
+                  !user || isToggling
+                    ? "opacity-50 cursor-not-allowed"
+                    : "hover:text-red-500 dark:hover:text-red-400 cursor-pointer"
+                }`}
+              >
+                <Heart
+                  size={16}
+                  className={isLiked ? "fill-red-500 text-red-500" : ""}
+                />
+                <span>{likeCount}</span>
+                {isToggling && <span className="text-xs">...</span>}
+              </button>
+              <div className="relative">
+                <button
+                  type="button"
+                  ref={shareButtonRef}
+                  onClick={handleShare}
+                  onMouseEnter={handleShareMouseEnter}
+                  onMouseLeave={handleShareMouseLeave}
                   className="flex items-center gap-1 hover:text-blue-500 dark:hover:text-blue-400 cursor-pointer transition-colors"
-                  aria-label="Edit draft"
                 >
-                  <Pencil size={16} />
-                  <span>Edit</span>
-                </Link>
-              ) : (
-                blogMetadata.slug && (
+                  <Share2 size={16} />
+                  <span>Share</span>
+                </button>
+                <ShareDropdown
+                  isOpen={isShareDropdownOpen}
+                  onClose={() => setIsShareDropdownOpen(false)}
+                  onMouseEnter={handleDropdownMouseEnter}
+                  onMouseLeave={handleDropdownMouseLeave}
+                  url={shareData.url}
+                  title={shareData.title}
+                  description={shareData.description}
+                  buttonRef={shareButtonRef}
+                />
+              </div>
+              {canEdit &&
+                (blogMetadata.draft ? (
                   <Link
-                    to={`/blogs/edit/${blogMetadata.slug}`}
+                    to={`/editor/${blog._id}`}
                     className="flex items-center gap-1 hover:text-blue-500 dark:hover:text-blue-400 cursor-pointer transition-colors"
-                    aria-label="Edit blog"
+                    aria-label="Edit draft"
                   >
                     <Pencil size={16} />
                     <span>Edit</span>
                   </Link>
-                )
-              ))}
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="flex items-center gap-1 hover:text-blue-500 dark:hover:text-blue-400 cursor-pointer transition-colors"
-            >
-              <Printer size={16} />
-              <span>Print</span>
-            </button>
+                ) : (
+                  blogMetadata.slug && (
+                    <Link
+                      to={`/blogs/edit/${blogMetadata.slug}`}
+                      className="flex items-center gap-1 hover:text-blue-500 dark:hover:text-blue-400 cursor-pointer transition-colors"
+                      aria-label="Edit blog"
+                    >
+                      <Pencil size={16} />
+                      <span>Edit</span>
+                    </Link>
+                  )
+                ))}
+              <button
+                type="button"
+                onClick={handlePrint}
+                className="flex items-center gap-1 hover:text-blue-500 dark:hover:text-blue-400 cursor-pointer transition-colors"
+              >
+                <Printer size={16} />
+                <span>Print</span>
+              </button>
+            </div>
           </div>
-        </div>
 
-        {blogMetadata.tags && blogMetadata.tags.length > 0 && (
-          <div className="flex items-start gap-2 mb-6">
-            <span className="text-sm text-gray-500 dark:text-gray-400 flex-shrink-0 mt-1">
-              <Tag className="inline mr-1" size={16} />
-            </span>
-            <div className="flex flex-wrap gap-2">
-              {blogMetadata.tags.map((tag, index) => (
-                <span
-                  key={index}
-                  className="px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap"
-                  style={{
-                    backgroundColor: "var(--accent)",
-                    color: "var(--accent-foreground)",
-                  }}
-                >
-                  {tag}
-                </span>
-              ))}
+          {blogMetadata.tags && blogMetadata.tags.length > 0 && (
+            <div className="flex items-start gap-2 mb-6">
+              <span className="text-sm text-gray-500 dark:text-gray-400 flex-shrink-0 mt-1">
+                <Tag className="inline mr-1" size={16} />
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {blogMetadata.tags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 rounded-full text-sm font-medium whitespace-nowrap"
+                    style={{
+                      backgroundColor: "var(--accent)",
+                      color: "var(--accent-foreground)",
+                    }}
+                  >
+                    {tag}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </header>
+
+        {blogMetadata.banner && (
+          <div className="mb-8">
+            <div className="relative w-full pt-[56.25%] rounded-lg shadow-lg overflow-hidden">
+              <img
+                src={blogMetadata.banner}
+                alt={blogMetadata.title}
+                className="absolute top-0 left-0 w-full h-full object-cover"
+              />
             </div>
           </div>
         )}
-      </header>
-
-      {blogMetadata.banner && (
-        <div className="mb-8">
-          <div className="relative w-full pt-[56.25%] rounded-lg shadow-lg overflow-hidden">
-            <img
-              src={blogMetadata.banner}
-              alt={blogMetadata.title}
-              className="absolute top-0 left-0 w-full h-full object-cover"
-            />
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 });

@@ -51,7 +51,7 @@ const AppLayout = () => {
                 </div>
               </div>
             ) : (
-              <div className="w-full min-h-[calc(100vh-64px)] pt-20 pb-8 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mx-auto max-w-[2000px]">
+              <div className="w-full min-h-[calc(100vh-64px)] pt-20 pb-8 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 mx-auto max-w-[2000px]">
                 <div className="w-full max-w-full mx-auto">
                   <Outlet />
                 </div>

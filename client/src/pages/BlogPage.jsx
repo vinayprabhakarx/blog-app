@@ -21,14 +21,17 @@ const BlogPage = React.memo(() => {
   const [showComments, setShowComments] = useState(false);
 
   // Memoize blog data for stable references
-  const blogData = useMemo(() => ({
-    id: currentBlog?._id,
-    title: currentBlog?.title,
-    category: currentBlog?.category,
-    author: currentBlog?.author,
-    activity: currentBlog?.activity,
-    draft: currentBlog?.draft
-  }), [currentBlog]);
+  const blogData = useMemo(
+    () => ({
+      id: currentBlog?._id,
+      title: currentBlog?.title,
+      category: currentBlog?.category,
+      author: currentBlog?.author,
+      activity: currentBlog?.activity,
+      draft: currentBlog?.draft,
+    }),
+    [currentBlog]
+  );
 
   // Memoize user authentication check
   const isAuthorized = useMemo(() => {
@@ -41,17 +44,25 @@ const BlogPage = React.memo(() => {
   }, [blogData.draft, blogData.author, isAuthenticated, user]);
 
   // Memoize comment data
-  const commentData = useMemo(() => ({
-    count: blogData.activity?.total_comments || 0,
-    categoryId: blogData.category?._id || blogData.category || "uncategorized"
-  }), [blogData.activity, blogData.category]);
+  const commentData = useMemo(
+    () => ({
+      count: blogData.activity?.total_comments || 0,
+      categoryId:
+        blogData.category?._id || blogData.category || "uncategorized",
+    }),
+    [blogData.activity, blogData.category]
+  );
 
   // Memoize breadcrumb data
-  const breadcrumbData = useMemo(() => ({
-    categoryName: blogData.category?.name || blogData.category?.slug || "Category",
-    categorySlug: blogData.category?.slug || blogData.category,
-    title: blogData.title
-  }), [blogData.category, blogData.title]);
+  const breadcrumbData = useMemo(
+    () => ({
+      categoryName:
+        blogData.category?.name || blogData.category?.slug || "Category",
+      categorySlug: blogData.category?.slug || blogData.category,
+      title: blogData.title,
+    }),
+    [blogData.category, blogData.title]
+  );
 
   useEffect(() => {
     if (id) {
@@ -69,15 +80,26 @@ const BlogPage = React.memo(() => {
     setShowComments((prev) => !prev);
   }, []);
 
-  const handleCommentClick = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    
-    // Always show comments when clicked from header
-    if (!showComments) {
-      setShowComments(true);
-      // Scroll to comments after they're shown
-      setTimeout(() => {
+  const handleCommentClick = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+
+      // Always show comments when clicked from header
+      if (!showComments) {
+        setShowComments(true);
+        // Scroll to comments after they're shown
+        setTimeout(() => {
+          const commentSection = document.getElementById("comment-section");
+          if (commentSection) {
+            commentSection.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        }, 200);
+      } else {
+        // If comments are already shown, just scroll to them
         const commentSection = document.getElementById("comment-section");
         if (commentSection) {
           commentSection.scrollIntoView({
@@ -85,18 +107,10 @@ const BlogPage = React.memo(() => {
             block: "start",
           });
         }
-      }, 200);
-    } else {
-      // If comments are already shown, just scroll to them
-      const commentSection = document.getElementById("comment-section");
-      if (commentSection) {
-        commentSection.scrollIntoView({
-          behavior: "smooth",
-          block: "start",
-        });
       }
-    }
-  }, [showComments]);
+    },
+    [showComments]
+  );
 
   // Error state
   if (currentBlogError) {
@@ -136,22 +150,16 @@ const BlogPage = React.memo(() => {
   return (
     <div className="min-h-screen bg-background">
       {/* Main Content Container */}
-      <div className="max-w-5xl mx-auto px-4 sm:px-6 md:px-8 pt-10 sm:pt-14 md:pt-20">
+      <div className="w-full px-4 sm:px-6 md:px-8 pt-10 sm:pt-14 md:pt-20">
         {/* Breadcrumb */}
-        <nav
-          className="max-w-[75ch] md:max-w-[80ch] mx-auto mb-8 text-sm"
-          aria-label="Breadcrumb"
-        >
-          <ol className="flex items-center gap-2 text-muted-foreground">
+        <nav className="max-w-2xl mx-auto mb-8 text-sm" aria-label="Breadcrumb">
+          <ol className="flex items-center gap-2 text-muted-foreground flex-wrap">
             <li>
-              <Link to="/" className="hover:underline">
+              <Link
+                to="/"
+                className="text-blue-800 hover:text-blue-500 hover:underline"
+              >
                 Home
-              </Link>
-            </li>
-            <li>/</li>
-            <li>
-              <Link to="/blogs" className="hover:underline">
-                Blogs
               </Link>
             </li>
             {blogData.category && (
@@ -160,7 +168,7 @@ const BlogPage = React.memo(() => {
                 <li>
                   <Link
                     to={`/category/${breadcrumbData.categorySlug}`}
-                    className="hover:underline"
+                    className="text-blue-800 hover:text-blue-500 hover:underline whitespace-nowrap"
                   >
                     {breadcrumbData.categoryName}
                   </Link>
@@ -177,7 +185,7 @@ const BlogPage = React.memo(() => {
         <BlogDisplay blog={currentBlog} />
 
         {/* Comment Toggle Button - Now directly after blog content */}
-        <div className="px-4 sm:px-6 pb-4">
+        <div className="px-1 sm:px-2 md:px-4 pb-4">
           <div className="max-w-[75ch] md:max-w-[80ch] mx-auto">
             <div className="flex justify-center items-center gap-4">
               <button
@@ -199,7 +207,8 @@ const BlogPage = React.memo(() => {
                   <>
                     <MessageCircle className="w-5 h-5" />
                     <span>
-                      {commentData.count} {commentData.count === 1 ? "Comment" : "Comments"}
+                      {commentData.count}{" "}
+                      {commentData.count === 1 ? "Comment" : "Comments"}
                     </span>
                   </>
                 )}
@@ -211,7 +220,10 @@ const BlogPage = React.memo(() => {
 
       {/* Comments Section - Full width outside the constrained container */}
       {showComments && (
-        <div id="comment-section" className="w-full px-4 sm:px-6 pb-8 sm:pb-12">
+        <div
+          id="comment-section"
+          className="w-full px-1 sm:px-2 md:px-4 pb-8 sm:pb-12"
+        >
           <CommentSection
             blogId={blogData.id}
             categoryId={commentData.categoryId}
