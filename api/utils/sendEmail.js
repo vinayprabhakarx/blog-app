@@ -83,7 +83,7 @@ const sendEmailWithSMTP = async ({ to, subject, html, text }) => {
     throw new Error("SMTP configuration incomplete");
   }
 
-  const transporter = nodemailer.createTransporter({
+  const transporter = nodemailer.createTransport({
     host,
     port,
     secure: port === 465,

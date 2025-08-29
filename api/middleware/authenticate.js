@@ -12,23 +12,14 @@ const authenticate = async (req, res, next) => {
 
   const token = authHeader.split(" ")[1];
 
-  // Debug: Check if JWT_SECRET is loaded
   if (!process.env.JWT_SECRET) {
-    console.error("❌ JWT_SECRET is not loaded from environment variables");
     return next(
       handleError(500, "Server configuration error: JWT_SECRET missing")
     );
   }
 
-  console.log("🔑 JWT_SECRET loaded:", process.env.JWT_SECRET ? "YES" : "NO");
-  console.log(
-    "🔑 JWT_SECRET length:",
-    process.env.JWT_SECRET ? process.env.JWT_SECRET.length : "N/A"
-  );
-
   try {
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("✅ Token verified successfully for user:", decoded.id);
 
     // Fetch complete user object from database
     const user = await User.findById(decoded.id)
@@ -44,8 +35,6 @@ const authenticate = async (req, res, next) => {
     req.user = user;
     next();
   } catch (error) {
-    console.error("❌ JWT verification failed:", error.message);
-    console.error("❌ Error details:", error);
 
     if (error.name === "TokenExpiredError") {
       return next(authError("Token has expired. Please log in again."));
