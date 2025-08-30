@@ -15,6 +15,7 @@ import { Tag, FileText, RefreshCw, ChevronRight, Star } from "lucide-react";
 const CategoriesView = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [hasFetched, setHasFetched] = React.useState(false);
 
   const categories = useSelector(selectAllCategories);
   const loading = useSelector(selectCategoriesLoading);
@@ -47,10 +48,11 @@ const CategoriesView = () => {
   }, [categories]);
 
   useEffect(() => {
-    if (categories.length === 0 && !loading) {
+    if (!hasFetched && !loading) {
       dispatch(fetchAllCategories());
+      setHasFetched(true);
     }
-  }, [dispatch, categories.length, loading]);
+  }, [dispatch, hasFetched, loading]);
 
   const handleCategoryClick = useCallback(
     (categorySlug) => {
@@ -60,6 +62,7 @@ const CategoriesView = () => {
   );
 
   const handleRetry = useCallback(() => {
+    setHasFetched(false);
     dispatch(fetchAllCategories());
   }, [dispatch]);
 

@@ -2,6 +2,7 @@ import express from "express";
 import cors from "cors";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
+import { testCloudinaryConnection } from "./config/cloudinary.js";
 
 // Import routes
 import authRoutes from "./routes/auth.route.js";
@@ -52,6 +53,7 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
+
 // Database Connection
 const connectDB = async () => {
   try {
@@ -65,7 +67,21 @@ const connectDB = async () => {
   }
 };
 
+const checkCloudinary = async () => {
+  try {
+    const ok = await testCloudinaryConnection();
+    if (ok) {
+      console.log("✅ Cloudinary connected successfully.");
+    } else {
+      console.error("❌ Cloudinary connection failed: Check your credentials and network.");
+    }
+  } catch (err) {
+    console.error("❌ Cloudinary connection failed:", err.message);
+  }
+};
+
 connectDB();
+checkCloudinary();
 
 // API Routes
 app.use("/api/auth", authRoutes);

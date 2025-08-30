@@ -23,6 +23,7 @@ import { Tag, ChevronRight, Star, Edit, Trash2, Plus } from "lucide-react";
 const CategoryManagement = () => {
   const dispatch = useDispatch();
   const { isAdmin, isAuthor } = useAuth();
+  const [hasFetched, setHasFetched] = React.useState(false);
   const categories = useSelector(selectAllCategories);
   const loading = useSelector(selectCategoriesLoading);
   const operationLoading = useSelector(selectOperationLoading);
@@ -56,10 +57,11 @@ const CategoryManagement = () => {
   }, [categories]);
 
   useEffect(() => {
-    if (categories.length === 0 && !loading) {
+    if (!hasFetched && !loading) {
       dispatch(fetchAllCategories());
+      setHasFetched(true);
     }
-  }, [dispatch, categories.length, loading]);
+  }, [dispatch, hasFetched, loading]);
 
   const handleDelete = useCallback(
     async (id, categoryName) => {

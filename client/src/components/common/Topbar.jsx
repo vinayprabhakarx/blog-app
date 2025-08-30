@@ -84,7 +84,7 @@ const Topbar = React.memo(() => {
       <div className="flex justify-between items-center h-16 fixed w-full z-[100] bg-background/95 backdrop-blur-sm text-foreground pl-4 pr-3 sm:pl-6 sm:pr-4 md:pl-8 md:pr-6 border-b border-border/20 shadow-sm no-print">
         <div className="flex items-center gap-2 sm:gap-4">
           {isAuthenticated && (
-            <button 
+            <button
               className="md:hidden p-2 -ml-2 rounded-md hover:bg-accent/50 transition-colors"
               onClick={() => setOpen(!open)}
               aria-label={open ? "Close menu" : "Open menu"}
@@ -140,7 +140,7 @@ const Topbar = React.memo(() => {
             <div className="flex items-center gap-2">
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button 
+                  <button
                     className="cursor-pointer rounded-full focus:outline-none p-0.5 -m-0.5 touch-manipulation transition-all duration-200"
                     aria-label="Open user menu"
                   >
@@ -152,8 +152,8 @@ const Topbar = React.memo(() => {
                     </Avatar>
                   </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent 
-                  align="end" 
+                <DropdownMenuContent
+                  align="end"
                   className="w-56 md:w-64 max-w-[90vw] mr-2 sm:mr-4"
                   sideOffset={8}
                   alignOffset={-4}

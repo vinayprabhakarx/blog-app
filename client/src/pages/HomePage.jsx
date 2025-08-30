@@ -46,8 +46,8 @@ const HomePage = React.memo(() => {
   // Memoize constants to prevent recreation
   const postsPerPage = useMemo(() => 9, []);
 
-  // Memoize refs to prevent recreation
-  const hasFetchedCategoriesRef = useRef(false);
+  // Track fetch state
+  const [hasFetchedCategories, setHasFetchedCategories] = useState(false);
   const isInitialLoadRef = useRef(true);
   const hasShownInitialLoadingRef = useRef(false);
 
@@ -97,10 +97,15 @@ const HomePage = React.memo(() => {
     return params;
   }, [currentPage, postsPerPage, selectedCategoryData]);
 
+  // Fetch categories only once on mount
   useEffect(() => {
-    // Fetch categories only once on mount
-    dispatch(fetchAllCategories());
-  }, [dispatch]);
+    if (!hasFetchedCategories) {
+      dispatch(fetchAllCategories())
+        .unwrap()
+        .then(() => setHasFetchedCategories(true))
+        .catch(error => console.error('Failed to fetch categories:', error));
+    }
+  }, [dispatch, hasFetchedCategories]);
 
   // Track initial load state
   useEffect(() => {
@@ -116,9 +121,10 @@ const HomePage = React.memo(() => {
   // Show loading spinner during initial load or when categories are loading
   const shouldShowInitialLoading = useMemo(() => {
     return (
-      isInitialLoadRef.current && (blogLoading.allBlogs || categoriesLoading)
+      isInitialLoadRef.current && 
+      (blogLoading.allBlogs || (categoriesLoading && !hasFetchedCategories))
     );
-  }, [blogLoading.allBlogs, categoriesLoading]);
+  }, [blogLoading.allBlogs, categoriesLoading, hasFetchedCategories]);
 
   useEffect(() => {
     // Handle search queries
@@ -133,13 +139,8 @@ const HomePage = React.memo(() => {
     }
 
     // Only fetch blogs if categories have been loaded
-    if (!hasFetchedCategoriesRef.current && categories.length === 0) {
+    if (!hasFetchedCategories) {
       return;
-    }
-
-    // Mark categories as fetched
-    if (categories.length > 0) {
-      hasFetchedCategoriesRef.current = true;
     }
 
     // Use memoized parameters for blog fetching

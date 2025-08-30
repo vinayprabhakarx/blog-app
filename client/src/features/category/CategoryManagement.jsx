@@ -23,6 +23,7 @@ import { Tag, Star, Edit, Trash2, Plus } from "lucide-react";
 const CategoryManagement = () => {
   const dispatch = useDispatch();
   const { isAdmin, isAuthor } = useAuth();
+  const [hasFetched, setHasFetched] = React.useState(false);
   const categories = useSelector(selectAllCategories);
   const loading = useSelector(selectCategoriesLoading);
   const operationLoading = useSelector(selectOperationLoading);
@@ -56,10 +57,11 @@ const CategoryManagement = () => {
   }, [categories]);
 
   useEffect(() => {
-    if (categories.length === 0 && !loading) {
+    if (!hasFetched && !loading) {
       dispatch(fetchAllCategories());
+      setHasFetched(true);
     }
-  }, [dispatch, categories.length, loading]);
+  }, [dispatch, hasFetched, loading]);
 
   const handleDelete = useCallback(
     async (id, categoryName) => {
@@ -99,34 +101,20 @@ const CategoryManagement = () => {
             Category Management
           </h1>
         </div>
-        <Card>
-          <CardHeader>
-            <div className="flex justify-center">
-              <Button asChild className="flex items-center gap-2">
-                <Link to={RouteAddCategory(userRole)}>
-                  <Plus className="h-4 w-4" />
-                  Add Category
-                </Link>
-              </Button>
-            </div>
-          </CardHeader>
-          <CardContent>
-            <div className="text-center py-8">
-              <Tag className="h-16 w-16 mx-auto mb-4 text-muted-foreground/60" />
-              <h2 className="text-xl font-semibold mb-2 text-muted-foreground">
-                No Categories Yet
-              </h2>
-              <p className="text-muted-foreground max-w-md mx-auto mb-4">
-                Create your first category to start organizing your content.
-              </p>
-              <Button asChild variant="outline">
-                <Link to={RouteAddCategory(userRole)}>
-                  Create your first category
-                </Link>
-              </Button>
-            </div>
-          </CardContent>
-        </Card>
+        <div className="text-center py-8">
+          <Tag className="h-16 w-16 mx-auto mb-4 text-muted-foreground/60" />
+          <h2 className="text-xl font-semibold mb-2 text-muted-foreground">
+            No Categories Yet
+          </h2>
+          <p className="text-muted-foreground max-w-md mx-auto mb-4">
+            Create your first category to start organizing your content.
+          </p>
+          <Button asChild variant="outline">
+            <Link to={RouteAddCategory(userRole)}>
+              Create your first category
+            </Link>
+          </Button>
+        </div>
       </div>
     );
   }

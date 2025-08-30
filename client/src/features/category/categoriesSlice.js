@@ -238,9 +238,10 @@ export const { clearCurrentCategory, clearErrors, optimisticDeleteCategory } =
 
 // Selectors
 export const selectAllCategories = (state) => state.categories.categories;
-export const selectCurrentCategory = (state) =>
-  state.categories.currentCategory;
+// Selector for fetched flag
+export const selectCategoriesFetched = (state) => state.categories.fetched;
 export const selectCategoriesLoading = (state) => state.categories.loading;
+export const selectCurrentCategory = (state) => state.categories.currentCategory;
 export const selectCurrentCategoryLoading = (state) =>
   state.categories.currentCategoryLoading;
 export const selectCategoriesError = (state) => state.categories.error;
