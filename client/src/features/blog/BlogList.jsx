@@ -10,7 +10,6 @@ import { useSelector } from "react-redux";
 import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
-import { Input } from "../../components/ui/input";
 import {
   Select,
   SelectContent,
@@ -20,12 +19,7 @@ import {
 } from "../../components/ui/select";
 import { useAuth } from "../../hooks/useAuth";
 import { useBlog, useCategories } from "../../hooks/useRedux";
-import {
-  fetchAllBlogs,
-  fetchMyBlogs,
-  setFilters,
-  deleteBlog,
-} from "./blogSlice";
+import { fetchAllBlogs, fetchMyBlogs, deleteBlog } from "./blogSlice";
 import { fetchAllCategories } from "../category/categoriesSlice";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import Pagination from "../../components/common/Pagination";
@@ -35,7 +29,6 @@ import {
   User,
   Tag,
   Clock,
-  Search,
   FileText,
   ArrowLeft,
   Edit,
@@ -116,7 +109,6 @@ const BlogList = () => {
       }
     }
 
-
     params.sortBy = sortBy;
     params.sortOrder = sortOrder;
 
@@ -191,27 +183,7 @@ const BlogList = () => {
         if (draftFilter === "published") passesDraftFilter = !blog.draft;
         if (draftFilter === "drafts") passesDraftFilter = blog.draft;
 
-        let passesAuthorFilter = true;
-        if (selectedAuthor && selectedAuthor !== "all") {
-          try {
-            const blogAuthor =
-              blog.author?.name ||
-              blog.author?.personal_info?.username ||
-              blog.author?.personal_info?.name ||
-              blog.author;
-            passesAuthorFilter =
-              typeof blogAuthor === "string" && blogAuthor === selectedAuthor;
-          } catch (error) {
-            console.warn(
-              "Error filtering by author for blog:",
-              blog._id,
-              error
-            );
-            passesAuthorFilter = false;
-          }
-        }
-
-        return passesDraftFilter && passesAuthorFilter;
+        return passesDraftFilter;
       });
     } else {
       return currentBlogs.filter((blog) => {
@@ -313,7 +285,6 @@ const BlogList = () => {
               params.category = categoryData._id;
             }
           }
-
 
           params.sortBy = sortBy;
           params.sortOrder = sortOrder;
@@ -450,7 +421,10 @@ const BlogList = () => {
       <div className="space-y-3 sm:space-y-4">
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
           <div className="col-span-1">
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
+            <Select
+              value={selectedCategory}
+              onValueChange={setSelectedCategory}
+            >
               <SelectTrigger className="w-full h-10 sm:h-9 text-sm">
                 <SelectValue placeholder="All Categories" />
               </SelectTrigger>
@@ -490,46 +464,48 @@ const BlogList = () => {
             </Select>
           )}
 
-          <Select
-            value={selectedAuthor || "all"}
-            onValueChange={setSelectedAuthor}
-          >
-            <SelectTrigger className="w-full h-10 sm:h-9 text-sm">
-              <SelectValue placeholder="All Authors" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Authors</SelectItem>
-              {Array.from(
-                new Set(
-                  currentBlogs
-                    .map((blog) => {
-                      try {
-                        const author =
-                          blog.author?.name ||
-                          blog.author?.personal_info?.username ||
-                          blog.author?.personal_info?.name ||
-                          blog.author;
-                        return typeof author === "string" && author.trim()
-                          ? author
-                          : null;
-                      } catch (error) {
-                        console.warn(
-                          "Error extracting author from blog:",
-                          blog._id,
-                          error
-                        );
-                        return null;
-                      }
-                    })
-                    .filter((author) => author && author.trim())
-                )
-              ).map((author) => (
-                <SelectItem key={author} value={author}>
-                  {author}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          {!isMyBlogsPage && (
+            <Select
+              value={selectedAuthor || "all"}
+              onValueChange={setSelectedAuthor}
+            >
+              <SelectTrigger className="w-full h-10 sm:h-9 text-sm">
+                <SelectValue placeholder="All Authors" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all">All Authors</SelectItem>
+                {Array.from(
+                  new Set(
+                    currentBlogs
+                      .map((blog) => {
+                        try {
+                          const author =
+                            blog.author?.name ||
+                            blog.author?.personal_info?.username ||
+                            blog.author?.personal_info?.name ||
+                            blog.author;
+                          return typeof author === "string" && author.trim()
+                            ? author
+                            : null;
+                        } catch (error) {
+                          console.warn(
+                            "Error extracting author from blog:",
+                            blog._id,
+                            error
+                          );
+                          return null;
+                        }
+                      })
+                      .filter((author) => author && author.trim())
+                  )
+                ).map((author) => (
+                  <SelectItem key={author} value={author}>
+                    {author}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
 
           <Select value={sortBy} onValueChange={setSortBy}>
             <SelectTrigger className="w-full h-10 sm:h-9 text-sm">

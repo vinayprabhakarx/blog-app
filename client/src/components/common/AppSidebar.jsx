@@ -1,115 +1,267 @@
-import React, { useEffect, useMemo } from "react";
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarGroup,
-  SidebarGroupLabel,
-  SidebarMenu,
-  SidebarMenuButton,
-  SidebarMenuItem,
-  SidebarSeparator,
-} from "@/components/ui/sidebar";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  createContext,
+  useContext,
+} from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useCategories } from "../../hooks/useRedux";
 import { fetchAllCategories } from "../../features/category/categoriesSlice";
+import { cn } from "../../lib/utils";
+import { motion } from "motion/react";
 import {
-  FaChartLine,
-  FaChartArea,
-  FaBlog,
-  FaShieldAlt,
-  FaUserCircle,
-  FaTachometerAlt,
-  FaPencilAlt,
-  FaThLarge,
-} from "react-icons/fa";
-import {
-  FaNewspaper,
-  FaTags,
-  FaTag,
-  FaComments,
-  FaComment,
-  FaPen,
-  FaBookOpen,
-  FaBook,
-  FaUsers,
-  FaBell,
-  FaRegBell,
-  FaUser,
-} from "react-icons/fa6";
+  IconDashboard,
+  IconNews,
+  IconTags,
+  IconMessages,
+  IconBell,
+  IconBookmark,
+  IconEdit,
+  IconChartLine,
+  IconUsers,
+  IconShield,
+  IconSettings,
+  IconFolder,
+  IconPencil,
+  IconChartBar,
+  IconNotification,
+} from "@tabler/icons-react";
+
+// Sidebar Context and Components (from the provided sidebar)
+const SidebarContext = createContext(undefined);
+
+export const useSidebar = () => {
+  const context = useContext(SidebarContext);
+  if (!context) {
+    throw new Error("useSidebar must be used within a SidebarProvider");
+  }
+  return context;
+};
+
+export const SidebarProvider = ({
+  children,
+  open: openProp,
+  setOpen: setOpenProp,
+  animate = true,
+}) => {
+  const [openState, setOpenState] = useState(false);
+  const open = openProp !== undefined ? openProp : openState;
+  const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
+
+  return (
+    <SidebarContext.Provider value={{ open, setOpen, animate: animate }}>
+      {children}
+    </SidebarContext.Provider>
+  );
+};
+
+export const Sidebar = ({ children, open, setOpen, animate }) => {
+  return (
+    <SidebarProvider open={open} setOpen={setOpen} animate={animate}>
+      {children}
+    </SidebarProvider>
+  );
+};
+
+export const SidebarBody = (props) => {
+  return (
+    <>
+      <DesktopSidebar {...props} />
+      <MobileSidebar {...props} />
+    </>
+  );
+};
+
+export const DesktopSidebar = ({ className, children, ...props }) => {
+  const { open, setOpen, animate } = useSidebar();
+  return (
+    <>
+      <motion.div
+        className={cn(
+          "h-screen fixed left-0 top-0 z-50 px-4 py-4 hidden md:flex md:flex-col bg-background border-r border-border shrink-0 overflow-hidden",
+          className
+        )}
+        animate={{
+          width: animate ? (open ? "300px" : "60px") : "300px",
+        }}
+        style={{
+          position: "fixed",
+          left: 0,
+          top: 0,
+        }}
+        onMouseEnter={() => setOpen(true)}
+        onMouseLeave={() => setOpen(false)}
+        {...props}
+      >
+        {children}
+      </motion.div>
+    </>
+  );
+};
+
+export const MobileSidebar = ({ className, children, ...props }) => {
+  const { open, setOpen } = useSidebar();
+
+  return (
+    <>
+      {/* Overlay */}
+      {open && (
+        <div
+          className="fixed inset-0 bg-background/80 backdrop-blur-sm z-30 md:hidden"
+          onClick={() => setOpen(false)}
+        />
+      )}
+      {/* Sidebar */}
+      <motion.div
+        className={cn(
+          "fixed left-0 top-16 bottom-0 z-40 px-4 py-4 flex flex-col bg-background border-r border-border w-[250px] md:hidden",
+          className
+        )}
+        initial={{ x: "-100%" }}
+        animate={{ x: open ? 0 : "-100%" }}
+        transition={{ type: "tween", duration: 0.2 }}
+        {...props}
+      >
+        {children}
+      </motion.div>
+    </>
+  );
+};
+
+export const SidebarLink = ({ link, className, ...props }) => {
+  const { open, animate } = useSidebar();
+  const location = useLocation();
+
+  // Check if current route is active
+  const isActive = (() => {
+    // Exact match for most routes
+    if (location.pathname === link.href) {
+      return true;
+    }
+
+    // Special handling for /blogs - only match /blogs and /blogs/:slug, not /blogs/create
+    if (link.href === "/blogs") {
+      return (
+        location.pathname === "/blogs" ||
+        (location.pathname.startsWith("/blogs/") &&
+          !location.pathname.startsWith("/blogs/create") &&
+          !location.pathname.startsWith("/blogs/edit"))
+      );
+    }
+
+    // Special handling for /categories - only match /categories and /categories/:slug
+    if (link.href === "/categories") {
+      return (
+        location.pathname === "/categories" ||
+        location.pathname.startsWith("/categories/")
+      );
+    }
+
+    return false;
+  })();
+
+  // Check if this is User Management and is active
+  const isUserManagementActive = link.href === "/users" && isActive;
+
+  return (
+    <Link
+      to={link.href}
+      className={cn(
+        "flex items-center justify-start gap-2 group/sidebar py-2 px-1 rounded-md transition-colors duration-200",
+        isActive
+          ? "bg-accent text-accent-foreground"
+          : "text-foreground/80 hover:bg-accent/50 hover:text-foreground",
+        className
+      )}
+      {...props}
+    >
+      <span
+        className={cn(
+          "transition-colors",
+          isUserManagementActive && "text-destructive"
+        )}
+      >
+        {link.icon}
+      </span>
+      <motion.span
+        animate={{
+          display: animate ? (open ? "inline-block" : "none") : "inline-block",
+          opacity: animate ? (open ? 1 : 0) : 1,
+        }}
+        className="text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0 md:inline-block"
+      >
+        {link.label}
+      </motion.span>
+    </Link>
+  );
+};
 
 // Navigation configuration
 const NAVIGATION_CONFIG = {
   dashboard: {
     title: "Dashboard",
     path: "/dashboard",
-    icon: FaThLarge,
-    activeIcon: FaTachometerAlt,
+    icon: IconDashboard,
+    activeIcon: IconDashboard,
     roles: ["author", "admin"],
   },
   categories: {
     title: "Categories",
     path: "/categories",
-    icon: FaTag,
-    activeIcon: FaTags,
+    icon: IconTags,
+    activeIcon: IconFolder,
     roles: ["user", "author", "admin"],
   },
   blogs: {
     title: "All Blogs",
     path: "/blogs",
-    icon: FaNewspaper,
-    activeIcon: FaBlog,
+    icon: IconNews,
+    activeIcon: IconBookmark,
     roles: ["user", "author", "admin"],
   },
   comments: {
     title: "Comments",
     path: "/comments",
-    icon: FaComment,
-    activeIcon: FaComments,
+    icon: IconMessages,
+    activeIcon: IconMessages,
     roles: ["admin", "author"],
   },
   notifications: {
     title: "Notifications",
     path: "/notifications",
-    icon: FaRegBell,
-    activeIcon: FaBell,
+    icon: IconBell,
+    activeIcon: IconNotification,
     roles: ["user", "author", "admin"],
   },
-
   myBlogs: {
     title: "My Blogs",
     path: "/my-blogs",
-    icon: FaBookOpen,
-    activeIcon: FaBook,
+    icon: IconBookmark,
+    activeIcon: IconBookmark,
     roles: ["author", "admin"],
   },
   createBlog: {
     title: "Create Blog",
     path: "/blogs/create",
-    icon: FaPencilAlt,
-    activeIcon: FaPen,
+    icon: IconPencil,
+    activeIcon: IconEdit,
     roles: ["author", "admin"],
   },
   analytics: {
     title: "Analytics",
     path: "/analytics",
-    icon: FaChartLine,
-    activeIcon: FaChartArea,
+    icon: IconChartLine,
+    activeIcon: IconChartBar,
     roles: ["admin"],
   },
   users: {
     title: "User Management",
     path: "/users",
-    icon: FaUsers,
-    activeIcon: FaUsers,
+    icon: IconUsers,
+    activeIcon: IconUsers,
     roles: ["admin"],
-  },
-  profile: {
-    title: "Profile",
-    path: "/profile",
-    icon: FaUser,
-    activeIcon: FaUserCircle,
-    roles: ["user", "author", "admin"],
   },
 };
 
@@ -128,7 +280,7 @@ const NAVIGATION_SECTIONS = {
     label: "Admin Panel",
     items: ["analytics", "users"],
     showFor: ["admin"],
-    icon: FaShieldAlt,
+    icon: IconShield,
   },
   account: {
     label: "Account",
@@ -136,10 +288,41 @@ const NAVIGATION_SECTIONS = {
   },
 };
 
+// Logo Components
+export const Logo = () => {
+  return (
+    <Link
+      to="/dashboard"
+      className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-foreground"
+    >
+      <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-foreground" />
+      <motion.span
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="font-medium whitespace-pre text-foreground hidden md:inline-block"
+      >
+        Acet Labs
+      </motion.span>
+    </Link>
+  );
+};
+
+export const LogoIcon = () => {
+  return (
+    <Link
+      to="/dashboard"
+      className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-foreground"
+    >
+      <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-foreground" />
+    </Link>
+  );
+};
+
 const AppSidebar = () => {
   const location = useLocation();
   const { isAuthenticated, isAdmin, isAuthor } = useAuth();
   const { categories, loading: categoriesLoading, dispatch } = useCategories();
+  const { open, setOpen } = useSidebar();
 
   useEffect(() => {
     if (categories.length === 0 && !categoriesLoading && isAuthenticated) {
@@ -179,7 +362,6 @@ const AppSidebar = () => {
       return location.pathname === path;
     }
 
-    // Handle routes with sub-paths
     if (path === "/blogs") {
       return (
         location.pathname === "/blogs" ||
@@ -197,129 +379,73 @@ const AppSidebar = () => {
     return location.pathname.startsWith(path);
   };
 
-  const renderNavigationItem = (itemKey) => {
-    const item = getFilteredItems[itemKey];
-    if (!item) return null;
+  const createLinks = () => {
+    const links = [];
 
-    const isActive = isActiveRoute(item.path);
-    const IconComponent = isActive ? item.activeIcon : item.icon;
+    Object.entries(NAVIGATION_SECTIONS).forEach(([sectionKey, section]) => {
+      if (section.showFor && !section.showFor.includes(userRole)) return;
 
-    return (
-      <SidebarMenuItem key={item.path}>
-        <SidebarMenuButton
-          asChild
-          isActive={isActive}
-          className="w-full transition-all duration-200 ease-in-out hover:bg-accent/80"
-        >
-          <Link
-            to={item.path}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${
-              isActive
-                ? "bg-primary/10 text-primary font-medium shadow-sm"
-                : "text-foreground/80 hover:text-foreground"
-            }`}
-          >
-            <IconComponent
-              className={`w-5 h-5 ${
-                isActive ? "text-primary" : "text-foreground/70"
-              }`}
-            />
-            <span className="text-sm">{item.title}</span>
-          </Link>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-    );
-  };
+      const availableItems = section.items.filter(
+        (itemKey) => getFilteredItems[itemKey]
+      );
 
-  const renderAdminNavigationItem = (itemKey) => {
-    const item = getFilteredItems[itemKey];
-    if (!item) return null;
+      if (availableItems.length === 0) return;
 
-    const isActive = isActiveRoute(item.path);
-    const IconComponent = isActive ? item.activeIcon : item.icon;
+      availableItems.forEach((itemKey) => {
+        const item = getFilteredItems[itemKey];
+        if (!item) return;
 
-    return (
-      <SidebarMenuItem key={item.path}>
-        <SidebarMenuButton
-          asChild
-          isActive={isActive}
-          className="w-full transition-all duration-200 ease-in-out hover:bg-accent/80"
-        >
-          <Link
-            to={item.path}
-            className={`flex items-center gap-3 px-3 py-2.5 rounded-lg ${
-              isActive
-                ? "bg-primary/10 font-medium shadow-sm"
-                : "text-foreground/80 hover:text-foreground"
-            }`}
-          >
-            <IconComponent
-              className={`w-5 h-5 ${
-                isActive ? "text-red-500" : "text-foreground/70"
-              }`}
-            />
-            <span className={`text-sm ${isActive ? "text-primary" : ""}`}>
-              {item.title}
-            </span>
-          </Link>
-        </SidebarMenuButton>
-      </SidebarMenuItem>
-    );
-  };
+        const isActive = isActiveRoute(item.path);
+        const IconComponent = isActive ? item.activeIcon : item.icon;
+        const isAdminSection = sectionKey === "admin";
 
-  const renderNavigationSection = (sectionKey) => {
-    const section = NAVIGATION_SECTIONS[sectionKey];
-    if (!section) return null;
+        links.push({
+          label: item.title,
+          href: item.path,
+          icon: (
+            <IconComponent className="h-5 w-5 flex-shrink-0 min-w-[20px] min-h-[20px] text-foreground/80" />
+          ),
+        });
+      });
+    });
 
-    if (section.showFor && !section.showFor.includes(userRole)) return null;
-
-    const availableItems = section.items.filter(
-      (itemKey) => getFilteredItems[itemKey]
-    );
-    if (availableItems.length === 0) return null;
-
-    const isAdminSection = sectionKey === "admin";
-
-    return (
-      <React.Fragment key={sectionKey}>
-        {sectionKey !== "main" && <SidebarSeparator className="my-4" />}
-        <SidebarGroup>
-          <SidebarGroupLabel
-            className={`px-3 py-2 text-xs font-semibold uppercase tracking-wider flex items-center gap-2 ${
-              section.className || "text-foreground/60"
-            }`}
-          >
-            {section.icon && <section.icon className="w-3 h-3" />}
-            {section.label}
-          </SidebarGroupLabel>
-          <SidebarMenu className="space-y-1">
-            {availableItems.map((itemKey) => {
-              const item = getFilteredItems[itemKey];
-              if (!item) return null;
-
-              return isAdminSection
-                ? renderAdminNavigationItem(itemKey)
-                : renderNavigationItem(itemKey);
-            })}
-          </SidebarMenu>
-        </SidebarGroup>
-      </React.Fragment>
-    );
+    return links;
   };
 
   if (!isAuthenticated) {
     return null;
   }
 
+  const links = createLinks();
+
   return (
-    <Sidebar>
-      <SidebarContent className="bg-background text-foreground pt-4">
-        {renderNavigationSection("main")}
-        {renderNavigationSection("contentManagement")}
-        {renderNavigationSection("admin")}
-        {renderNavigationSection("account")}
-      </SidebarContent>
-    </Sidebar>
+    <>
+      {/* Sidebar */}
+      <Sidebar open={open} setOpen={setOpen}>
+        <SidebarBody className="justify-between gap-10">
+          <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
+            <div className="mt-4 flex flex-col gap-2">
+              {links.map((link, idx) => (
+                <SidebarLink key={idx} link={link} />
+              ))}
+            </div>
+          </div>
+          <div>
+            <SidebarLink
+              link={{
+                label: "Profile Settings",
+                href: "/profile",
+                icon: (
+                  <IconSettings className="h-5 w-5 flex-shrink-0 min-w-[20px] min-h-[20px] text-foreground/80" />
+                ),
+              }}
+            />
+          </div>
+        </SidebarBody>
+      </Sidebar>
+
+      {/* Content area push is now handled in AppLayout.jsx */}
+    </>
   );
 };
 

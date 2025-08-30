@@ -19,25 +19,22 @@ import { IoLogOutOutline } from "react-icons/io5";
 import ThemeToggle from "./ThemeToggle";
 import { logout } from "../../features/auth/authSlice";
 import { showToast } from "../../utils/showToast";
-import { AiOutlineMenu } from "react-icons/ai";
-import { IoClose } from "react-icons/io5";
-import { useSidebar } from "../ui/sidebar";
 import { RouteIndex, RouteProfile, RouteSignIn } from "../../utils/RouteName";
 import { useTheme } from "../../utils/ThemeContext";
 import { useAuth } from "../../hooks/useAuth";
-import { Bell, Search } from "lucide-react";
+import { Search, Menu, X } from "lucide-react";
 import NotificationDropdown from "../../features/notification/NotificationDropdown";
+import { useSidebar } from "./AppSidebar";
 
 const Topbar = React.memo(() => {
-  const { toggleSidebar, isMobile, openMobile } = useSidebar();
   const [showSearch, setShowSearch] = useState(false);
   const [currentLogo, setCurrentLogo] = useState(logoLight);
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, getUserName, getUserEmail, getUserAvatar } =
     useAuth();
-
   const { theme } = useTheme();
+  const { open, setOpen } = useSidebar();
 
   // Memoize user data to prevent unnecessary re-renders
   const userData = useMemo(
@@ -82,52 +79,27 @@ const Topbar = React.memo(() => {
     setShowSearch((prev) => !prev);
   }, []);
 
-  const handleSidebarToggle = useCallback(() => {
-    toggleSidebar();
-  }, [toggleSidebar]);
-
   return (
     <>
-      <div className="flex justify-between items-center h-16 fixed w-full z-[100] bg-background/95 backdrop-blur-sm text-foreground px-4 sm:px-6 md:px-8 border-b border-border/20 shadow-sm no-print">
+      <div className="flex justify-between items-center h-16 fixed w-full z-[100] bg-background/95 backdrop-blur-sm text-foreground pl-4 pr-3 sm:pl-6 sm:pr-4 md:pl-8 md:pr-6 border-b border-border/20 shadow-sm no-print">
         <div className="flex items-center gap-2 sm:gap-4">
-          {isAuthenticated && (
-            <button
-              onClick={handleSidebarToggle}
-              className="p-2 rounded-lg hover:bg-accent/80 transition-all duration-200 ease-in-out flex-shrink-0 md:hidden cursor-pointer"
-              type="button"
-              aria-label={
-                isMobile && openMobile ? "Close sidebar" : "Open sidebar"
-              }
-            >
-              {isMobile && openMobile ? (
-                <IoClose className="w-5 h-5" />
-              ) : (
-                <AiOutlineMenu className="w-5 h-5" />
-              )}
-            </button>
-          )}
-
+          <button 
+            className="md:hidden p-2 -ml-2 rounded-md hover:bg-accent/50 transition-colors"
+            onClick={() => setOpen(!open)}
+            aria-label={open ? "Close menu" : "Open menu"}
+          >
+            {open ? (
+              <X className="h-5 w-5 transition-transform duration-200" />
+            ) : (
+              <Menu className="h-5 w-5 transition-transform duration-200" />
+            )}
+          </button>
           <Link
             to={RouteIndex}
-            className="hidden md:flex items-center hover:opacity-80 transition-opacity duration-200 rounded-lg"
+            className="flex items-center hover:opacity-80 transition-opacity duration-200 rounded-lg"
           >
             <img
-              key={`logo-desktop-${theme}`}
-              src={currentLogo}
-              alt="Logo"
-              className="object-contain transition-opacity duration-300"
-              style={logoStyle}
-            />
-          </Link>
-
-          <Link
-            to={RouteIndex}
-            className={`flex md:hidden items-center hover:opacity-80 transition-opacity duration-200 rounded-lg ${
-              isAuthenticated ? "-ml-4" : "ml-0"
-            } md:ml-0`}
-          >
-            <img
-              key={`logo-mobile-${theme}`}
+              key={`logo-${theme}`}
               src={currentLogo}
               alt="Logo"
               className="object-contain transition-opacity duration-300"
@@ -165,15 +137,25 @@ const Topbar = React.memo(() => {
           ) : (
             <div className="flex items-center gap-2">
               <DropdownMenu>
-                <DropdownMenuTrigger asChild className="cursor-pointer">
-                  <Avatar className="w-7 h-7 sm:w-8 sm:h-8">
-                    <AvatarImage src={userData.avatar} />
-                    <AvatarFallback>
-                      <FaRegUser className="w-3 h-3" />
-                    </AvatarFallback>
-                  </Avatar>
+                <DropdownMenuTrigger asChild>
+                  <button 
+                    className="cursor-pointer rounded-full focus:outline-none p-0.5 -m-0.5 touch-manipulation transition-all duration-200"
+                    aria-label="Open user menu"
+                  >
+                    <Avatar className="w-7 h-7 sm:w-8 sm:h-8 transition-transform duration-200 hover:scale-105 active:scale-95">
+                      <AvatarImage src={userData.avatar} />
+                      <AvatarFallback>
+                        <FaRegUser className="w-3 h-3" />
+                      </AvatarFallback>
+                    </Avatar>
+                  </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-56">
+                <DropdownMenuContent 
+                  align="end" 
+                  className="w-56 md:w-64 max-w-[90vw] mr-2 sm:mr-4"
+                  sideOffset={8}
+                  alignOffset={-4}
+                >
                   <DropdownMenuLabel>
                     <p className="font-semibold truncate">{getUserName()}</p>
                     <p className="text-xs text-muted-foreground truncate">
@@ -222,5 +204,4 @@ const Topbar = React.memo(() => {
 });
 
 Topbar.displayName = "Topbar";
-
 export default Topbar;

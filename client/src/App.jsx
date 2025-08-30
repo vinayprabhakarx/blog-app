@@ -3,7 +3,6 @@ import { Provider } from "react-redux";
 import { PersistGate } from "redux-persist/integration/react";
 import { store, persistor } from "./app/store";
 import { ThemeProvider } from "./utils/ThemeContext.jsx";
-import { SidebarProvider } from "./components/ui/sidebar";
 import { NotificationProvider } from "./utils/NotificationContext";
 import AppRouter from "./utils/AppRouter";
 import { ToastContainer } from "react-toastify";
@@ -31,8 +30,7 @@ function App() {
     <PersistGate persistor={persistor}>
       <Provider store={store}>
         <ThemeProvider>
-          <SidebarProvider>
-            <NotificationProvider>
+          <NotificationProvider>
               <AuthInitializer>
                 <div className="App w-full min-h-screen bg-background text-foreground ">
                   <AppRouter />
@@ -51,11 +49,10 @@ function App() {
                 </div>
               </AuthInitializer>
             </NotificationProvider>
-          </SidebarProvider>
-        </ThemeProvider>
-      </Provider>
-    </PersistGate>
-  );
+          </ThemeProvider>
+        </Provider>
+      </PersistGate>
+    );
 }
 
 export default App;

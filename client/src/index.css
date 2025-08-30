@@ -344,6 +344,24 @@ body {
 /* Mobile-specific optimizations */
 @media (max-width: 640px) {
 
+    /* Prevent content from stretching to edges */
+    .px-2 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    /* Ensure proper spacing on mobile */
+    .px-4 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
+    /* Override any excessive padding */
+    .sm\:px-4 {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+
     /* Improve touch targets */
     .touch-manipulation {
         touch-action: manipulation;
@@ -367,6 +385,20 @@ body {
     button {
         min-height: 44px;
         min-width: 44px;
+    }
+
+    /* Improve dropdown menu touch interaction */
+    [data-radix-popper-content-wrapper] {
+        z-index: 9999 !important;
+    }
+
+    /* Ensure dropdown menu items are touch-friendly */
+    [role="menuitem"] {
+        min-height: 44px;
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        touch-action: manipulation;
     }
 
     /* Mobile blog content optimizations */
@@ -438,8 +470,30 @@ body {
 
 /* Consistent comfortable padding across all screen sizes */
 .container {
-    padding-left: 1.5rem !important;
-    padding-right: 1.5rem !important;
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+}
+
+/* Mobile-first responsive padding */
+@media (max-width: 480px) {
+    .container {
+        padding-left: 0.75rem !important;
+        padding-right: 0.75rem !important;
+    }
+}
+
+@media (min-width: 481px) and (max-width: 640px) {
+    .container {
+        padding-left: 1rem !important;
+        padding-right: 1rem !important;
+    }
+}
+
+@media (min-width: 641px) {
+    .container {
+        padding-left: 1.5rem !important;
+        padding-right: 1.5rem !important;
+    }
 }
 
 /* Critical fixes for 764-820px range */

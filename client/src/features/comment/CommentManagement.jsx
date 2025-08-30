@@ -33,7 +33,7 @@ import { cn } from "../../lib/utils";
 import CommentForm from "./CommentForm";
 import { Link } from "react-router-dom";
 import { showToast } from "../../utils/showToast";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
+import LoadingSpinner from "../../components/common/LoadingSpinner";
 
 // New, minimal management view aligned with app design
 const CommentManagement = () => {
@@ -358,24 +358,31 @@ const CommentManagement = () => {
         className="w-full mt-8"
       >
         <div className="flex justify-center mb-6">
-          <TabsList className="w-full bg-muted/30 p-1 rounded-lg gap-1">
+          <TabsList className="w-auto max-w-full bg-muted/30 p-1.5 rounded-xl gap-1 overflow-hidden">
             <TabsTrigger
               value="all"
-              className="cursor-pointer data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground rounded-md transition-all duration-200 text-sm px-3 py-2"
+              className="cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-lg transition-all duration-200 text-xs sm:text-sm px-3 sm:px-4 py-2.5 min-w-0 flex-shrink border-0 shadow-none font-medium"
             >
-              All ({stats.total})
+              <span className="hidden sm:inline">All ({stats.total})</span>
+              <span className="sm:hidden">All</span>
             </TabsTrigger>
             <TabsTrigger
               value="reports"
-              className="cursor-pointer data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground rounded-md transition-all duration-200 text-sm px-3 py-2"
+              className="cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-lg transition-all duration-200 text-xs sm:text-sm px-3 sm:px-4 py-2.5 min-w-0 flex-shrink border-0 shadow-none font-medium"
             >
-              Reports ({stats.reported})
+              <span className="hidden sm:inline">
+                Reports ({stats.reported})
+              </span>
+              <span className="sm:hidden">Reports</span>
             </TabsTrigger>
             <TabsTrigger
               value="comments"
-              className="cursor-pointer data-[state=active]:bg-background data-[state=active]:shadow-sm data-[state=active]:text-foreground rounded-md transition-all duration-200 text-sm px-3 py-2"
+              className="cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-lg transition-all duration-200 text-xs sm:text-sm px-3 sm:px-4 py-2.5 min-w-0 flex-shrink border-0 shadow-none font-medium"
             >
-              Comments ({stats.comments})
+              <span className="hidden sm:inline">
+                Comments ({stats.comments})
+              </span>
+              <span className="sm:hidden">Comments</span>
             </TabsTrigger>
           </TabsList>
         </div>
