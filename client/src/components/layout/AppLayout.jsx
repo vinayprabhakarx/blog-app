@@ -1,7 +1,7 @@
 import AppSidebar, { SidebarProvider } from "../common/AppSidebar";
 import Footer from "../common/Footer";
 import Topbar from "../common/Topbar";
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 
@@ -9,6 +9,13 @@ const AppLayout = () => {
   const location = useLocation();
   const { isAuthenticated, isAdmin, isAuthor } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
+
+  // Reset sidebar state when authentication changes
+  useEffect(() => {
+    if (!isAuthenticated) {
+      setSidebarOpen(false);
+    }
+  }, [isAuthenticated]);
 
   const isAuthRoute = () => {
     return location.pathname === "/login" || location.pathname === "/register";
@@ -19,11 +26,8 @@ const AppLayout = () => {
       return false;
     }
 
-    if (isAuthenticated && location.pathname !== "/") {
-      return true;
-    }
-
-    if (isAuthenticated && (isAdmin || isAuthor)) {
+    // Show sidebar for all authenticated users (including regular users)
+    if (isAuthenticated) {
       return true;
     }
 

@@ -8,7 +8,7 @@ import {
   removeProfileImage,
   clearProfileImageRemovalStatus,
 } from "./settingsSlice";
-import { updateUserProfile } from "../auth/authSlice";
+import { updateUserProfile, logout } from "../auth/authSlice";
 import { showToast } from "../../utils/showToast";
 import LoadingButton from "../../components/common/LoadingButton";
 import InputBox from "../../components/common/InputBox";
@@ -404,11 +404,8 @@ const EditProfile = () => {
         );
         // Clear token and redirect to login
         localStorage.removeItem("token");
-        // Also clear any user state via auth slice logout if available
-        try {
-          const { logout } = await import("../auth/authSlice");
-          dispatch(logout());
-        } catch (_) {}
+        // Also clear any user state via auth slice logout
+        dispatch(logout());
         navigate("/login");
         return;
       }
@@ -715,12 +712,7 @@ const EditProfile = () => {
                                   "Email updated. Please verify your new email and sign in again."
                                 );
                                 localStorage.removeItem("token");
-                                try {
-                                  const { logout } = await import(
-                                    "../auth/authSlice"
-                                  );
-                                  dispatch(logout());
-                                } catch (_) {}
+                                dispatch(logout());
                                 navigate("/login");
                                 return;
                               }
@@ -794,12 +786,7 @@ const EditProfile = () => {
                                   "Email updated. Please verify your new email and sign in again."
                                 );
                                 localStorage.removeItem("token");
-                                try {
-                                  const { logout } = await import(
-                                    "../auth/authSlice"
-                                  );
-                                  dispatch(logout());
-                                } catch (_) {}
+                                dispatch(logout());
                                 navigate("/login");
                                 return;
                               }

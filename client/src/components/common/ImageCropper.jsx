@@ -87,8 +87,8 @@ const ImageCropper = ({ imageUrl, onClose, onCrop }) => {
   };
 
   return (
-    <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4">
-      <div className="bg-card text-card-foreground w-full max-w-md p-4 rounded-md shadow-md border">
+    <div className="fixed inset-0 bg-black/70 z-[200] flex items-center justify-center p-4">
+      <div className="bg-card text-card-foreground w-full max-w-md p-4 rounded-lg shadow-lg border relative z-[201]">
         <div className="relative w-full h-64 bg-muted rounded-md overflow-hidden">
           <Cropper
             image={imageUrl}

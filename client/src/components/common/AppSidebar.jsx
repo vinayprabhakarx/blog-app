@@ -421,28 +421,26 @@ const AppSidebar = () => {
   return (
     <>
       {/* Sidebar */}
-      <Sidebar open={open} setOpen={setOpen}>
-        <SidebarBody className="justify-between gap-10">
-          <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
-            <div className="mt-4 flex flex-col gap-2">
-              {links.map((link, idx) => (
-                <SidebarLink key={idx} link={link} />
-              ))}
-            </div>
+      <SidebarBody className="justify-between gap-10">
+        <div className="flex flex-1 flex-col overflow-x-hidden overflow-y-auto">
+          <div className="mt-4 flex flex-col gap-2">
+            {links.map((link, idx) => (
+              <SidebarLink key={idx} link={link} />
+            ))}
           </div>
-          <div>
-            <SidebarLink
-              link={{
-                label: "Profile Settings",
-                href: "/profile",
-                icon: (
-                  <IconSettings className="h-5 w-5 flex-shrink-0 min-w-[20px] min-h-[20px] text-foreground/80" />
-                ),
-              }}
-            />
-          </div>
-        </SidebarBody>
-      </Sidebar>
+        </div>
+        <div>
+          <SidebarLink
+            link={{
+              label: "Profile Settings",
+              href: "/profile",
+              icon: (
+                <IconSettings className="h-5 w-5 flex-shrink-0 min-w-[20px] min-h-[20px] text-foreground/80" />
+              ),
+            }}
+          />
+        </div>
+      </SidebarBody>
 
       {/* Content area push is now handled in AppLayout.jsx */}
     </>
