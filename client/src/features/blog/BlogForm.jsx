@@ -117,8 +117,6 @@ const BlogForm = ({ existingBlog }) => {
 
     if (!formData.title.trim()) {
       errors.title = "Title is required";
-    } else if (formData.title.trim().length < 10) {
-      errors.title = "Title must be at least 10 characters long";
     } else if (formData.title.trim().length > 200) {
       errors.title = "Title must be less than 200 characters long";
     }

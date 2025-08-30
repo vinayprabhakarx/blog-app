@@ -135,12 +135,10 @@ const CategoryForm = () => {
         showToast("success", successMessage);
 
         if (!isEditMode) {
-          // Reset form only when creating
-          form.reset();
+          // Redirect to category display page after creation
+          navigate("/categories");
+          return;
         }
-
-        // Optional: Navigate back to categories list
-        // navigate("/admin/categories");
       } else {
         const errorMessage = isEditMode
           ? "Failed to update category"

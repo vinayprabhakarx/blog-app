@@ -26,10 +26,10 @@ const router = express.Router();
 
 // --- Validation Rules ---
 const blogValidation = [
-  check("title", "Title is required and must be between 10 and 200 characters.")
+  check("title", "Title is required and must be less than 200 characters.")
     .not()
     .isEmpty()
-    .isLength({ min: 5, max: 200 }),
+    .isLength({ max: 200 }),
   check(
     "content",
     "Content is required and must be at least 200 characters long."

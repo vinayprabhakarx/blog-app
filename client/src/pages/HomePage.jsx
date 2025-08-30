@@ -89,13 +89,12 @@ const HomePage = React.memo(() => {
       page: currentPage,
       limit: postsPerPage,
     };
-
-    if (selectedCategoryData) {
+    // Only add category if not 'all'
+    if (selectedCategory !== "all" && selectedCategoryData) {
       params.category = selectedCategoryData._id;
     }
-
     return params;
-  }, [currentPage, postsPerPage, selectedCategoryData]);
+  }, [currentPage, postsPerPage, selectedCategory, selectedCategoryData]);
 
   // Fetch categories only once on mount
   useEffect(() => {
@@ -103,7 +102,7 @@ const HomePage = React.memo(() => {
       dispatch(fetchAllCategories())
         .unwrap()
         .then(() => setHasFetchedCategories(true))
-        .catch(error => console.error('Failed to fetch categories:', error));
+        .catch((error) => console.error("Failed to fetch categories:", error));
     }
   }, [dispatch, hasFetchedCategories]);
 
@@ -121,7 +120,7 @@ const HomePage = React.memo(() => {
   // Show loading spinner during initial load or when categories are loading
   const shouldShowInitialLoading = useMemo(() => {
     return (
-      isInitialLoadRef.current && 
+      isInitialLoadRef.current &&
       (blogLoading.allBlogs || (categoriesLoading && !hasFetchedCategories))
     );
   }, [blogLoading.allBlogs, categoriesLoading, hasFetchedCategories]);

@@ -48,10 +48,7 @@ export default defineConfig({
           ],
           ckeditor: ["ckeditor5"],
 
-          // Visualization
-          mermaid: ["mermaid"],
-
-          // Firebase (modular SDK must use submodules)
+          // Firebase
           firebase: [
             "firebase/app",
             "firebase/auth",
