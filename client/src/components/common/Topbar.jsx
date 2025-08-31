@@ -81,7 +81,7 @@ const Topbar = React.memo(() => {
 
   return (
     <>
-      <div className="flex justify-between items-center h-16 fixed w-full z-[100] bg-background/95 backdrop-blur-sm text-foreground pl-4 pr-3 sm:pl-6 sm:pr-4 md:pl-8 md:pr-6 border-b border-border/20 shadow-sm no-print">
+      <div className="flex justify-between items-center h-16 fixed w-full z-[100] bg-background/95 backdrop-blur-sm text-foreground pl-4 pr-3 sm:pl-4 sm:pr-4 md:pl-4 md:pr-6 border-b border-border/20 shadow-sm no-print">
         <div className="flex items-center gap-2 sm:gap-4">
           {isAuthenticated && (
             <button

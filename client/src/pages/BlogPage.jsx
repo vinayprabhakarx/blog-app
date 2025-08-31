@@ -150,7 +150,7 @@ const BlogPage = React.memo(() => {
   return (
     <div className="min-h-screen bg-background">
       {/* Main Content Container */}
-      <div className="w-full px-4 sm:px-6 md:px-8 pt-10 sm:pt-14 md:pt-20">
+      <div className="w-full  sm:px-6 md:px-8 pt-10 sm:pt-14 md:pt-20">
         {/* Breadcrumb */}
         <nav className="max-w-2xl mx-auto mb-8 text-sm" aria-label="Breadcrumb">
           <ol className="flex items-center gap-2 text-muted-foreground flex-wrap">
