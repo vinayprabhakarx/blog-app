@@ -53,7 +53,6 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 
-
 // Database Connection
 const connectDB = async () => {
   try {
@@ -73,7 +72,9 @@ const checkCloudinary = async () => {
     if (ok) {
       console.log("✅ Cloudinary connected successfully.");
     } else {
-      console.error("❌ Cloudinary connection failed: Check your credentials and network.");
+      console.error(
+        "❌ Cloudinary connection failed: Check your credentials and network."
+      );
     }
   } catch (err) {
     console.error("❌ Cloudinary connection failed:", err.message);

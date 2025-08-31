@@ -1,10 +1,4 @@
-import React, {
-  useState,
-  useCallback,
-  useMemo,
-  useRef,
-  useEffect,
-} from "react";
+import React, { useState, useCallback, useRef, useEffect } from "react";
 import { Input } from "../ui/input";
 import { Search, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
@@ -25,7 +19,6 @@ const SearchBar = React.memo(() => {
   const abortControllerRef = useRef(null);
   const lastSearchTimeRef = useRef(0);
   const searchCountRef = useRef(0);
-  const isThrottledRef = useRef(false);
 
   // Configuration constants
   const DEBOUNCE_DELAY = 300;
@@ -73,7 +66,7 @@ const SearchBar = React.memo(() => {
       }
       return null;
     },
-    [searchCache]
+    [searchCache, CACHE_EXPIRY]
   );
 
   const setCachedResult = useCallback((query, data) => {
@@ -223,40 +216,13 @@ const SearchBar = React.memo(() => {
       const value = e.target.value;
       setSearchQuery(value);
 
-      // Clear existing timeouts
-      if (debounceTimeoutRef.current) {
-        clearTimeout(debounceTimeoutRef.current);
-        debounceTimeoutRef.current = null;
-      }
-
       // Show results dropdown immediately when typing
       setShowResults(true);
 
-      // Immediate UI update for empty query
-      if (!value.trim()) {
-        setShowResults(false);
-        setSearchResults([]);
-        return;
-      }
-
-      // If query is too short, don't show anything
-      if (value.trim().length < MIN_SEARCH_LENGTH) {
-        setShowResults(false);
-        setSearchResults([]);
-        return;
-      }
-
-      // Set up debounced search
-      debounceTimeoutRef.current = setTimeout(() => {
-        // Create new abort controller for this request
-        if (abortControllerRef.current) {
-          abortControllerRef.current.abort();
-        }
-        abortControllerRef.current = new AbortController();
-        performSearch(value, abortControllerRef.current.signal);
-      }, DEBOUNCE_DELAY);
+      // Use the debounced search function
+      debouncedSearch(value);
     },
-    [loadTopBlogs, performSearch]
+    [debouncedSearch]
   );
 
   // Enhanced result click handler
@@ -323,14 +289,6 @@ const SearchBar = React.memo(() => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
-
-  // Memoize search status text
-  const searchStatusText = useMemo(() => {
-    if (isSearching) return "Searching...";
-    if (searchResults.length === 0)
-      return `No blogs found for "${searchQuery}"`;
-    return null;
-  }, [isSearching, searchResults.length, searchQuery]);
 
   return (
     <div className="relative w-full" data-search-container>

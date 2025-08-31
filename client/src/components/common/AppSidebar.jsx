@@ -1,69 +1,22 @@
-import React, {
-  useEffect,
-  useMemo,
-  useState,
-  createContext,
-  useContext,
-  useCallback,
-} from "react";
+import React, { useEffect, useMemo, useState, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useCategories } from "../../hooks/useRedux";
 import { fetchAllCategories } from "../../features/category/categoriesSlice";
 import { cn } from "../../lib/utils";
-import { motion } from "motion/react";
+import { motion as Motion } from "motion/react";
+import { IconSettings } from "@tabler/icons-react";
 import {
-  IconDashboard,
-  IconNews,
-  IconTags,
-  IconMessages,
-  IconBell,
-  IconBookmark,
-  IconEdit,
-  IconChartLine,
-  IconUsers,
-  IconShield,
-  IconSettings,
-  IconPencil,
-  IconChartBar,
-  IconNotification,
-} from "@tabler/icons-react";
+  NAVIGATION_CONFIG,
+  NAVIGATION_SECTIONS,
+  getUserRole,
+  hasRole,
+  isRouteActive,
+} from "./navigation-config";
+import { useSidebar } from "./sidebar-hooks";
+import { SidebarProvider } from "./sidebar-context.jsx";
 
 // Sidebar Context and Components
-const SidebarContext = createContext(undefined);
-
-export const useSidebar = () => {
-  const context = useContext(SidebarContext);
-  if (!context) {
-    throw new Error("useSidebar must be used within a SidebarProvider");
-  }
-  return context;
-};
-
-export const SidebarProvider = React.memo(
-  ({ children, open: openProp, setOpen: setOpenProp, animate = true }) => {
-    const [openState, setOpenState] = useState(false);
-    const open = openProp !== undefined ? openProp : openState;
-    const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
-
-    const contextValue = useMemo(
-      () => ({
-        open,
-        setOpen,
-        animate,
-      }),
-      [open, setOpen, animate]
-    );
-
-    return (
-      <SidebarContext.Provider value={contextValue}>
-        {children}
-      </SidebarContext.Provider>
-    );
-  }
-);
-
-SidebarProvider.displayName = "SidebarProvider";
 
 export const Sidebar = ({ children, open, setOpen, animate }) => {
   return (
@@ -90,7 +43,7 @@ export const DesktopSidebar = React.memo(
     const handleMouseLeave = useCallback(() => setOpen(false), [setOpen]);
 
     return (
-      <motion.div
+      <Motion.div
         className={cn(
           "fixed left-0 z-50 px-4 py-4 hidden md:flex md:flex-col bg-background border-r border-border shrink-0 overflow-hidden",
           className
@@ -112,7 +65,7 @@ export const DesktopSidebar = React.memo(
         {...props}
       >
         {children}
-      </motion.div>
+      </Motion.div>
     );
   }
 );
@@ -134,7 +87,7 @@ export const MobileSidebar = React.memo(({ className, children, ...props }) => {
         />
       )}
       {/* Sidebar */}
-      <motion.div
+      <Motion.div
         className={cn(
           "fixed left-0 top-16 bottom-0 z-40 px-4 py-4 flex flex-col bg-background border-r border-border w-[250px] md:hidden",
           className
@@ -150,7 +103,7 @@ export const MobileSidebar = React.memo(({ className, children, ...props }) => {
         {...props}
       >
         {children}
-      </motion.div>
+      </Motion.div>
     </>
   );
 });
@@ -209,7 +162,7 @@ export const SidebarLink = React.memo(({ link, className, ...props }) => {
       >
         {link.icon}
       </span>
-      <motion.span
+      <Motion.span
         animate={{
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           opacity: animate ? (open ? 1 : 0) : 1,
@@ -217,140 +170,12 @@ export const SidebarLink = React.memo(({ link, className, ...props }) => {
         className="text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0 md:inline-block"
       >
         {link.label}
-      </motion.span>
+      </Motion.span>
     </Link>
   );
 });
 
 SidebarLink.displayName = "SidebarLink";
-
-// Navigation configuration
-const NAVIGATION_CONFIG = {
-  dashboard: {
-    title: "Dashboard",
-    path: "/dashboard",
-    icon: IconDashboard,
-    activeIcon: IconDashboard,
-    roles: ["author", "admin"],
-  },
-  categories: {
-    title: "Categories",
-    path: "/categories",
-    icon: IconTags,
-    activeIcon: IconTags,
-    roles: ["user", "author", "admin"],
-  },
-  blogs: {
-    title: "All Blogs",
-    path: "/blogs",
-    icon: IconNews,
-    activeIcon: IconNews,
-    roles: ["user", "author", "admin"],
-  },
-  comments: {
-    title: "Comments",
-    path: "/comments",
-    icon: IconMessages,
-    activeIcon: IconMessages,
-    roles: ["admin", "author"],
-  },
-  notifications: {
-    title: "Notifications",
-    path: "/notifications",
-    icon: IconBell,
-    activeIcon: IconNotification,
-    roles: ["user", "author", "admin"],
-  },
-  myBlogs: {
-    title: "My Blogs",
-    path: "/my-blogs",
-    icon: IconBookmark,
-    activeIcon: IconBookmark,
-    roles: ["author", "admin"],
-  },
-  createBlog: {
-    title: "Create Blog",
-    path: "/blogs/create",
-    icon: IconPencil,
-    activeIcon: IconEdit,
-    roles: ["author", "admin"],
-  },
-  analytics: {
-    title: "Analytics",
-    path: "/analytics",
-    icon: IconChartLine,
-    activeIcon: IconChartBar,
-    roles: ["admin"],
-  },
-  users: {
-    title: "User Management",
-    path: "/users",
-    icon: IconUsers,
-    activeIcon: IconUsers,
-    roles: ["admin"],
-  },
-};
-
-// Navigation sections configuration
-const NAVIGATION_SECTIONS = {
-  main: {
-    label: "Navigation",
-    items: ["dashboard", "categories", "blogs", "comments", "notifications"],
-  },
-  contentManagement: {
-    label: "Blog Management",
-    items: ["myBlogs", "createBlog"],
-    showFor: ["author", "admin"],
-  },
-  admin: {
-    label: "Admin Panel",
-    items: ["analytics", "users"],
-    showFor: ["admin"],
-    icon: IconShield,
-  },
-  account: {
-    label: "Account",
-    items: ["profile"],
-  },
-};
-
-// Helper function to determine user role
-const getUserRole = (isAdmin, isAuthor) => {
-  if (isAdmin) return "admin";
-  if (isAuthor) return "author";
-  return "user";
-};
-
-// Helper function to check if user has required role
-const hasRole = (roles, userRole) => roles.includes(userRole);
-
-// Helper function to check route activity
-const isRouteActive = (path, pathname) => {
-  const exactMatches = [
-    "/dashboard",
-    "/profile",
-    "/analytics",
-    "/users",
-    "/my-blogs",
-    "/blogs/create",
-    "/comments",
-    "/notifications",
-  ];
-
-  if (exactMatches.includes(path)) {
-    return pathname === path;
-  }
-
-  if (path === "/blogs") {
-    return pathname === "/blogs" || pathname.startsWith("/blogs/");
-  }
-
-  if (path === "/categories") {
-    return pathname === "/categories" || pathname.startsWith("/categories/");
-  }
-
-  return pathname.startsWith(path);
-};
 
 // Logo Components
 export const Logo = React.memo(() => {
@@ -360,13 +185,13 @@ export const Logo = React.memo(() => {
       className="relative z-20 flex items-center space-x-2 py-1 text-sm font-normal text-foreground"
     >
       <div className="h-5 w-6 shrink-0 rounded-tl-lg rounded-tr-sm rounded-br-lg rounded-bl-sm bg-foreground" />
-      <motion.span
+      <Motion.span
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="font-medium whitespace-pre text-foreground hidden md:inline-block"
       >
         Acet Labs
-      </motion.span>
+      </Motion.span>
     </Link>
   );
 });
@@ -388,7 +213,7 @@ LogoIcon.displayName = "LogoIcon";
 
 const AppSidebar = React.memo(() => {
   const location = useLocation();
-  const { isAuthenticated, isAdmin, isAuthor } = useAuth();
+  const { isAuthenticated, isAdmin, isAuthor, user } = useAuth();
   const { loading: categoriesLoading, dispatch } = useCategories();
   const [hasFetched, setHasFetched] = useState(false);
 
@@ -412,7 +237,7 @@ const AppSidebar = React.memo(() => {
   const navigationLinks = useMemo(() => {
     const links = [];
 
-    Object.entries(NAVIGATION_SECTIONS).forEach(([sectionKey, section]) => {
+    Object.entries(NAVIGATION_SECTIONS).forEach(([, section]) => {
       // Skip sections that user doesn't have access to
       if (section.showFor && !section.showFor.includes(userRole)) return;
 

@@ -1,4 +1,5 @@
-import AppSidebar, { SidebarProvider } from "../common/AppSidebar";
+import AppSidebar from "../common/AppSidebar";
+import { SidebarProvider } from "../common/sidebar-context.jsx";
 import Footer from "../common/Footer";
 import Topbar from "../common/Topbar";
 import React, { useState, useEffect } from "react";
@@ -7,7 +8,7 @@ import { useAuth } from "../../hooks/useAuth";
 
 const AppLayout = () => {
   const location = useLocation();
-  const { isAuthenticated, isAdmin, isAuthor } = useAuth();
+  const { isAuthenticated } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   // Reset sidebar state when authentication changes

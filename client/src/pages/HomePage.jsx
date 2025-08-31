@@ -7,8 +7,6 @@ import React, {
 } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-
-import { Filter } from "lucide-react";
 import BlogCard from "../features/blog/BlogCard";
 import Pagination from "../components/common/Pagination";
 import LoadingSpinner from "../components/common/LoadingSpinner";
@@ -18,7 +16,6 @@ import {
   searchBlogs,
   selectAllBlogs,
   selectBlogLoading,
-  selectBlogFilters,
 } from "../features/blog/blogSlice";
 import {
   fetchAllCategories,
@@ -151,6 +148,7 @@ const HomePage = React.memo(() => {
     urlParams.search,
     currentPage,
     postsPerPage,
+    hasFetchedCategories,
   ]);
 
   useEffect(() => {

@@ -37,18 +37,25 @@ const BlogCard = React.memo(
     const authorData = useMemo(
       () => ({
         avatar:
-          blog?.author?.personal_info?.profile_img || blog?.author?.avatar,
+          blog?.author?.personal_info?.profile_img ||
+          blog?.author?.avatar ||
+          blog?.authorInfo?.profile_img,
         username:
           blog?.author?.personal_info?.username ||
           blog?.author?.username ||
-          "anonymous",
+          blog?.authorInfo?.username ||
+          "vianyprabhakarx",
         displayName:
-          blog?.author?.name ||
           blog?.author?.personal_info?.username ||
-          "Anonymous",
-        altText: blog?.author?.personal_info?.username || "Author",
+          blog?.authorInfo?.username ||
+          blog?.author?.username ||
+          "vianyprabhakarx",
+        altText:
+          blog?.author?.personal_info?.username ||
+          blog?.authorInfo?.username ||
+          "vianyprabhakarx",
       }),
-      [blog?.author]
+      [blog?.author, blog?.authorInfo]
     );
 
     // Memoize computed display values

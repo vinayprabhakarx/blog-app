@@ -11,22 +11,43 @@ const api = axios.create({
   },
 });
 
-// Add auth token only to authenticated routes
+// Add auth token to requests that need authentication
 api.interceptors.request.use(
   (config) => {
-    const token = store.getState().auth?.token;
+    const reduxToken = store.getState().auth?.token;
+    const localStorageToken = localStorage.getItem("token");
 
-    // List of public routes that don't need authentication
-    const publicRoutes = ["/blogs", "/categories", "/blogs/author"];
+    // Use Redux token first, fallback to localStorage
+    const token = reduxToken || localStorageToken;
 
-    // Check if the current route is not in public routes
-    const needsAuth = !publicRoutes.some((route) =>
-      config.url.startsWith(route)
-    );
+    const publicGetRoutes = [
+      "/blogs?",
+      "/blogs/author",
+      "/categories",
+      "/auth/verify-email",
+      "/auth/forgot-password",
+      "/auth/reset-password",
+    ];
 
-    if (token && needsAuth) {
+    // Check if this is a public GET request
+    const isPublicGetRequest =
+      config.method === "get" &&
+      publicGetRoutes.some((route) => {
+        if (route === "/blogs?") {
+          return (
+            config.url === "/blogs" ||
+            (config.url.startsWith("/blogs?") &&
+              !config.url.includes("/blogs/my-blogs"))
+          );
+        }
+        return config.url.startsWith(route);
+      });
+
+    // Add token for all requests except public GET requests
+    if (token && !isPublicGetRequest) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => {

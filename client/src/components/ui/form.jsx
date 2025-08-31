@@ -1,18 +1,12 @@
 import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-import {
-  Controller,
-  FormProvider,
-  useFormContext,
-  useFormState,
-} from "react-hook-form";
+import { Controller, FormProvider } from "react-hook-form";
 
 import { cn } from "../../utils/utils";
 import { Label } from "./label";
+import { useFormField, FormFieldContext, FormItemContext } from "./form-hooks";
 
 const Form = FormProvider;
-
-const FormFieldContext = React.createContext({});
 
 const FormField = ({ ...props }) => {
   return (
@@ -21,31 +15,6 @@ const FormField = ({ ...props }) => {
     </FormFieldContext.Provider>
   );
 };
-
-const useFormField = () => {
-  const fieldContext = React.useContext(FormFieldContext);
-  const itemContext = React.useContext(FormItemContext);
-  const { getFieldState } = useFormContext();
-  const formState = useFormState({ name: fieldContext.name });
-  const fieldState = getFieldState(fieldContext.name, formState);
-
-  if (!fieldContext) {
-    throw new Error("useFormField should be used within <FormField>");
-  }
-
-  const { id } = itemContext;
-
-  return {
-    id,
-    name: fieldContext.name,
-    formItemId: `${id}-form-item`,
-    formDescriptionId: `${id}-form-item-description`,
-    formMessageId: `${id}-form-item-message`,
-    ...fieldState,
-  };
-};
-
-const FormItemContext = React.createContext({});
 
 function FormItem({ className, ...props }) {
   const id = React.useId();
@@ -128,7 +97,6 @@ function FormMessage({ className, ...props }) {
 }
 
 export {
-  useFormField,
   Form,
   FormItem,
   FormLabel,

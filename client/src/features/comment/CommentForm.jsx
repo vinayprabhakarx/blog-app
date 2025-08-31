@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { Send, X, AtSign } from "lucide-react";
+import { useDispatch } from "react-redux";
+import { Send, AtSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 import commentService from "./commentsService";
 import { refreshNotificationsAfterAction } from "../../utils/notificationRefresh";
@@ -33,7 +33,6 @@ const CommentForm = ({
   const textareaRef = useRef(null);
 
   // Removed loading states for instant UI updates
-  const isLoading = false; // Always false for instant interactions
   const isValid = content.trim().length > 0 && content.trim().length <= 1000;
 
   useEffect(() => {
@@ -209,7 +208,10 @@ const CommentForm = ({
   };
 
   return (
-    <form onSubmit={handleSubmit} className="relative flex items-center gap-2 w-full max-w-md">
+    <form
+      onSubmit={handleSubmit}
+      className="relative flex items-center gap-2 w-full max-w-md"
+    >
       <div className="flex-1 min-w-0 bg-muted rounded-full flex items-center pr-1 sm:pr-2 h-8 sm:h-9">
         <input
           ref={textareaRef}

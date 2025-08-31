@@ -13,15 +13,11 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Card } from "../../components/ui/card";
 import { useTheme } from "../../utils/ThemeContext";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  RouteSignIn,
-  RouteIndex,
-  getRoleBasedRedirect,
-} from "../../utils/RouteName";
+import { RouteSignIn, RouteIndex } from "../../utils/RouteName";
 import { showToast } from "../../utils/showToast";
 import GoogleAuth from "./GoogleAuth";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser, getCurrentUser } from "../auth/authSlice";
+import { registerUser } from "../auth/authSlice";
 import InputBox from "../../components/common/InputBox";
 import LoadingButton from "../../components/common/LoadingButton";
 import { FaUser, FaAt, FaEnvelope, FaLock } from "react-icons/fa6";
@@ -61,7 +57,7 @@ const SignUp = () => {
 
   async function onSubmit(values) {
     try {
-      const { confirmPassword, ...userData } = values;
+      const { confirmPassword: _confirmPassword, ...userData } = values;
 
       await dispatch(registerUser(userData)).unwrap();
 

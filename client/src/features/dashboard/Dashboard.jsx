@@ -68,13 +68,15 @@ const Dashboard = () => {
         try {
           const authorResponse = await api.get("/users/author/stats");
           setAuthorStats(authorResponse.data.stats);
-        } catch (error) {}
+        } catch {
+          // Error handled silently
+        }
 
         try {
           const blogsResponse = await api.get("/users/author/recent-blogs");
           setRecentBlogs(blogsResponse.data.blogs);
           setBlogsLoading(false);
-        } catch (error) {
+        } catch {
           setBlogsLoading(false);
         }
       }
@@ -82,12 +84,6 @@ const Dashboard = () => {
 
     fetchDashboardData();
   }, [dispatch, isAdmin, isAuthor]);
-
-  const getUserRole = () => {
-    if (isAdmin) return "Administrator";
-    if (isAuthor) return "Author";
-    return "User";
-  };
 
   const getQuickActions = () => {
     const actions = [];

@@ -1020,23 +1020,23 @@ export const selectCommentsPagination = createSelector(
 );
 
 export const selectCommentsLoading = createSelector(
-  [selectCommentsState, (state, blogId) => blogId],
-  (commentsState, blogId) => false // Always return false for instant UI updates
+  [selectCommentsState],
+  () => false // Always return false for instant UI updates
 );
 
 export const selectCreateCommentLoading = createSelector(
   [selectCommentsState],
-  (commentsState) => false // Always return false for instant UI updates
+  () => false // Always return false for instant UI updates
 );
 
 export const selectUpdateCommentLoading = createSelector(
-  [selectCommentsState, (state, commentId) => commentId],
-  (commentsState, commentId) => false // Always return false for instant UI updates
+  [selectCommentsState],
+  () => false // Always return false for instant UI updates
 );
 
 export const selectDeleteCommentLoading = createSelector(
-  [selectCommentsState, (state, commentId) => commentId],
-  (commentsState, commentId) => false // Always return false for instant UI updates
+  [selectCommentsState],
+  () => false // Always return false for instant UI updates
 );
 
 export const selectCommentsError = createSelector(
@@ -1081,8 +1081,8 @@ export const selectCommentUserLikeStatus = createSelector(
 );
 
 export const selectCommentLikeLoading = createSelector(
-  [selectCommentsState, (state, commentId) => commentId],
-  (commentsState, commentId) => false // Always return false for instant UI updates
+  [selectCommentsState],
+  () => false // Always return false for instant UI updates
 );
 
 // Check if current user has reported a comment

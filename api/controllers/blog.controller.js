@@ -23,6 +23,17 @@ export const createBlog = async (req, res, next) => {
     return next(handleError(400, "Title, content, and category are required."));
   }
 
+  // Get author information for backup storage
+  const author = await User.findById(authorId)
+    .select("personal_info")
+    .catch((err) => {
+      throw databaseError("finding author information", err);
+    });
+
+  if (!author) {
+    return next(notFoundError("Author"));
+  }
+
   // Handle banner image upload if provided
   let bannerUrl = "";
   if (req.file) {
@@ -45,6 +56,12 @@ export const createBlog = async (req, res, next) => {
     category,
     draft: draft === "true",
     author: authorId,
+    // Store author backup info
+    authorInfo: {
+      username: author.personal_info.username,
+      name: author.personal_info.name,
+      profile_img: author.personal_info.profile_img || "",
+    },
     banner: bannerUrl,
   };
 
@@ -432,6 +449,28 @@ export const updateBlog = async (req, res, next) => {
   if (category) blog.category = category;
   if (draft !== undefined) blog.draft = draft;
   if (tags) blog.tags = tags.split(",").map((tag) => tag.trim());
+
+  // Ensure authorInfo exists for validation (for blogs created before authorInfo was added)
+  if (!blog.authorInfo || !blog.authorInfo.username || !blog.authorInfo.name) {
+    const author = await User.findById(blog.author).catch((err) => {
+      throw databaseError("finding blog author for backup info", err);
+    });
+
+    if (author) {
+      blog.authorInfo = {
+        username: author.personal_info.username,
+        name: author.personal_info.name,
+        profile_img: author.personal_info.profile_img || "",
+      };
+    } else {
+      // If author is deleted, use fallback values
+      blog.authorInfo = {
+        username: blog.authorInfo?.username || "deleted_user",
+        name: blog.authorInfo?.name || "Deleted User",
+        profile_img: blog.authorInfo?.profile_img || "",
+      };
+    }
+  }
 
   if (req.file) {
     // If there's an old banner, delete it from Cloudinary

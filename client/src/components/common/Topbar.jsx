@@ -24,7 +24,7 @@ import { useTheme } from "../../utils/ThemeContext";
 import { useAuth } from "../../hooks/useAuth";
 import { Search, Menu, X } from "lucide-react";
 import NotificationDropdown from "../../features/notification/NotificationDropdown";
-import { useSidebar } from "./AppSidebar";
+import { useSidebar } from "./sidebar-hooks";
 
 const Topbar = React.memo(() => {
   const [showSearch, setShowSearch] = useState(false);

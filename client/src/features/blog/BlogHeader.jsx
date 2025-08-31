@@ -5,7 +5,7 @@ import React, {
   useCallback,
   useMemo,
 } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useSelector } from "react-redux";
 import {
   Eye,
   MessageCircle,
@@ -17,36 +17,22 @@ import {
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
-import { refreshNotificationsAfterAction } from "../../utils/notificationRefresh";
 import ShareDropdown from "../../components/common/ShareDropdown";
-import {
-  toggleBlogLike,
-  selectLikeCount,
-  selectUserLikeStatus,
-  selectToggleLoading,
-  toggleBlogLikeFrontend,
-} from "../like/likesSlice";
+import LikeButton from "../../components/common/LikeButton";
+import useBlogLike from "../../hooks/useBlogLike";
 
 const handlePrint = () => {
   window.print();
 };
 
 const BlogHeader = React.memo(({ blog, onCommentClick }) => {
-  const dispatch = useDispatch();
-
   const [isShareDropdownOpen, setIsShareDropdownOpen] = useState(false);
   const [hoverTimeout, setHoverTimeout] = useState(null);
   const shareButtonRef = useRef(null);
 
-  const likeCount = useSelector((state) =>
-    selectLikeCount(state, blog?._id, "blog")
-  );
-  const isLiked = useSelector((state) =>
-    selectUserLikeStatus(state, blog?._id, "blog")
-  );
-  const isToggling = useSelector((state) =>
-    selectToggleLoading(state, blog?._id, "blog")
-  );
+  // Use custom hook for optimized like functionality - memoized with blog ID
+  const blogId = useMemo(() => blog?._id, [blog?._id]);
+  const likeButtonState = useBlogLike(blogId, blog?.category);
   const { user } = useSelector((state) => state.auth);
 
   // Memoize computed values
@@ -89,11 +75,16 @@ const BlogHeader = React.memo(({ blog, onCommentClick }) => {
 
   const authorInfo = useMemo(
     () => ({
-      username: blog?.author?.personal_info?.username || "vinayprabhakarx",
+      username:
+        blog?.author?.personal_info?.username ||
+        blog?.authorInfo?.username ||
+        "vinayprabhakarx",
       profileImg:
-        blog?.author?.personal_info?.profile_img || blog?.author?.avatar,
+        blog?.author?.personal_info?.profile_img ||
+        blog?.author?.avatar ||
+        blog?.authorInfo?.profile_img,
     }),
-    [blog?.author]
+    [blog?.author, blog?.authorInfo]
   );
 
   const activityStats = useMemo(
@@ -157,33 +148,6 @@ const BlogHeader = React.memo(({ blog, onCommentClick }) => {
   );
 
   // Memoize callback functions
-  const handleLike = useCallback(async () => {
-    if (!user) {
-      alert("Please log in to like this blog");
-      return;
-    }
-
-    if (!blog?._id) return;
-
-    dispatch(toggleBlogLikeFrontend({ blogId: blog._id }));
-
-    try {
-      await dispatch(
-        toggleBlogLike({
-          blogId: blog._id,
-          categoryId:
-            blogMetadata.category?._id ||
-            blogMetadata.category ||
-            "uncategorized",
-        })
-      ).unwrap();
-
-      refreshNotificationsAfterAction("like");
-    } catch (error) {
-      dispatch(toggleBlogLikeFrontend({ blogId: blog._id }));
-    }
-  }, [user, blog?._id, dispatch, blogMetadata.category]);
-
   const handleShare = useCallback((e) => {
     e.preventDefault();
     e.stopPropagation();
@@ -275,18 +239,12 @@ const BlogHeader = React.memo(({ blog, onCommentClick }) => {
       >
         <header className="mb-6 border-b border-border pb-4">
           {/* Title */}
-          <h1
-            className="text-3xl md:text-4xl lg:text-5xl font-extrabold leading-tight mb-2 text-foreground"
-            style={{ fontFamily: "Georgia, serif" }}
-          >
+          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-2 text-foreground">
             {blogMetadata.title}
           </h1>
           {/* Subtitle/Excerpt */}
           {blogMetadata.excerpt && (
-            <div
-              className="text-lg md:text-xl text-muted-foreground mb-4"
-              style={{ fontFamily: "Georgia, serif" }}
-            >
+            <div className="text-base md:text-lg text-muted-foreground mb-4">
               {blogMetadata.excerpt}
             </div>
           )}
@@ -315,28 +273,13 @@ const BlogHeader = React.memo(({ blog, onCommentClick }) => {
               <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>{activityStats.totalComments}</span>
             </button>
-            <button
-              type="button"
-              onClick={(e) => {
-                e.preventDefault();
-                e.stopPropagation();
-                handleLike();
-              }}
-              disabled={!user || isToggling}
-              className={`flex items-center gap-2 flex-shrink-0 whitespace-nowrap transition-colors ${
-                !user || isToggling
-                  ? "opacity-50 cursor-not-allowed"
-                  : "hover:text-red-500 cursor-pointer"
-              }`}
-            >
-              <Heart
-                className={`w-4 h-4 sm:w-5 sm:h-5 ${
-                  isLiked ? "fill-red-500 text-red-500" : ""
-                }`}
-              />
-              <span>{likeCount}</span>
-              {isToggling && <span className="text-xs">...</span>}
-            </button>
+            <LikeButton
+              count={likeButtonState.count}
+              isLiked={likeButtonState.isLiked}
+              isToggling={likeButtonState.isToggling}
+              isDisabled={likeButtonState.isDisabled}
+              onLike={likeButtonState.handleLike}
+            />
             <div className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
               <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>{readTimeTextMobile}</span>
@@ -413,4 +356,21 @@ const BlogHeader = React.memo(({ blog, onCommentClick }) => {
   );
 });
 
-export default BlogHeader;
+BlogHeader.displayName = "BlogHeader";
+
+// Add a custom comparison function to prevent unnecessary re-renders
+const arePropsEqual = (prevProps, nextProps) => {
+  // Only re-render if blog ID, title, or like-related activity changes
+  return (
+    prevProps.blog?._id === nextProps.blog?._id &&
+    prevProps.blog?.title === nextProps.blog?.title &&
+    prevProps.blog?.activity?.total_likes ===
+      nextProps.blog?.activity?.total_likes &&
+    prevProps.blog?.createdAt === nextProps.blog?.createdAt &&
+    prevProps.blog?.excerpt === nextProps.blog?.excerpt &&
+    prevProps.blog?.banner === nextProps.blog?.banner &&
+    prevProps.onCommentClick === nextProps.onCommentClick
+  );
+};
+
+export default React.memo(BlogHeader, arePropsEqual);

@@ -19,7 +19,12 @@ import {
 } from "../../components/ui/select";
 import { useAuth } from "../../hooks/useAuth";
 import { useBlog, useCategories } from "../../hooks/useRedux";
-import { fetchAllBlogs, fetchMyBlogs, deleteBlog } from "./blogSlice";
+import {
+  fetchAllBlogs,
+  fetchMyBlogs,
+  fetchBlogsByAuthor,
+  deleteBlog,
+} from "./blogSlice";
 import { fetchAllCategories } from "../category/categoriesSlice";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
 import Pagination from "../../components/common/Pagination";
@@ -51,9 +56,12 @@ const BlogList = () => {
 
   const isMyBlogsPage = location.pathname.includes("my-blogs");
   const isUserBlogsPage =
+    username && location.pathname.includes(`${username}/blogs`);
+  const isGeneralBlogsPage =
     location.pathname.includes("/blogs") &&
     !location.pathname.includes("/category/") &&
-    !location.pathname.includes("/my-blogs");
+    !location.pathname.includes("/my-blogs") &&
+    !isUserBlogsPage;
 
   const {
     allBlogs,
@@ -62,6 +70,9 @@ const BlogList = () => {
     myBlogs,
     myBlogsLoading,
     myBlogsError,
+    authorBlogs,
+    authorBlogsLoading,
+    authorBlogsError,
     filters,
     dispatch: blogDispatch,
   } = useBlog();
@@ -116,6 +127,9 @@ const BlogList = () => {
       try {
         if (isMyBlogsPage) {
           await blogDispatch(fetchMyBlogs(params));
+        } else if (isUserBlogsPage && username) {
+          // Fetch blogs by specific author username
+          await blogDispatch(fetchBlogsByAuthor({ username, params }));
         } else {
           await blogDispatch(fetchAllBlogs(params));
         }
@@ -138,6 +152,7 @@ const BlogList = () => {
     blogsPerPage,
     isMyBlogsPage,
     isUserBlogsPage,
+    isGeneralBlogsPage,
     username,
   ]);
 
@@ -164,12 +179,33 @@ const BlogList = () => {
     return textContent.substring(0, maxLength) + "...";
   };
 
-  const blogPagination = useSelector((state) =>
-    isMyBlogsPage ? state.blog.myBlogsPagination : state.blog.allBlogsPagination
-  );
-  const currentBlogs = isMyBlogsPage ? myBlogs : allBlogs;
-  const currentLoading = isMyBlogsPage ? myBlogsLoading : allBlogsLoading;
-  const currentError = isMyBlogsPage ? myBlogsError : allBlogsError;
+  const blogPagination = useSelector((state) => {
+    if (isMyBlogsPage) {
+      return state.blog.myBlogsPagination;
+    } else if (isUserBlogsPage) {
+      return state.blog.authorBlogsPagination;
+    } else {
+      return state.blog.allBlogsPagination;
+    }
+  });
+
+  const currentBlogs = isMyBlogsPage
+    ? myBlogs
+    : isUserBlogsPage
+    ? authorBlogs
+    : allBlogs;
+
+  const currentLoading = isMyBlogsPage
+    ? myBlogsLoading
+    : isUserBlogsPage
+    ? authorBlogsLoading
+    : allBlogsLoading;
+
+  const currentError = isMyBlogsPage
+    ? myBlogsError
+    : isUserBlogsPage
+    ? authorBlogsError
+    : allBlogsError;
 
   // Only show loading on initial page load, not during pagination/search/filter
   const shouldShowInitialLoading = currentLoading && isInitialLoad;
@@ -190,9 +226,11 @@ const BlogList = () => {
         if (selectedAuthor && selectedAuthor !== "all") {
           try {
             const blogAuthor =
-              blog.author?.name ||
               blog.author?.personal_info?.username ||
+              blog.authorInfo?.username ||
               blog.author?.personal_info?.name ||
+              blog.authorInfo?.name ||
+              blog.author?.name ||
               blog.author;
             return (
               typeof blogAuthor === "string" && blogAuthor === selectedAuthor
@@ -344,9 +382,15 @@ const BlogList = () => {
         <FileText className="h-16 w-16 mx-auto mb-4 opacity-50" />
         <p>Error loading blogs: {currentError}</p>
         <Button
-          onClick={() =>
-            blogDispatch(isMyBlogsPage ? fetchMyBlogs() : fetchAllBlogs())
-          }
+          onClick={() => {
+            if (isMyBlogsPage) {
+              blogDispatch(fetchMyBlogs());
+            } else if (isUserBlogsPage && username) {
+              blogDispatch(fetchBlogsByAuthor({ username, params: {} }));
+            } else {
+              blogDispatch(fetchAllBlogs());
+            }
+          }}
           className="mt-4"
           variant="outline"
         >
@@ -361,7 +405,13 @@ const BlogList = () => {
       <div className="flex flex-col space-y-3 sm:space-y-4 items-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
-            {isAdmin || isAuthor ? "Blog Management" : "All Blogs"}
+            {isMyBlogsPage
+              ? "My Blogs"
+              : isUserBlogsPage
+              ? `${username}'s Blogs`
+              : isAdmin || isAuthor
+              ? "Blog Management"
+              : "All Blogs"}
           </h1>
           <div className="flex justify-center gap-4 text-sm text-muted-foreground">
             <span>{displayTotalBlogs} blogs</span>
@@ -480,9 +530,11 @@ const BlogList = () => {
                       .map((blog) => {
                         try {
                           const author =
-                            blog.author?.name ||
                             blog.author?.personal_info?.username ||
+                            blog.authorInfo?.username ||
                             blog.author?.personal_info?.name ||
+                            blog.authorInfo?.name ||
+                            blog.author?.name ||
                             blog.author;
                           return typeof author === "string" && author.trim()
                             ? author
@@ -608,7 +660,9 @@ const BlogList = () => {
                           <div className="flex items-center gap-1">
                             <User className="w-3 h-3 sm:w-4 sm:h-4" />
                             <span>
-                              {blog.author?.personal_info?.username || "Admin"}
+                              {blog.author?.personal_info?.username ||
+                                blog.authorInfo?.username ||
+                                "Unknown Author"}
                             </span>
                           </div>
 

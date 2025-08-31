@@ -132,14 +132,7 @@ const MdRenderCard = React.memo(({ content }) => {
 
   return (
     <div className="w-full overflow-hidden">
-      <div
-        data-color-mode={theme}
-        className="w-full mx-auto px-4 sm:px-6"
-        style={{
-          maxWidth: "42rem",
-          margin: "0 auto",
-        }}
-      >
+      <div data-color-mode={theme} className="w-full">
         <div style={overflowStyle}>
           <MDEditor.Markdown
             source={content}

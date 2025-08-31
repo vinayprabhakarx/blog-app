@@ -1,10 +1,11 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useParams, Link } from "react-router-dom";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 import { cn } from "@/lib/utils";
 // Redux and hooks
 import { useBlog } from "../hooks/useRedux";
 import { fetchBlogBySlug, fetchBlogById } from "../features/blog/blogSlice";
+import { setLikeData, getUserLikeStatus } from "../features/like/likesSlice";
 // Icons
 import { MessageCircle, MessageCircleOff } from "lucide-react";
 // Components
@@ -15,9 +16,9 @@ import NotFound from "../components/common/NotFound";
 
 const BlogPage = React.memo(() => {
   const { slug, id } = useParams();
-  const { currentBlog, currentBlogLoading, currentBlogError, dispatch } =
-    useBlog();
+  const { currentBlog, currentBlogError, dispatch } = useBlog();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
+  const mainDispatch = useDispatch();
   const [showComments, setShowComments] = useState(false);
 
   // Memoize blog data for stable references
@@ -72,6 +73,48 @@ const BlogPage = React.memo(() => {
       dispatch(fetchBlogBySlug(slug));
     }
   }, [slug, id, dispatch]);
+
+  // Memoize like data initialization to prevent unnecessary dispatches
+  const likeInitData = useMemo(() => {
+    if (!currentBlog?._id) return null;
+    return {
+      blogId: currentBlog._id,
+      likeCount: currentBlog.activity?.total_likes || 0,
+    };
+  }, [currentBlog?._id, currentBlog?.activity?.total_likes]);
+
+  // Memoize user authentication state for like initialization
+  const userAuthState = useMemo(
+    () => ({
+      isAuthenticated,
+      userId: user?._id || user?.id,
+    }),
+    [isAuthenticated, user?._id, user?.id]
+  );
+
+  // Initialize like data when blog is loaded (optimized to prevent unnecessary calls)
+  useEffect(() => {
+    if (likeInitData) {
+      const likeItems = [
+        {
+          id: likeInitData.blogId,
+          type: "blog",
+          count: likeInitData.likeCount,
+        },
+      ];
+      mainDispatch(setLikeData({ items: likeItems }));
+
+      // Fetch user's like status if authenticated
+      if (userAuthState.isAuthenticated && userAuthState.userId) {
+        mainDispatch(
+          getUserLikeStatus({
+            likeableId: likeInitData.blogId,
+            onModel: "Blog",
+          })
+        );
+      }
+    }
+  }, [likeInitData, userAuthState, mainDispatch]);
 
   // Memoize callback functions
   const toggleComments = useCallback((e) => {

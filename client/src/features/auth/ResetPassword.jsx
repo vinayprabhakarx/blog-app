@@ -23,7 +23,6 @@ import {
 const ResetPassword = () => {
   const [searchParams] = useSearchParams();
   const [token, setToken] = useState("");
-  const [email, setEmail] = useState("");
   const [isValidToken, setIsValidToken] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -70,7 +69,6 @@ const ResetPassword = () => {
         const response = await authService.validateResetToken(tokenParam);
         if (response.valid) {
           setToken(tokenParam);
-          setEmail(response.email || "your account");
           setIsValidToken(true);
         } else {
           showToast(
@@ -80,7 +78,7 @@ const ResetPassword = () => {
           );
           navigate(RouteLogin);
         }
-      } catch (error) {
+      } catch {
         showToast("error", "Failed to validate reset token");
         navigate(RouteLogin);
       } finally {
@@ -90,7 +88,6 @@ const ResetPassword = () => {
 
     validateToken();
   }, [searchParams, navigate]);
-
 
   const onSubmit = async (values) => {
     if (values.newPassword !== values.confirmPassword) {

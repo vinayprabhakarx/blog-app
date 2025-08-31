@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
+import { store } from "../../app/store";
 import {
   Card,
   CardContent,
@@ -58,33 +59,49 @@ const Analytics = () => {
   const [loading, setLoading] = useState(true);
   const [blogs, setBlogs] = useState([]);
 
-  useEffect(() => {
-    fetchAnalytics();
-  }, []);
-
-  const fetchAnalytics = async () => {
+  const fetchAnalytics = useCallback(async () => {
     try {
       setLoading(true);
 
-      // Fetch data using Redux actions
-      await Promise.all([
+      // Fetch data using Redux actions and blogs
+      const [, , , blogsResponse] = await Promise.all([
         dispatch(fetchAdminStats()),
         dispatch(fetchMonthlyPerformance()),
         dispatch(fetchRecentActivities()),
+        api.get("/blogs"),
       ]);
 
-      // Fetch all blogs for views calculation
-      const blogsResponse = await api.get("/blogs");
       const blogsData = blogsResponse.data.blogs || [];
       setBlogs(blogsData);
 
-      setLoading(false);
+      // Set data from Redux state after successful fetch
+      const state = store.getState();
+      setAnalytics({
+        totalViews: state.user.adminStats?.totalViews || 0,
+        totalLikes: state.user.adminStats?.totalLikes || 0,
+        totalComments: state.user.adminStats?.totalComments || 0,
+        totalUsers: state.user.adminStats?.totalUsers || 0,
+        totalBlogs: state.user.adminStats?.totalBlogs || 0,
+        totalCategories: state.user.adminStats?.totalCategories || 0,
+        monthlyGrowth: state.user.monthlyPerformance?.monthlyGrowth || 0,
+        topBlogs: state.user.adminStats?.topBlogs || [],
+        recentStats: state.user.adminStats?.recentStats || [],
+        usersByRole: state.user.adminStats?.usersByRole || {},
+        recentRegistrations: state.user.adminStats?.recentRegistrations || 0,
+        monthlyRegistrations:
+          state.user.monthlyPerformance?.monthlyRegistrations || [],
+      });
     } catch (error) {
-      console.error("Analytics fetch error:", error);
+      console.error("Failed to fetch analytics:", error);
       showToast("error", "Failed to load analytics data");
+    } finally {
       setLoading(false);
     }
-  };
+  }, [dispatch]);
+
+  useEffect(() => {
+    fetchAnalytics();
+  }, [fetchAnalytics]);
 
   // Process analytics data when Redux state changes
   useEffect(() => {

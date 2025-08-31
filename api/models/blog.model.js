@@ -32,6 +32,21 @@ const blogSchema = new mongoose.Schema(
       ref: "User",
       required: true,
     },
+    // Backup author info in case the user is deleted
+    authorInfo: {
+      username: {
+        type: String,
+        required: true,
+      },
+      name: {
+        type: String,
+        required: true,
+      },
+      profile_img: {
+        type: String,
+        default: "",
+      },
+    },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Category",

@@ -1,13 +1,13 @@
-// src/store/slices/likesSlice.js
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { createSelector } from "@reduxjs/toolkit";
 import likeService from "./likesService";
 
 // Async thunks
 export const toggleBlogLike = createAsyncThunk(
   "likes/toggleBlogLike",
-  async ({ blogId, categoryId }, { rejectWithValue }) => {
+  async ({ blogId }, { rejectWithValue }) => {
     try {
-      const data = await likeService.toggleBlog(blogId, categoryId);
+      const data = await likeService.toggleBlog(blogId);
       return {
         blogId,
         totalLikes: data.data?.total_likes || data.totalLikes || 0,
@@ -143,22 +143,31 @@ const likesSlice = createSlice({
 export const { clearError, toggleBlogLikeFrontend, setLikeData } =
   likesSlice.actions;
 
-// Selectors
-export const selectLikeCount = (state, itemId, itemType) => {
-  const key = `${itemType}_${itemId}`;
-  return state.likes.likeCounts[key] || 0;
-};
+// Base selectors
+const selectLikesState = (state) => state.likes;
+const selectLikeCounts = (state) => state.likes.likeCounts;
+const selectUserLikes = (state) => state.likes.userLikes;
+const selectToggleLoadings = (state) => state.likes.toggleLoading;
 
-export const selectUserLikeStatus = (state, itemId, itemType) => {
-  const key = `${itemType}_${itemId}`;
-  return state.likes.userLikes[key] || false;
-};
+// Memoized selectors to prevent unnecessary re-renders
+export const selectLikeCount = createSelector(
+  [selectLikeCounts, (state, itemId, itemType) => `${itemType}_${itemId}`],
+  (likeCounts, key) => likeCounts[key] || 0
+);
 
-export const selectToggleLoading = (state, itemId, itemType) => {
-  const key = `${itemType}_${itemId}`;
-  return state.likes.toggleLoading[key] || false;
-};
+export const selectUserLikeStatus = createSelector(
+  [selectUserLikes, (state, itemId, itemType) => `${itemType}_${itemId}`],
+  (userLikes, key) => userLikes[key] || false
+);
 
-export const selectLikesError = (state) => state.likes.error;
+export const selectToggleLoading = createSelector(
+  [selectToggleLoadings, (state, itemId, itemType) => `${itemType}_${itemId}`],
+  (toggleLoadings, key) => toggleLoadings[key] || false
+);
+
+export const selectLikesError = createSelector(
+  [selectLikesState],
+  (likesState) => likesState.error
+);
 
 export default likesSlice.reducer;

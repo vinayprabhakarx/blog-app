@@ -30,7 +30,11 @@ const BlogDisplay = React.memo(({ blog }) => {
     >
       <article
         id="article"
-        className="w-full max-w-[75ch] md:max-w-[80ch] mx-auto px-1 sm:px-2 md:px-4"
+        className="w-full px-2 sm:px-4 md:px-0"
+        style={{
+          maxWidth: window.innerWidth < 768 ? "100%" : "800px",
+          margin: window.innerWidth < 768 ? 0 : "0 auto",
+        }}
       >
         <div className="w-full">
           <MdRenderCard content={blogContent} />
