@@ -220,6 +220,7 @@ export const updateUser = async (req, res, next) => {
       }
 
       updateData["personal_info.profile_img"] = uploadResult.url;
+      updateData["manual_avatar_update"] = true;
 
       // Clean up temporary file after successful upload
       const fs = await import("fs");
@@ -902,6 +903,7 @@ export const removeProfileImage = async (req, res, next) => {
         $set: {
           "personal_info.profile_img": "",
           avatar: "", // Also clear the avatar field for consistency
+          manual_avatar_update: false, // Reset the manual avatar update flag
         },
       },
       { new: true, runValidators: true }

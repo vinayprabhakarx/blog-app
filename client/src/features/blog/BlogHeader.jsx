@@ -11,26 +11,16 @@ import {
   MessageCircle,
   Heart,
   Share2,
-  Calendar,
   Clock,
-  User,
-  Tag,
   Printer,
   Pencil,
 } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import { refreshNotificationsAfterAction } from "../../utils/notificationRefresh";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "../../components/ui/avatar";
 import ShareDropdown from "../../components/common/ShareDropdown";
 import {
   toggleBlogLike,
-  getUserLikeStatus,
-  getLikeCount,
   selectLikeCount,
   selectUserLikeStatus,
   selectToggleLoading,
@@ -115,7 +105,6 @@ const BlogHeader = React.memo(({ blog, onCommentClick }) => {
   );
 
   // Memoize utility functions
-  // Format date as '16 Aug, 2025' for mobile
   const formatDate = useCallback((date, short = false) => {
     if (!date) return "";
     const d = new Date(date);
@@ -153,16 +142,8 @@ const BlogHeader = React.memo(({ blog, onCommentClick }) => {
     () => calculateReadTime(blogMetadata.content, true),
     [blogMetadata.content, calculateReadTime]
   );
-  // For desktop: full date and read time
-  const formattedDate = useMemo(
-    () => (blogMetadata.createdAt ? formatDate(blogMetadata.createdAt) : ""),
-    [blogMetadata.createdAt, formatDate]
-  );
-  const readTimeText = useMemo(
-    () => calculateReadTime(blogMetadata.content),
-    [blogMetadata.content, calculateReadTime]
-  );
 
+  // For sharing
   const shareData = useMemo(
     () => ({
       url: window.location.href,

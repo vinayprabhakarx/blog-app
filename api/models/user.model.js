@@ -15,6 +15,10 @@ const socialLinkValidator = {
 
 const userSchema = new mongoose.Schema(
   {
+    manual_avatar_update: {
+      type: Boolean,
+      default: false,
+    },
     role: {
       type: String,
       default: "user",

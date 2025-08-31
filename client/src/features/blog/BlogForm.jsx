@@ -368,7 +368,7 @@ const BlogForm = ({ existingBlog }) => {
   const isSavingDraft = Boolean(formData.draft === true);
 
   return (
-    <div className="p-6">
+    <div className="p-2 sm:p-4 md:p-6 max-w-3xl mx-auto">
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-3 mb-2">
           <h1 className="text-2xl md:text-2xl font-bold">
@@ -376,12 +376,12 @@ const BlogForm = ({ existingBlog }) => {
           </h1>
         </div>
       </div>
-      <Card>
-        <CardContent>
+      <Card className="w-full">
+        <CardContent className="p-3 sm:p-6">
           <form onSubmit={handleSubmit}>
             <div className="mb-3">
               <label className="block text-sm font-medium mb-2">
-                Category <span className="text-red-500">*</span>
+                Category <span className="text-destructive">*</span>
               </label>
               <Select
                 value={formData.category}
@@ -410,7 +410,7 @@ const BlogForm = ({ existingBlog }) => {
                 </SelectContent>
               </Select>
               {formErrors.category && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-destructive text-sm mt-1">
                   {formErrors.category}
                 </p>
               )}
@@ -418,7 +418,7 @@ const BlogForm = ({ existingBlog }) => {
 
             <div className="mb-3">
               <label className="block text-sm font-medium mb-2">
-                Title <span className="text-red-500">*</span>
+                Title <span className="text-destructive">*</span>
               </label>
               <Input
                 placeholder="Enter blog title"
@@ -427,13 +427,15 @@ const BlogForm = ({ existingBlog }) => {
                 disabled={isEditing ? updateLoading : createLoading}
               />
               {formErrors.title && (
-                <p className="text-red-500 text-sm mt-1">{formErrors.title}</p>
+                <p className="text-destructive text-sm mt-1">
+                  {formErrors.title}
+                </p>
               )}
             </div>
 
             <div className="mb-3">
               <label className="block text-sm font-medium mb-2">
-                Slug <span className="text-red-500">*</span>
+                Slug <span className="text-destructive">*</span>
               </label>
               <Input
                 placeholder="Slug"
@@ -445,7 +447,9 @@ const BlogForm = ({ existingBlog }) => {
                 }
               />
               {formErrors.slug && (
-                <p className="text-red-500 text-sm mt-1">{formErrors.slug}</p>
+                <p className="text-destructive text-sm mt-1">
+                  {formErrors.slug}
+                </p>
               )}
             </div>
 
@@ -463,16 +467,16 @@ const BlogForm = ({ existingBlog }) => {
                 <span
                   className={`text-sm ${
                     formData.excerpt.length > 180
-                      ? "text-orange-500"
+                      ? "text-warning"
                       : formData.excerpt.length === 200
-                      ? "text-red-500"
-                      : "text-gray-500"
+                      ? "text-destructive"
+                      : "text-muted-foreground"
                   }`}
                 >
                   {formData.excerpt.length}/200 characters
                 </span>
                 {formData.excerpt.length >= 200 && (
-                  <span className="text-red-500 text-sm">
+                  <span className="text-destructive text-sm">
                     Character limit reached
                   </span>
                 )}
@@ -500,7 +504,7 @@ const BlogForm = ({ existingBlog }) => {
                   (isEditing ? updateLoading : createLoading)
                     ? "opacity-50 cursor-not-allowed"
                     : ""
-                } border-gray-300`}
+                } border-border`}
               >
                 <input
                   type="file"
@@ -517,13 +521,13 @@ const BlogForm = ({ existingBlog }) => {
                       alt="Preview"
                     />
                     {!(isEditing ? updateLoading : createLoading) && (
-                      <div className="absolute inset-0 bg-black/30 rounded hidden group-hover:flex justify-center items-center">
-                        <IoCameraOutline className="text-white text-xl" />
+                      <div className="absolute inset-0 bg-foreground/30 rounded hidden group-hover:flex justify-center items-center">
+                        <IoCameraOutline className="text-background text-xl" />
                       </div>
                     )}
                   </>
                 ) : (
-                  <div className="flex flex-col items-center justify-center text-gray-400">
+                  <div className="flex flex-col items-center justify-center text-muted-foreground">
                     <IoCameraOutline className="text-2xl mb-1" />
                     <span className="text-xs">
                       {(isEditing ? updateLoading : createLoading)
@@ -537,7 +541,7 @@ const BlogForm = ({ existingBlog }) => {
                 <button
                   type="button"
                   onClick={handleRemoveImage}
-                  className="mt-2 text-sm text-red-600 hover:text-red-800 cursor-pointer"
+                  className="mt-2 text-sm text-destructive hover:text-destructive/90 cursor-pointer"
                   disabled={isEditing ? updateLoading : createLoading}
                 >
                   Remove Image
@@ -548,7 +552,7 @@ const BlogForm = ({ existingBlog }) => {
             <div className="mb-3">
               <label className="block text-sm font-medium mb-2">
                 Blog Content{" "}
-                {!formData.draft && <span className="text-red-500">*</span>}
+                {!formData.draft && <span className="text-destructive">*</span>}
               </label>
               <BlogEditor
                 value={formData.content}
@@ -556,12 +560,12 @@ const BlogForm = ({ existingBlog }) => {
                 disabled={isEditing ? updateLoading : createLoading}
               />
               <div className="mt-1">
-                <span className="text-sm text-gray-500">
+                <span className="text-sm text-muted-foreground">
                   {formData.content.replace(/<[^>]*>/g, "").length} characters
                 </span>
               </div>
               {formErrors.content && (
-                <p className="text-red-500 text-sm mt-1">
+                <p className="text-destructive text-sm mt-1">
                   {formErrors.content}
                 </p>
               )}
@@ -575,9 +579,9 @@ const BlogForm = ({ existingBlog }) => {
                 checked={formData.draft}
                 onChange={handleToggleDraft}
                 disabled={isEditing ? updateLoading : createLoading}
-                className="mr-2 h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded  cursor-pointer"
+                className="mr-2 h-4 w-4 text-primary focus:ring-primary border-input rounded cursor-pointer"
               />
-              <label htmlFor="draft" className="text-sm text-gray-700">
+              <label htmlFor="draft" className="text-sm text-foreground">
                 Save as Draft
               </label>
             </div>

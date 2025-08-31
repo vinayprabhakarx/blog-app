@@ -410,10 +410,11 @@ export const verifyEmailLink = async (req, res, next) => {
       process.env.CLIENT_URL || "https://blog.vinayprabhakar.dev";
 
     // Clean clientBase to ensure no double domains in redirects and add https if missing
-    let cleanClientBase = clientBase
-      .replace(/\/api.*$/, "")
-      .replace(/\/$/, "");
-    if (!cleanClientBase.startsWith('http://') && !cleanClientBase.startsWith('https://')) {
+    let cleanClientBase = clientBase.replace(/\/api.*$/, "").replace(/\/$/, "");
+    if (
+      !cleanClientBase.startsWith("http://") &&
+      !cleanClientBase.startsWith("https://")
+    ) {
       cleanClientBase = `https://${cleanClientBase}`;
     }
 
@@ -494,10 +495,11 @@ export const verifyEmailLink = async (req, res, next) => {
   } catch (error) {
     const clientBase =
       process.env.CLIENT_URL || "https://blog.vinayprabhakar.dev";
-    let cleanClientBase = clientBase
-      .replace(/\/api.*$/, "")
-      .replace(/\/$/, "");
-    if (!cleanClientBase.startsWith('http://') && !cleanClientBase.startsWith('https://')) {
+    let cleanClientBase = clientBase.replace(/\/api.*$/, "").replace(/\/$/, "");
+    if (
+      !cleanClientBase.startsWith("http://") &&
+      !cleanClientBase.startsWith("https://")
+    ) {
       cleanClientBase = `https://${cleanClientBase}`;
     }
     try {
@@ -624,13 +626,16 @@ export const googleAuth = async (req, res, next) => {
       );
     }
 
-    // Update existing user's avatar if provided and user logged in via Google
-    if (
-      profile_img &&
-      (!user.personal_info.profile_img || user.authProvider === "google")
-    ) {
-      user.personal_info.profile_img = profile_img;
-      await user.save();
+    // Update avatar logic for Google auth users
+    if (profile_img) {
+      // If user is new to Google auth or hasn't manually changed their avatar
+      if (
+        !user.personal_info.profile_img ||
+        (user.authProvider === "google" && !user.manual_avatar_update)
+      ) {
+        user.personal_info.profile_img = profile_img;
+        await user.save();
+      }
     }
   } else {
     const username = await generateUniqueUsername(email);

@@ -23,6 +23,20 @@ import {
 } from "lucide-react";
 import MdRenderCard from "./MdRenderCard";
 import { useTheme } from "../../utils/ThemeContext";
+const ToolButton = ({ onClick, title, children }) => (
+  <button
+    type="button"
+    onClick={onClick}
+    className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center rounded hover:bg-opacity-80 transition-colors cursor-pointer"
+    style={{
+      backgroundColor: "var(--muted)",
+      color: "var(--foreground)",
+    }}
+    title={title}
+  >
+    {children}
+  </button>
+);
 
 const BlogEditor = ({
   value = "",
@@ -125,26 +139,26 @@ const BlogEditor = ({
   const getViewModeIcon = () => {
     switch (viewMode) {
       case "edit":
-        return <Type className="w-4 h-4" />;
+        return <Type className="w-3 h-3 sm:w-4 sm:h-4" />;
       case "preview":
-        return <Eye className="w-4 h-4" />;
+        return <Eye className="w-3 h-3 sm:w-4 sm:h-4" />;
       case "split":
-        return <EyeOff className="w-4 h-4" />;
+        return <EyeOff className="w-3 h-3 sm:w-4 sm:h-4" />;
       default:
-        return <Type className="w-4 h-4" />;
+        return <Type className="w-3 h-3 sm:w-4 sm:h-4" />;
     }
   };
 
   const editorStyle = {
-    height: isFullscreen ? "80vh" : `${height}px`,
+    height: isFullscreen ? "100vh" : `${height}px`,
     border: "1px solid var(--border)",
     borderRadius: "8px",
     overflow: "hidden",
     backgroundColor: "var(--card)",
     position: isFullscreen ? "fixed" : "relative",
-    top: isFullscreen ? "10vh" : "auto",
-    left: isFullscreen ? "5vw" : "auto",
-    width: isFullscreen ? "90vw" : "100%",
+    top: isFullscreen ? "0" : "auto",
+    left: isFullscreen ? "0" : "auto",
+    width: isFullscreen ? "100vw" : "100%",
     zIndex: isFullscreen ? 9999 : "auto",
   };
 
@@ -156,10 +170,11 @@ const BlogEditor = ({
     >
       {/* Toolbar */}
       <div
-        className="flex items-center justify-between p-2 border-b"
+        className="flex items-center justify-between p-2 border-b sticky top-0"
         style={{
           borderColor: "var(--border)",
           backgroundColor: "var(--muted)",
+          zIndex: 10,
         }}
       >
         <div className="flex items-center gap-2">
@@ -186,9 +201,9 @@ const BlogEditor = ({
           }}
         >
           {isFullscreen ? (
-            <Minimize className="w-4 h-4" />
+            <Minimize className="w-3 h-3 sm:w-4 sm:h-4" />
           ) : (
-            <Maximize className="w-4 h-4" />
+            <Maximize className="w-3 h-3 sm:w-4 sm:h-4" />
           )}
         </button>
       </div>
@@ -196,229 +211,100 @@ const BlogEditor = ({
       {/* Formatting Toolbar */}
       {(viewMode === "edit" || viewMode === "split") && (
         <div
-          className="flex items-center gap-1 p-2 border-b flex-wrap"
+          className="flex items-center gap-1 p-2 border-b overflow-x-auto sticky top-[48px] whitespace-nowrap"
           style={{
             borderColor: "var(--border)",
             backgroundColor: "var(--background)",
+            zIndex: 10,
           }}
         >
-          {/* Headings */}
-          <div
-            className="flex items-center gap-1 pr-2 border-r"
-            style={{ borderColor: "var(--border)" }}
-          >
-            <button
-              type="button"
-              onClick={formatH1}
-              className="p-1.5 rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-              style={{
-                backgroundColor: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-              title="Heading 1"
+          <div className="flex items-center gap-2 min-w-fit">
+            {/* Headings */}
+            <div
+              className="flex items-center gap-1 pr-2 border-r"
+              style={{ borderColor: "var(--border)" }}
             >
-              <Heading1 className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={formatH2}
-              className="p-1.5 rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-              style={{
-                backgroundColor: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-              title="Heading 2"
-            >
-              <Heading2 className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={formatH3}
-              className="p-1.5 rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-              style={{
-                backgroundColor: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-              title="Heading 3"
-            >
-              <Heading3 className="w-4 h-4" />
-            </button>
-          </div>
+              <ToolButton onClick={formatH1} title="Heading 1">
+                <Heading1 className="w-3 h-3 sm:w-4 sm:h-4" />
+              </ToolButton>
+              <ToolButton onClick={formatH2} title="Heading 2">
+                <Heading2 className="w-3 h-3 sm:w-4 sm:h-4" />
+              </ToolButton>
+              <ToolButton onClick={formatH3} title="Heading 3">
+                <Heading3 className="w-3 h-3 sm:w-4 sm:h-4" />
+              </ToolButton>
+            </div>
 
-          {/* Text Formatting */}
-          <div
-            className="flex items-center gap-1 pr-2 border-r"
-            style={{ borderColor: "var(--border)" }}
-          >
-            <button
-              type="button"
-              onClick={formatBold}
-              className="p-1.5 rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-              style={{
-                backgroundColor: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-              title="Bold"
+            {/* Text Formatting */}
+            <div
+              className="flex items-center gap-1 pr-2 border-r"
+              style={{ borderColor: "var(--border)" }}
             >
-              <Bold className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={formatItalic}
-              className="p-1.5 rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-              style={{
-                backgroundColor: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-              title="Italic"
-            >
-              <Italic className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={formatStrikethrough}
-              className="p-1.5 rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-              style={{
-                backgroundColor: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-              title="Strikethrough"
-            >
-              <Strikethrough className="w-4 h-4" />
-            </button>
-          </div>
+              <ToolButton onClick={formatBold} title="Bold">
+                <Bold className="w-3 h-3 sm:w-4 sm:h-4" />
+              </ToolButton>
+              <ToolButton onClick={formatItalic} title="Italic">
+                <Italic className="w-3 h-3 sm:w-4 sm:h-4" />
+              </ToolButton>
+              <ToolButton onClick={formatStrikethrough} title="Strikethrough">
+                <Strikethrough className="w-3 h-3 sm:w-4 sm:h-4" />
+              </ToolButton>
+            </div>
 
-          {/* Links and Images */}
-          <div
-            className="flex items-center gap-1 pr-2 border-r"
-            style={{ borderColor: "var(--border)" }}
-          >
-            <button
-              type="button"
-              onClick={formatLink}
-              className="p-1.5 rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-              style={{
-                backgroundColor: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-              title="Link"
+            {/* Links and Images */}
+            <div
+              className="flex items-center gap-1 pr-2 border-r"
+              style={{ borderColor: "var(--border)" }}
             >
-              <Link className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={formatImage}
-              className="p-1.5 rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-              style={{
-                backgroundColor: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-              title="Image"
-            >
-              <Image className="w-4 h-4" />
-            </button>
-          </div>
+              <ToolButton onClick={formatLink} title="Link">
+                <Link className="w-3 h-3 sm:w-4 sm:h-4" />
+              </ToolButton>
+              <ToolButton onClick={formatImage} title="Image">
+                <Image className="w-3 h-3 sm:w-4 sm:h-4" />
+              </ToolButton>
+            </div>
 
-          {/* Lists */}
-          <div
-            className="flex items-center gap-1 pr-2 border-r"
-            style={{ borderColor: "var(--border)" }}
-          >
-            <button
-              type="button"
-              onClick={formatUnorderedList}
-              className="p-1.5 rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-              style={{
-                backgroundColor: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-              title="Bullet List"
+            {/* Lists */}
+            <div
+              className="flex items-center gap-1 pr-2 border-r"
+              style={{ borderColor: "var(--border)" }}
             >
-              <List className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={formatOrderedList}
-              className="p-1.5 rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-              style={{
-                backgroundColor: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-              title="Numbered List"
-            >
-              <ListOrdered className="w-4 h-4" />
-            </button>
-          </div>
+              <ToolButton onClick={formatUnorderedList} title="Bullet List">
+                <List className="w-3 h-3 sm:w-4 sm:h-4" />
+              </ToolButton>
+              <ToolButton onClick={formatOrderedList} title="Numbered List">
+                <ListOrdered className="w-3 h-3 sm:w-4 sm:h-4" />
+              </ToolButton>
+            </div>
 
-          {/* Code and Quote */}
-          <div
-            className="flex items-center gap-1 pr-2 border-r"
-            style={{ borderColor: "var(--border)" }}
-          >
-            <button
-              type="button"
-              onClick={formatInlineCode}
-              className="p-1.5 rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-              style={{
-                backgroundColor: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-              title="Inline Code"
+            {/* Code and Quote */}
+            <div
+              className="flex items-center gap-1 pr-2 border-r"
+              style={{ borderColor: "var(--border)" }}
             >
-              <Code className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={formatCodeBlock}
-              className="p-1.5 rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-              style={{
-                backgroundColor: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-              title="Code Block"
-            >
-              <Code2 className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={formatQuote}
-              className="p-1.5 rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-              style={{
-                backgroundColor: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-              title="Quote"
-            >
-              <Quote className="w-4 h-4" />
-            </button>
-          </div>
+              <ToolButton onClick={formatInlineCode} title="Inline Code">
+                <Code className="w-3 h-3 sm:w-4 sm:h-4" />
+              </ToolButton>
+              <ToolButton onClick={formatCodeBlock} title="Code Block">
+                <Code2 className="w-3 h-3 sm:w-4 sm:h-4" />
+              </ToolButton>
+              <ToolButton onClick={formatQuote} title="Quote">
+                <Quote className="w-3 h-3 sm:w-4 sm:h-4" />
+              </ToolButton>
+            </div>
 
-          {/* Table and Horizontal Rule */}
-          <div className="flex items-center gap-1">
-            <button
-              type="button"
-              onClick={formatTable}
-              className="p-1.5 rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-              style={{
-                backgroundColor: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-              title="Table"
-            >
-              <Table className="w-4 h-4" />
-            </button>
-            <button
-              type="button"
-              onClick={formatHorizontalRule}
-              className="p-1.5 rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-              style={{
-                backgroundColor: "var(--muted)",
-                color: "var(--foreground)",
-              }}
-              title="Horizontal Rule"
-            >
-              <Minus className="w-4 h-4" />
-            </button>
+            {/* Table and Horizontal Rule */}
+            <div className="flex items-center gap-1">
+              <ToolButton onClick={formatTable} title="Table">
+                <Table className="w-3 h-3 sm:w-4 sm:h-4" />
+              </ToolButton>
+              <ToolButton
+                onClick={formatHorizontalRule}
+                title="Horizontal Rule"
+              >
+                <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
+              </ToolButton>
+            </div>
           </div>
         </div>
       )}

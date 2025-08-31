@@ -11,12 +11,20 @@ const api = axios.create({
   },
 });
 
-// Add auth token to requests
+// Add auth token only to authenticated routes
 api.interceptors.request.use(
   (config) => {
     const token = store.getState().auth?.token;
 
-    if (token) {
+    // List of public routes that don't need authentication
+    const publicRoutes = ["/blogs", "/categories", "/blogs/author"];
+
+    // Check if the current route is not in public routes
+    const needsAuth = !publicRoutes.some((route) =>
+      config.url.startsWith(route)
+    );
+
+    if (token && needsAuth) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
     return config;

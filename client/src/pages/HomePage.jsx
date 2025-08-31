@@ -41,7 +41,6 @@ const HomePage = React.memo(() => {
   );
   const initialPage = parseInt(searchParams.get("page"), 10) || 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
-  // Removed mobile dropdown state; using a unified category bar across breakpoints
 
   // Memoize constants to prevent recreation
   const postsPerPage = useMemo(() => 9, []);
@@ -168,9 +167,6 @@ const HomePage = React.memo(() => {
     }
   }, [urlParams, currentPage, selectedCategory]);
 
-  // Removed dropdown and related outside click handler for a simpler unified UI
-
-  // Simplified pagination handler - no need to update URL since it's handled by state sync
   const handlePageChange = useCallback(
     (newPage) => {
       // Update URL which will trigger state update via searchParams effect
@@ -201,14 +197,10 @@ const HomePage = React.memo(() => {
     [searchParams, setSearchParams]
   );
 
-  // Removed dropdown toggle; unified bar does not require it
-
   // Memoize filtered categories for display
   const filteredDisplayCategories = useMemo(() => {
     return displayCategories.filter((category) => category.articleCount > 0);
   }, [displayCategories]);
-
-  // No selected category display name needed without dropdown
 
   return (
     <div className="min-h-screen bg-background text-foreground">
@@ -224,7 +216,6 @@ const HomePage = React.memo(() => {
             <div className="w-full">
               <div className="container mx-auto px-6 sm:px-6">
                 <nav className="py-2 sm:py-3">
-                  {/* Unified horizontal, scrollable list for all viewports */}
                   <div className="flex justify-center">
                     <div className="flex items-center space-x-2 max-w-full overflow-x-auto scrollbar-hide">
                       <button
