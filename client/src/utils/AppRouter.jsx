@@ -10,6 +10,7 @@ import Login from "../features/auth/Login";
 import Signup from "../features/auth/Signup";
 import ForgotPassword from "../features/auth/ForgotPassword";
 import ResetPassword from "../features/auth/ResetPassword";
+import VerifyEmail from "../features/auth/VerifyEmail";
 import ProfilePage from "../pages/ProfilePage";
 import EditProfile from "../features/settings/EditProfile";
 import ChangePassword from "../features/settings/ChangePassword";
@@ -54,6 +55,9 @@ const AppRouter = () => {
             <Route path="forgot-password" element={<ForgotPassword />} />
             <Route path="reset-password" element={<ResetPassword />} />
           </Route>
+
+          {/* Email Verification Route - Public access */}
+          <Route path="verify-email" element={<VerifyEmail />} />
 
           {/* Home Page */}
           <Route index element={<HomePage />} />
