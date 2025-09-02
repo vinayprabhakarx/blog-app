@@ -89,9 +89,9 @@ const BlogCard = React.memo(
     // Memoize image variants
     const imageVariants = useMemo(
       () => ({
-        default: "aspect-[4/3] sm:aspect-[16/10]",
+        default: "aspect-video",
         compact: "aspect-video",
-        featured: "aspect-[4/3] sm:aspect-[16/9]",
+        featured: "aspect-video",
       }),
       []
     );

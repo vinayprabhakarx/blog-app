@@ -358,13 +358,15 @@ const BlogHeader = React.memo(({ blog, onCommentClick }) => {
         {/* Banner image below header */}
         {bannerImageSrc && (
           <div className="mt-6">
-            <img
-              src={bannerImageSrc}
-              alt={blogMetadata.title}
-              className="w-full h-auto max-h-96 object-cover rounded-lg shadow-sm"
-              loading="lazy"
-              onError={handleImageError}
-            />
+            <div className="relative overflow-hidden bg-muted rounded-lg border border-border/50 aspect-video">
+              <img
+                src={bannerImageSrc}
+                alt={blogMetadata.title}
+                className="h-full w-full object-cover"
+                loading="lazy"
+                onError={handleImageError}
+              />
+            </div>
           </div>
         )}
       </div>
