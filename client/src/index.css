@@ -510,3 +510,9 @@ body {
         image-rendering: crisp-edges;
     }
 }
+
+.katex {
+    font-size: 1.2em;
+    line-height: 1.5;
+
+}

@@ -228,15 +228,31 @@ const BlogHeader = React.memo(({ blog, onCommentClick }) => {
     [onCommentClick]
   );
 
+  // Memoize inline styles to prevent re-creation
+  const containerStyle = useMemo(
+    () => ({
+      maxWidth: window.innerWidth < 768 ? "100%" : "800px",
+      margin: window.innerWidth < 768 ? 0 : "0 auto",
+    }),
+    []
+  );
+
+  // Memoize image source with error handling
+  const bannerImageSrc = useMemo(() => {
+    if (!blogMetadata.banner) return null;
+    return blogMetadata.banner.startsWith("http")
+      ? blogMetadata.banner
+      : `/api${blogMetadata.banner}`;
+  }, [blogMetadata.banner]);
+
+  // Memoize image error handler
+  const handleImageError = useCallback((e) => {
+    e.target.style.display = "none";
+  }, []);
+
   return (
     <div className="w-full overflow-hidden">
-      <div
-        className="w-full px-2 sm:px-4 md:px-0 pb-6"
-        style={{
-          maxWidth: window.innerWidth < 768 ? "100%" : "800px",
-          margin: window.innerWidth < 768 ? 0 : "0 auto",
-        }}
-      >
+      <div className="w-full px-2 sm:px-4 md:px-0 pb-6" style={containerStyle}>
         <header className="mb-6 border-b border-border pb-4">
           {/* Title */}
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-2 text-foreground">
@@ -340,15 +356,15 @@ const BlogHeader = React.memo(({ blog, onCommentClick }) => {
           </div>
         </header>
         {/* Banner image below header */}
-        {blogMetadata.banner && (
-          <div className="mb-6">
-            <div className="relative w-full pt-[56.25%] rounded-lg shadow-lg overflow-hidden">
-              <img
-                src={blogMetadata.banner}
-                alt={blogMetadata.title}
-                className="absolute top-0 left-0 w-full h-full object-cover"
-              />
-            </div>
+        {bannerImageSrc && (
+          <div className="mt-6">
+            <img
+              src={bannerImageSrc}
+              alt={blogMetadata.title}
+              className="w-full h-auto max-h-96 object-cover rounded-lg shadow-sm"
+              loading="lazy"
+              onError={handleImageError}
+            />
           </div>
         )}
       </div>

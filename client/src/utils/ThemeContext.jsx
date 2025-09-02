@@ -3,9 +3,31 @@ import React, { createContext, useContext, useState, useEffect } from "react";
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
+  // Helper function to get system preference
+  const getSystemTheme = () => {
+    if (typeof window !== "undefined" && window.matchMedia) {
+      return window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "dark"
+        : "light";
+    }
+    return "light";
+  };
+
+  // Helper function to get time-based theme
+  const getTimeBasedTheme = () => {
+    const hour = new Date().getHours();
+    return hour >= 19 || hour < 6 ? "dark" : "light";
+  };
+
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
-    return savedTheme || "light";
+    const savedMode = localStorage.getItem("themeMode");
+
+    // If no saved theme, use system preference or time-based
+    if (!savedTheme) {
+      return savedMode === "time" ? getTimeBasedTheme() : getSystemTheme();
+    }
+    return savedTheme;
   });
 
   useEffect(() => {
@@ -17,8 +39,31 @@ export const ThemeProvider = ({ children }) => {
     setTheme((prevTheme) => (prevTheme === "light" ? "dark" : "light"));
   };
 
+  // Apply system theme
+  const setSystemTheme = () => {
+    const systemTheme = getSystemTheme();
+    setTheme(systemTheme);
+    localStorage.setItem("themeMode", "system");
+  };
+
+  // Apply time-based theme
+  const setTimeBasedTheme = () => {
+    const timeTheme = getTimeBasedTheme();
+    setTheme(timeTheme);
+    localStorage.setItem("themeMode", "time");
+  };
+
   return (
-    <ThemeContext.Provider value={{ theme, toggleTheme }}>
+    <ThemeContext.Provider
+      value={{
+        theme,
+        toggleTheme,
+        setSystemTheme,
+        setTimeBasedTheme,
+        getSystemTheme,
+        getTimeBasedTheme,
+      }}
+    >
       {children}
     </ThemeContext.Provider>
   );

@@ -74,6 +74,12 @@ const MarkdownListItem = React.memo(({ children, ...props }) => {
 const MdRenderCard = React.memo(({ content }) => {
   const { theme } = useTheme();
 
+  // Memoize content to prevent unnecessary re-renders
+  const memoizedContent = useMemo(() => content, [content]);
+
+  // Memoize theme data attribute
+  const themeDataMode = useMemo(() => theme, [theme]);
+
   const overflowStyle = useMemo(() => ({ overflow: "hidden" }), []);
 
   // Memoize plugins arrays
@@ -130,28 +136,44 @@ const MdRenderCard = React.memo(({ content }) => {
     []
   );
 
+  // Memoize code block styles
+  const preStyle = useMemo(
+    () => ({
+      overflowX: "hidden",
+      whiteSpace: "pre-wrap",
+      wordBreak: "break-all",
+      overflowWrap: "break-word",
+      margin: "1.5rem 0",
+      padding: "1rem",
+      borderRadius: "8px",
+      backgroundColor: "var(--muted)",
+      border: "1px solid var(--border)",
+    }),
+    []
+  );
+
+  const codeStyle = useMemo(
+    () => ({
+      whiteSpace: "pre-wrap",
+      wordBreak: "break-all",
+      overflowWrap: "break-word",
+    }),
+    []
+  );
+
   return (
     <div className="w-full overflow-hidden">
-      <div data-color-mode={theme} className="w-full">
+      <div data-color-mode={themeDataMode} className="w-full">
         <div style={overflowStyle}>
           <MDEditor.Markdown
-            source={content}
+            source={memoizedContent}
             style={markdownStyle}
             remarkPlugins={remarkPlugins}
             rehypePlugins={rehypePlugins}
             components={{
               ...components,
               pre: ({ children, ...props }) => (
-                <pre
-                  {...props}
-                  style={{
-                    overflowX: "hidden",
-                    whiteSpace: "pre-wrap",
-                    wordBreak: "break-all",
-                    overflowWrap: "break-word",
-                    margin: "1rem 0",
-                  }}
-                >
+                <pre {...props} style={preStyle}>
                   {children}
                 </pre>
               ),
@@ -159,14 +181,7 @@ const MdRenderCard = React.memo(({ content }) => {
                 inline ? (
                   <MarkdownCode {...props}>{children}</MarkdownCode>
                 ) : (
-                  <code
-                    {...props}
-                    style={{
-                      whiteSpace: "pre-wrap",
-                      wordBreak: "break-all",
-                      overflowWrap: "break-word",
-                    }}
-                  >
+                  <code {...props} style={codeStyle}>
                     {children}
                   </code>
                 ),
