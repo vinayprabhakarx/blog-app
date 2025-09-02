@@ -316,23 +316,23 @@ const Analytics = () => {
                       <div className="text-right space-y-1">
                         <div className="flex items-center gap-4 text-xs">
                           <span className="flex items-center gap-1">
-                            <Eye className="h-3 w-3 text-blue-600" />
+                            <Eye className="h-3 w-3 text-primary" />
                             {stat.views}
                           </span>
                           <span className="flex items-center gap-1">
-                            <Users className="h-3 w-3 text-green-600" />
+                            <Users className="h-3 w-3 text-success" />
                             {stat.users}
                           </span>
                           <span className="flex items-center gap-1">
-                            <MessageSquare className="h-3 w-3 text-purple-600" />
+                            <MessageSquare className="h-3 w-3 text-accent" />
                             {stat.comments}
                           </span>
                           <span className="flex items-center gap-1">
-                            <FileText className="h-3 w-3 text-orange-600" />
+                            <FileText className="h-3 w-3 text-warning" />
                             {stat.blogs}
                           </span>
                           <span className="flex items-center gap-1">
-                            <Heart className="h-3 w-3 text-red-600" />
+                            <Heart className="h-3 w-3 text-destructive" />
                             {stat.likes}
                           </span>
                         </div>

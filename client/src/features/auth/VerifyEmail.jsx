@@ -2,7 +2,6 @@ import React from "react";
 import { useSearchParams, Link } from "react-router-dom";
 import authService from "./authService";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
-import { useTheme } from "../../utils/ThemeContext";
 import {
   FaCheckCircle,
   FaExclamationTriangle,
@@ -10,7 +9,6 @@ import {
 } from "react-icons/fa";
 
 const VerifyEmail = () => {
-  const { theme } = useTheme();
   const [searchParams] = useSearchParams();
   const token = searchParams.get("token");
   const statusParam = searchParams.get("status");
@@ -65,11 +63,7 @@ const VerifyEmail = () => {
   }, [token, statusParam]);
 
   const Wrapper = ({ children }) => (
-    <div
-      className={`min-h-screen w-full flex items-center justify-center px-4 ${
-        theme === "dark" ? "bg-background" : "bg-white"
-      }`}
-    >
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background px-4">
       <div className="max-w-xl w-full text-center text-foreground">
         {children}
       </div>
@@ -91,10 +85,10 @@ const VerifyEmail = () => {
     return (
       <Wrapper>
         <div className="flex flex-col items-center gap-4">
-          <FaCheckCircle className="text-green-500" size={64} />
+          <FaCheckCircle className="text-success" size={64} />
           <h1 className="text-3xl font-semibold">Email verified</h1>
           <p className="opacity-80">{message}</p>
-          <Link to="/login" className="text-blue-500 hover:underline">
+          <Link to="/login" className="text-primary hover:underline">
             Continue to login
           </Link>
         </div>
@@ -106,10 +100,10 @@ const VerifyEmail = () => {
     return (
       <Wrapper>
         <div className="flex flex-col items-center gap-4">
-          <FaCheckCircle className="text-green-500" size={64} />
+          <FaCheckCircle className="text-success" size={64} />
           <h1 className="text-3xl font-semibold">Email already verified</h1>
           <p className="opacity-80">{message}</p>
-          <Link to="/login" className="text-blue-500 hover:underline">
+          <Link to="/login" className="text-primary hover:underline">
             Continue to login
           </Link>
         </div>
@@ -121,10 +115,10 @@ const VerifyEmail = () => {
     return (
       <Wrapper>
         <div className="flex flex-col items-center gap-4">
-          <FaExclamationTriangle className="text-yellow-500" size={64} />
+          <FaExclamationTriangle className="text-warning" size={64} />
           <h1 className="text-3xl font-semibold">Verification link expired</h1>
           <p className="opacity-80">{message}</p>
-          <Link to="/login" className="text-blue-500 hover:underline">
+          <Link to="/login" className="text-primary hover:underline">
             Resend from login page
           </Link>
         </div>
@@ -136,10 +130,10 @@ const VerifyEmail = () => {
   return (
     <Wrapper>
       <div className="flex flex-col items-center gap-4">
-        <FaTimesCircle className="text-red-500" size={64} />
+        <FaTimesCircle className="text-destructive" size={64} />
         <h1 className="text-3xl font-semibold">Verification failed</h1>
         <p className="opacity-80">{message || "Invalid verification link"}</p>
-        <Link to="/login" className="text-blue-500 hover:underline">
+        <Link to="/login" className="text-primary hover:underline">
           Go to login
         </Link>
       </div>

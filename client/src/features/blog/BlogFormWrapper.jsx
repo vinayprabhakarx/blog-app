@@ -39,7 +39,7 @@ const BlogFormWrapper = () => {
   if (isEditing && currentBlogError) {
     return (
       <div className="text-center content-center justify-center mt-30">
-        <h2 className="flex text-center justify-center text-2xl font-bold text-red-600">
+        <h2 className="flex text-center justify-center text-2xl font-bold text-destructive">
           Blog not found
         </h2>
         <p className="text-foreground mt-2">
@@ -60,7 +60,7 @@ const BlogFormWrapper = () => {
   ) {
     return (
       <div className="text-center content-center justify-center mt-30">
-        <h2 className="flex text-center justify-center text-2xl font-bold text-red-600">
+        <h2 className="flex text-center justify-center text-2xl font-bold text-destructive">
           Unauthorized
         </h2>
         <p className="text-foreground mt-2">

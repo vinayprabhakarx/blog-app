@@ -213,7 +213,7 @@ LogoIcon.displayName = "LogoIcon";
 
 const AppSidebar = React.memo(() => {
   const location = useLocation();
-  const { isAuthenticated, isAdmin, isAuthor, user } = useAuth();
+  const { isAuthenticated, isAdmin, isAuthor } = useAuth();
   const { loading: categoriesLoading, dispatch } = useCategories();
   const [hasFetched, setHasFetched] = useState(false);
 

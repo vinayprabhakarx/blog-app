@@ -247,7 +247,7 @@ const Profile = () => {
                     />
                   </AvatarFallback>
                   <div className="absolute inset-0 bg-black/30 border-2  rounded-full hidden group-hover:flex justify-center items-center z-10">
-                    <IoCameraOutline className="text-white text-xl" />
+                    <IoCameraOutline className="text-primary-foreground text-xl" />
                   </div>
                 </Avatar>
               </div>

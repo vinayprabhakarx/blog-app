@@ -87,9 +87,9 @@ const CategoriesView = () => {
   if (error) {
     return (
       <div className="p-6 space-y-6">
-        <div className="text-center text-red-500 p-8">
-          <FileText className="h-16 w-16 mx-auto mb-4 text-red-400" />
-          <h2 className="text-xl font-semibold text-red-600 mb-2">
+        <div className="text-center text-destructive p-8">
+          <FileText className="h-16 w-16 mx-auto mb-4 text-destructive/60" />
+          <h2 className="text-xl font-semibold text-destructive mb-2">
             Failed to Load Categories
           </h2>
           <p className="text-muted-foreground mb-6 max-w-md mx-auto">

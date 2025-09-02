@@ -200,7 +200,7 @@ const BlogPage = React.memo(() => {
             <li>
               <Link
                 to="/"
-                className="text-blue-800 hover:text-blue-500 hover:underline"
+                className="text-primary hover:text-primary/80 hover:underline"
               >
                 Home
               </Link>
@@ -211,7 +211,7 @@ const BlogPage = React.memo(() => {
                 <li>
                   <Link
                     to={`/category/${breadcrumbData.categorySlug}`}
-                    className="text-blue-800 hover:text-blue-500 hover:underline whitespace-nowrap"
+                    className="text-primary hover:text-primary/80 hover:underline whitespace-nowrap"
                   >
                     {breadcrumbData.categoryName}
                   </Link>

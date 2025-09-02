@@ -84,11 +84,11 @@ const ReportDialog = ({
         <div className="space-y-4">
           {hasReported ? (
             <div
-              className="p-3 bg-blue-50 border border-blue-200 rounded-lg"
+              className="p-3 bg-info/5 border border-info/20 rounded-lg"
               role="status"
               aria-live="polite"
             >
-              <p className="text-sm text-blue-800">
+              <p className="text-sm text-info">
                 You have already reported this comment. Our moderation team will
                 review it.
               </p>
@@ -165,7 +165,7 @@ const ReportDialog = ({
             <Button
               onClick={handleSubmit}
               disabled={!selectedReason || isSubmitting}
-              className="bg-orange-600 hover:bg-orange-700 text-white transition-colors cursor-pointer"
+              className="bg-warning hover:bg-warning/80 text-warning-foreground transition-colors cursor-pointer"
             >
               {isSubmitting ? "Reporting..." : "Report Comment"}
             </Button>

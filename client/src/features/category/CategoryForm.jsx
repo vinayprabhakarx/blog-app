@@ -167,7 +167,7 @@ const CategoryForm = () => {
     return (
       <div className="flex justify-center items-center min-h-screen">
         <div className="text-center">
-          <h2 className="text-xl font-semibold text-red-600 mb-2">
+          <h2 className="text-xl font-semibold text-destructive mb-2">
             Error Loading Category
           </h2>
           <p className="text-muted-foreground">{error}</p>

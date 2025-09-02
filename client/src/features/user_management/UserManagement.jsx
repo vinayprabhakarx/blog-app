@@ -527,7 +527,7 @@ const UserManagement = () => {
                             {user.personal_info?.email}
                           </span>
                           {user.emailVerified && (
-                            <CheckCircle className="h-4 w-4 text-green-500 flex-shrink-0" />
+                            <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
                           )}
                         </div>
                       </TableCell>
@@ -624,7 +624,7 @@ const UserManagement = () => {
                                 <Button
                                   variant="outline"
                                   size="sm"
-                                  className="transition-colors duration-200 hover:text-red-600 hover:border-red-500 cursor-pointer"
+                                  className="transition-colors duration-200 hover:text-destructive hover:border-destructive cursor-pointer"
                                   title="Delete User"
                                 >
                                   <Trash2 className="h-4 w-4" />
@@ -649,7 +649,7 @@ const UserManagement = () => {
                                   </AlertDialogCancel>
                                   <AlertDialogAction
                                     onClick={() => handleDeleteUser(user._id)}
-                                    className="bg-red-600 hover:bg-red-700 cursor-pointer"
+                                    className="bg-destructive hover:bg-destructive/80 cursor-pointer"
                                   >
                                     Delete User
                                   </AlertDialogAction>
@@ -725,7 +725,7 @@ const UserManagement = () => {
                         {user.personal_info?.email}
                       </span>
                       {user.emailVerified && (
-                        <CheckCircle className="h-4 w-4 text-green-500" />
+                        <CheckCircle className="h-4 w-4 text-success" />
                       )}
                     </div>
                   </div>
@@ -801,7 +801,7 @@ const UserManagement = () => {
                         <Button
                           variant="outline"
                           size="sm"
-                          className="px-3 py-1 h-8 text-xs transition-colors duration-200 hover:text-red-600 hover:border-red-500 cursor-pointer"
+                          className="px-3 py-1 h-8 text-xs transition-colors duration-200 hover:text-destructive hover:border-destructive cursor-pointer"
                           title="Delete User"
                         >
                           <Trash2 className="h-3 w-3 mr-1" />
@@ -824,7 +824,7 @@ const UserManagement = () => {
                           </AlertDialogCancel>
                           <AlertDialogAction
                             onClick={() => handleDeleteUser(user._id)}
-                            className="bg-red-600 hover:bg-red-700 cursor-pointer"
+                            className="bg-destructive hover:bg-destructive/80 cursor-pointer"
                           >
                             Delete User
                           </AlertDialogAction>

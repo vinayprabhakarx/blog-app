@@ -101,7 +101,9 @@ const Index = () => {
           {/* Error State */}
           {error && !loading && (
             <div className="text-center py-8">
-              <p className="text-red-500 mb-4">Failed to load blogs: {error}</p>
+              <p className="text-destructive mb-4">
+                Failed to load blogs: {error}
+              </p>
               <button
                 onClick={() => dispatch(fetchBlogs({ page: 1, limit: 6 }))}
                 className="bg-primary text-primary-foreground px-4 py-2 rounded-lg hover:bg-primary/90"

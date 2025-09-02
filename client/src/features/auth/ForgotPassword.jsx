@@ -9,7 +9,6 @@ import { showToast } from "../../utils/showToast";
 import authService from "./authService";
 import LoadingButton from "../../components/common/LoadingButton";
 import { FaEnvelope } from "react-icons/fa6";
-import { useTheme } from "../../utils/ThemeContext";
 import {
   Form,
   FormControl,
@@ -18,12 +17,10 @@ import {
   FormLabel,
   FormMessage,
 } from "../../components/ui/form";
-import InputBox from "../../components/common/InputBox";
 
 const ForgotPassword = () => {
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
-  const { theme } = useTheme();
 
   const formSchema = z.object({
     email: z.string().email("Please enter a valid email address"),
@@ -58,11 +55,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div
-      className={`flex justify-center items-start pt-32 w-screen min-h-screen ${
-        theme === "dark" ? "bg-background" : "bg-white"
-      }`}
-    >
+    <div className="flex justify-center items-start pt-32 w-screen min-h-screen bg-background">
       <Card className="w-[400px] p-5 bg-background text-foreground">
         <h1 className="text-2xl font-bold text-center mb-6">
           Forgot your password?
@@ -89,7 +82,7 @@ const ForgotPassword = () => {
                         />
                       </div>
                     </FormControl>
-                    <FormMessage className="text-sm text-red-500" />
+                    <FormMessage className="text-sm text-destructive" />
                   </FormItem>
                 )}
               />

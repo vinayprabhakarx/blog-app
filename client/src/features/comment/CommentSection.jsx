@@ -74,7 +74,7 @@ const CommentSection = ({
               src={currentUser.personal_info?.profile_img}
               alt={currentUser.personal_info?.name}
             />
-            <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-blue-100 to-purple-100 dark:from-blue-900/30 dark:to-purple-900/30 text-foreground">
+            <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-primary/10 to-secondary/20 text-foreground">
               {getInitials(currentUser.personal_info?.name)}
             </AvatarFallback>
           </Avatar>
@@ -118,10 +118,10 @@ const CommentSection = ({
 
       {/* Error Display */}
       {error && (
-        <div className="p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+        <div className="p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-red-500 rounded-full flex-shrink-0" />
-            <p className="text-base text-red-600 dark:text-red-400">
+            <div className="w-2 h-2 bg-destructive rounded-full flex-shrink-0" />
+            <p className="text-base text-destructive">
               Failed to load comments: {error}
             </p>
           </div>
@@ -146,25 +146,25 @@ const CommentSection = ({
         </div>
       ) : (
         <div className="py-6">
-            <div className="flex flex-col items-center text-center">
-              <div className="w-14 h-14 mb-3 rounded-full bg-muted/50 dark:bg-muted/20 flex items-center justify-center">
-                <Link to="/login">
-                  <MessageCircle className="h-6 w-6 text-foreground/70 cursor-pointer" />
-                </Link>
-              </div>
+          <div className="flex flex-col items-center text-center">
+            <div className="w-14 h-14 mb-3 rounded-full bg-muted/50 dark:bg-muted/20 flex items-center justify-center">
               <Link to="/login">
-                <h3 className="text-lg font-semibold text-foreground mb-1.5">
-                  Be the first to comment
-                </h3>
-              </Link>
-              <Link to="/login">
-                <p className="text-sm text-muted-foreground max-w-xs mb-4 leading-relaxed">
-                  Start the conversation! Share your thoughts and connect with
-                  others about this post.
-                </p>
+                <MessageCircle className="h-6 w-6 text-foreground/70 cursor-pointer" />
               </Link>
             </div>
+            <Link to="/login">
+              <h3 className="text-lg font-semibold text-foreground mb-1.5">
+                Be the first to comment
+              </h3>
+            </Link>
+            <Link to="/login">
+              <p className="text-sm text-muted-foreground max-w-xs mb-4 leading-relaxed">
+                Start the conversation! Share your thoughts and connect with
+                others about this post.
+              </p>
+            </Link>
           </div>
+        </div>
       )}
     </div>
   );

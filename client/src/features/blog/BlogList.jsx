@@ -378,7 +378,7 @@ const BlogList = () => {
 
   if (currentError) {
     return (
-      <div className="text-center text-red-500 p-8">
+      <div className="text-center text-destructive p-8">
         <FileText className="h-16 w-16 mx-auto mb-4 opacity-50" />
         <p>Error loading blogs: {currentError}</p>
         <Button

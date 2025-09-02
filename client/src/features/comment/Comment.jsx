@@ -398,7 +398,7 @@ const Comment = React.memo(
 
                   {/* Reported Badge */}
                   {hasReported && (
-                    <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-orange-100 text-orange-800 rounded-full">
+                    <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-warning/10 text-warning rounded-full">
                       <Flag className="h-3 w-3" />
                       Reported
                     </span>
@@ -409,7 +409,7 @@ const Comment = React.memo(
                     currentUser?.role === "author") &&
                     comment.reports &&
                     comment.reports.length > 0 && (
-                      <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-red-100 text-red-800 rounded-full">
+                      <span className="inline-flex items-center gap-1 px-2 py-1 text-xs bg-destructive/10 text-destructive rounded-full">
                         <Flag className="h-3 w-3" />
                         {comment.reports.length}{" "}
                         {comment.reports.length === 1 ? "report" : "reports"}

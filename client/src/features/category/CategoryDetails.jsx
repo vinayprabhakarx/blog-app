@@ -247,7 +247,7 @@ const CategoryManagement = () => {
                             variant="outline"
                             size="sm"
                             disabled={operationLoading.delete}
-                            className="transition-colors duration-200 hover:text-red-600 hover:border-red-500"
+                            className="transition-colors duration-200 hover:text-destructive hover:border-destructive"
                             title="Delete category"
                           >
                             <Trash2 className="h-4 w-4" />
@@ -323,7 +323,7 @@ const CategoryManagement = () => {
                     variant="outline"
                     size="sm"
                     disabled={operationLoading.delete}
-                    className="px-2 py-0.5 h-7 min-w-[60px] flex items-center justify-center gap-1 text-xs transition-colors duration-200 hover:text-red-600 hover:border-red-500"
+                    className="px-2 py-0.5 h-7 min-w-[60px] flex items-center justify-center gap-1 text-xs transition-colors duration-200 hover:text-destructive hover:border-destructive"
                     title="Delete category"
                   >
                     <Trash2 className="h-3 w-3" />

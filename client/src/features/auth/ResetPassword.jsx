@@ -10,7 +10,6 @@ import authService from "./authService";
 import LoadingButton from "../../components/common/LoadingButton";
 import InputBox from "../../components/common/InputBox";
 import { FaLock, FaCheck } from "react-icons/fa6";
-import { useTheme } from "../../utils/ThemeContext";
 import {
   Form,
   FormControl,
@@ -27,7 +26,6 @@ const ResetPassword = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const navigate = useNavigate();
-  const { theme } = useTheme();
 
   const formSchema = z
     .object({
@@ -131,11 +129,7 @@ const ResetPassword = () => {
 
   if (isLoading) {
     return (
-      <div
-        className={`flex justify-center items-start pt-32 w-screen min-h-screen ${
-          theme === "dark" ? "bg-background" : "bg-white"
-        }`}
-      >
+      <div className="flex justify-center items-start pt-32 w-screen min-h-screen bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </div>
     );
@@ -143,15 +137,11 @@ const ResetPassword = () => {
 
   if (!isValidToken) {
     return (
-      <div
-        className={`flex justify-center items-start pt-32 w-screen min-h-screen ${
-          theme === "dark" ? "bg-background" : "bg-white"
-        }`}
-      >
+      <div className="flex justify-center items-start pt-32 w-screen min-h-screen bg-background">
         <Card className="w-[400px] p-5 bg-background text-foreground">
           <div className="text-center">
-            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 mb-4">
-              <FaCheck className="h-6 w-6 text-red-600" />
+            <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-destructive/10 mb-4">
+              <FaCheck className="h-6 w-6 text-destructive" />
             </div>
             <h2 className="text-2xl font-bold text-center mb-2">
               Invalid or Expired Link
@@ -162,7 +152,7 @@ const ResetPassword = () => {
             </p>
             <Link
               to="/forgot-password"
-              className="w-full inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+              className="w-full inline-flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             >
               Request New Reset Link
             </Link>
@@ -173,11 +163,7 @@ const ResetPassword = () => {
   }
 
   return (
-    <div
-      className={`flex justify-center items-start pt-32 w-screen min-h-screen ${
-        theme === "dark" ? "bg-background" : "bg-white"
-      }`}
-    >
+    <div className="flex justify-center items-start pt-32 w-screen min-h-screen bg-background">
       <Card className="w-[400px] p-5 bg-background text-foreground">
         <h1 className="text-2xl font-bold text-center mb-6">
           Reset Your Password
@@ -207,7 +193,7 @@ const ResetPassword = () => {
                           />
                         </div>
                       </FormControl>
-                      <FormMessage className="text-sm text-red-500" />
+                      <FormMessage className="text-sm text-destructive" />
                     </FormItem>
                   );
                 }}
@@ -234,7 +220,7 @@ const ResetPassword = () => {
                           />
                         </div>
                       </FormControl>
-                      <FormMessage className="text-sm text-red-500" />
+                      <FormMessage className="text-sm text-destructive" />
                     </FormItem>
                   );
                 }}

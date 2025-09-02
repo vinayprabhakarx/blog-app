@@ -532,10 +532,7 @@ const EditProfile = () => {
                 className="relative block w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full overflow-hidden cursor-pointer border-4 border-dashed transition-all duration-200 hover:border-opacity-100"
                 style={{ borderColor: "var(--border)" }}
               >
-                <div
-                  className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-white opacity-0 hover:opacity-100 transition-opacity duration-200 rounded-full"
-                  style={{ backgroundColor: "rgba(0, 0, 0, 0.6)" }}
-                >
+                <div className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-primary-foreground opacity-0 hover:opacity-100 transition-opacity duration-200 rounded-full bg-background/60 backdrop-blur-sm">
                   <span className="text-center">
                     <FaPlus className="w-8 h-8 mb-2 mx-auto block" />
                     Upload Image
@@ -583,7 +580,7 @@ const EditProfile = () => {
                   type="button"
                   onClick={handleRemoveProfileImage}
                   disabled={profileImageRemovalLoading}
-                  className="mt-4 text-red-500 hover:text-red-700 text-sm underline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="mt-4 text-destructive hover:text-destructive/80 text-sm underline cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   {profileImageRemovalLoading
                     ? "Removing..."
@@ -596,7 +593,7 @@ const EditProfile = () => {
                 <button
                   type="button"
                   onClick={handleRemoveSelectedImage}
-                  className="mt-4 text-red-500 hover:text-red-700 text-sm underline cursor-pointer"
+                  className="mt-4 text-destructive hover:text-destructive/80 text-sm underline cursor-pointer"
                 >
                   Remove Selected Image
                 </button>
@@ -626,7 +623,7 @@ const EditProfile = () => {
               {/* Image upload status */}
               {profileUpdateSuccess && (
                 <div className="mt-2 text-center">
-                  <p className="text-sm text-green-600 dark:text-green-400">
+                  <p className="text-sm text-success">
                     ✓ Image uploaded successfully!
                   </p>
                 </div>
@@ -635,7 +632,7 @@ const EditProfile = () => {
               {/* Profile image removal status */}
               {profileImageRemovalSuccess && (
                 <div className="mt-2 text-center">
-                  <p className="text-sm text-green-600 dark:text-green-400">
+                  <p className="text-sm text-success">
                     ✓ Profile image removed successfully!
                   </p>
                 </div>
@@ -643,7 +640,7 @@ const EditProfile = () => {
 
               {profileImageRemovalError && (
                 <div className="mt-2 text-center">
-                  <p className="text-sm text-red-600 dark:text-red-400">
+                  <p className="text-sm text-destructive">
                     ✗ {profileImageRemovalError}
                   </p>
                 </div>
@@ -742,7 +739,7 @@ const EditProfile = () => {
                       emailChanged ? (
                         <button
                           type="button"
-                          className="text-blue-500 hover:underline text-sm sm:text-base whitespace-nowrap px-0 py-2 sm:py-0 bg-transparent cursor-pointer w-full sm:w-auto text-center sm:text-left disabled:opacity-60"
+                          className="text-primary hover:underline text-sm sm:text-base whitespace-nowrap px-0 py-2 sm:py-0 bg-transparent cursor-pointer w-full sm:w-auto text-center sm:text-left disabled:opacity-60"
                           disabled={emailChangeLoading}
                           onClick={async () => {
                             try {

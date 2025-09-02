@@ -11,13 +11,8 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card } from "../../components/ui/card";
-import { useTheme } from "../../utils/ThemeContext";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  RouteIndex,
-  RouteSignUp,
-  getRoleBasedRedirect,
-} from "../../utils/RouteName";
+import { RouteSignUp, getRoleBasedRedirect } from "../../utils/RouteName";
 import { showToast } from "../../utils/showToast";
 import GoogleAuth from "./GoogleAuth";
 import { useDispatch, useSelector } from "react-redux";
@@ -81,14 +76,8 @@ const Login = () => {
     }
   };
 
-  const { theme } = useTheme();
-
   return (
-    <div
-      className={`flex justify-center items-center h-screen w-screen ${
-        theme === "dark" ? "bg-background" : "bg-white"
-      }`}
-    >
+    <div className="flex justify-center items-center h-screen w-screen bg-background">
       <Card className="w-[400px] p-5 bg-background text-foreground">
         <h1 className="text-2xl font-bold text-center mb-5">
           Login into Account

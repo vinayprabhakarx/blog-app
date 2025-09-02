@@ -56,7 +56,7 @@ const ShareDropdown = ({ isOpen, url, title, onMouseEnter, onMouseLeave }) => {
       data-share-dropdown
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className="absolute top-full left-0 mt-2 bg-white dark:bg-gray-800 rounded-lg shadow-lg border p-3 z-50 min-w-max"
+      className="absolute top-full left-0 mt-2 bg-popover rounded-lg shadow-lg border p-3 z-50 min-w-max"
       style={{
         backgroundColor: "var(--card)",
         borderColor: "var(--border)",
@@ -70,7 +70,7 @@ const ShareDropdown = ({ isOpen, url, title, onMouseEnter, onMouseLeave }) => {
             <button
               key={option.platform}
               onClick={() => handleShare(option.platform)}
-              className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+              className="flex items-center justify-center p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer"
               title={option.name}
               style={{ border: "1px solid var(--border)" }}
             >
@@ -84,7 +84,7 @@ const ShareDropdown = ({ isOpen, url, title, onMouseEnter, onMouseLeave }) => {
 
         <button
           onClick={copyToClipboard}
-          className="flex items-center justify-center p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors cursor-pointer"
+          className="flex items-center justify-center p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer"
           title={copied ? "Copied!" : "Copy Link"}
           style={{
             color: "var(--foreground)",
@@ -92,7 +92,7 @@ const ShareDropdown = ({ isOpen, url, title, onMouseEnter, onMouseLeave }) => {
           }}
         >
           {copied ? (
-            <Check className="w-5 h-5 text-green-500" />
+            <Check className="w-5 h-5 text-success" />
           ) : (
             <Copy
               className="w-5 h-5"

@@ -11,9 +11,8 @@ import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Card } from "../../components/ui/card";
-import { useTheme } from "../../utils/ThemeContext";
 import { Link, useNavigate } from "react-router-dom";
-import { RouteSignIn, RouteIndex } from "../../utils/RouteName";
+import { RouteSignIn } from "../../utils/RouteName";
 import { showToast } from "../../utils/showToast";
 import GoogleAuth from "./GoogleAuth";
 import { useDispatch, useSelector } from "react-redux";
@@ -72,14 +71,8 @@ const SignUp = () => {
     }
   }
 
-  const { theme } = useTheme();
-
   return (
-    <div
-      className={`flex justify-center items-center h-screen w-screen ${
-        theme === "dark" ? "bg-background" : "bg-white"
-      }`}
-    >
+    <div className="flex justify-center items-center min-h-screen w-screen bg-background py-8">
       <Card className="w-[400px] p-5 bg-background text-foreground">
         <h1 className="text-2xl font-bold text-center mb-5">
           Create Your Account
@@ -204,10 +197,7 @@ const SignUp = () => {
               </LoadingButton>
               <div className="mt-5 text-sm flex justify-center items-center gap-2">
                 <p>Already have account?</p>
-                <Link
-                  className="text-blue-500 hover:underline"
-                  to={RouteSignIn}
-                >
+                <Link className="text-primary hover:underline" to={RouteSignIn}>
                   Sign In
                 </Link>
               </div>

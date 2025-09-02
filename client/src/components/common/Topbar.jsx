@@ -176,7 +176,7 @@ const Topbar = React.memo(() => {
                     onClick={handleLogout}
                     className="cursor-pointer hover:bg-accent hover:text-accent-foreground transition-colors text-foreground flex items-center gap-2"
                   >
-                    <IoLogOutOutline className="w-4 h-4 text-red-500" />
+                    <IoLogOutOutline className="w-4 h-4 text-destructive" />
                     <span>Logout</span>
                   </DropdownMenuItem>
                 </DropdownMenuContent>
