@@ -93,17 +93,15 @@ const Comment = React.memo(
 
       return parts.map((part, index) => {
         if (part.startsWith("@")) {
-          const username = part.substring(1);
+          const username = part.slice(1);
           const taggedUser = taggedUsers.find(
-            (tag) =>
-              tag.username === username ||
-              tag.user_id?.personal_info?.username === username
+            (tag) => tag.user_id?.personal_info?.username === username
           );
 
           if (taggedUser) {
             return (
               <Link
-                key={index}
+                key={`mention-${username}-${index}`}
                 to={`/profile/${username}`}
                 className="text-primary hover:underline font-medium"
               >
@@ -112,7 +110,7 @@ const Comment = React.memo(
             );
           }
         }
-        return <span key={index}>{part}</span>;
+        return <span key={`text-${index}-${part.slice(0, 10)}`}>{part}</span>;
       });
     };
 

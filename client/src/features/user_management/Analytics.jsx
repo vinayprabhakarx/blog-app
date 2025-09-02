@@ -262,7 +262,7 @@ const Analytics = () => {
               <div className="space-y-4">
                 {analytics.topBlogs.map((blog, index) => (
                   <div
-                    key={index}
+                    key={blog.slug || `blog-${index}`}
                     className="flex items-center justify-between p-3 bg-accent/50 rounded-lg"
                   >
                     <div className="flex-1">
@@ -304,7 +304,7 @@ const Analytics = () => {
                 {monthlyPerformance && monthlyPerformance.length > 0 ? (
                   monthlyPerformance.map((stat, index) => (
                     <div
-                      key={index}
+                      key={stat.period || `stat-${index}`}
                       className="flex items-center justify-between p-3 bg-accent/50 rounded-lg"
                     >
                       <div>

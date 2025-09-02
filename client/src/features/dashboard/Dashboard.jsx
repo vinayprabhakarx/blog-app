@@ -251,7 +251,10 @@ const Dashboard = () => {
             ? Array(4)
                 .fill(0)
                 .map((_, index) => (
-                  <div key={index} className="rounded-lg border bg-card p-6">
+                  <div
+                    key={`loading-stat-${index}`}
+                    className="rounded-lg border bg-card p-6"
+                  >
                     <div className="flex items-center justify-between space-y-0 pb-2">
                       <div className="h-4 w-20 bg-muted animate-pulse rounded"></div>
                       <div className="h-4 w-4 bg-muted animate-pulse rounded"></div>
@@ -261,10 +264,13 @@ const Dashboard = () => {
                     </div>
                   </div>
                 ))
-            : stats.map((stat, index) => {
+            : stats.map((stat) => {
                 const IconComponent = stat.icon;
                 return (
-                  <div key={index} className="rounded-lg border bg-card p-6">
+                  <div
+                    key={stat.title || stat.id}
+                    className="rounded-lg border bg-card p-6"
+                  >
                     <div className="flex items-center justify-between space-y-0 pb-2">
                       <h3 className="text-sm font-medium text-muted-foreground">
                         {stat.title}
@@ -289,10 +295,10 @@ const Dashboard = () => {
               </div>
               <div className="p-6 pt-0">
                 <div className="flex flex-wrap justify-center gap-15">
-                  {quickActions.map((action, index) => {
+                  {quickActions.map((action) => {
                     const IconComponent = action.icon;
                     return (
-                      <Link key={index} to={action.path}>
+                      <Link key={action.path} to={action.path}>
                         <div className="flex items-center justify-center">
                           <div className="flex h-12 w-12 items-center justify-center rounded-lg bg-primary/10 hover:bg-primary/20 transition-colors cursor-pointer">
                             <IconComponent className="h-6 w-6 text-primary" />
@@ -328,7 +334,7 @@ const Dashboard = () => {
                 <div className="space-y-4">
                   {recentActivities.map((activity, index) => (
                     <div
-                      key={index}
+                      key={`${activity.type}-${activity.createdAt}-${index}`}
                       className="flex items-center space-x-4 p-3 bg-accent/50 rounded-lg"
                     >
                       <div
@@ -373,7 +379,7 @@ const Dashboard = () => {
                 <div className="space-y-4">
                   {recentBlogs.map((blog, index) => (
                     <div
-                      key={index}
+                      key={blog._id || blog.slug || `blog-${index}`}
                       className="flex items-center justify-between p-3 bg-accent/50 rounded-lg"
                     >
                       <div className="flex-1">
