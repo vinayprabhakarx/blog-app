@@ -172,6 +172,124 @@ const MdRenderCard = React.memo(({ content }) => {
   const remarkPlugins = useMemo(() => [remarkMath], []);
   const rehypePlugins = useMemo(() => [rehypeKatex, rehypeRaw], []);
 
+  // Memoize CSS styles for markdown rendering
+  const markdownStyles = useMemo(
+    () => `
+    /* Prose base styles */
+    .prose {
+      width: 100%;
+      max-width: 100% !important;
+    }
+
+    .prose ol,
+    .prose ul {
+      list-style-position: outside;
+      padding-left: 1.5rem;
+      margin-bottom: 1rem;
+      max-width: 100%;
+      width: 100%;
+    }
+
+    .prose ol {
+      list-style-type: decimal;
+    }
+
+    .prose ul {
+      list-style-type: disc;
+    }
+
+    /* Re-enable pointer events for heading content but not links */
+    .wmde-markdown h1 *:not(a),
+    .wmde-markdown h2 *:not(a),
+    .wmde-markdown h3 *:not(a),
+    .wmde-markdown h4 *:not(a),
+    .wmde-markdown h5 *:not(a),
+    .wmde-markdown h6 *:not(a),
+    .prose h1 *:not(a),
+    .prose h2 *:not(a),
+    .prose h3 *:not(a),
+    .prose h4 *:not(a),
+    .prose h5 *:not(a),
+    .prose h6 *:not(a) {
+      pointer-events: auto !important;
+    }
+
+    /* Global code block wrapping rules */
+    .prose pre {
+      overflow-x: hidden !important;
+      white-space: pre-wrap !important;
+      word-break: break-all !important;
+      overflow-wrap: break-word !important;
+    }
+
+    .prose pre code {
+      white-space: pre-wrap !important;
+      word-break: break-all !important;
+      overflow-wrap: break-word !important;
+    }
+
+    .prose code {
+      white-space: pre-wrap !important;
+      word-break: break-all !important;
+      overflow-wrap: break-word !important;
+    }
+
+    /* KaTeX math display centering */
+    .katex-display {
+      display: flex !important;
+      justify-content: center !important;
+      align-items: center !important;
+      margin: 1.5em 0 !important;
+      text-align: center !important;
+    }
+
+    .katex {
+      font-size: 1.5em;
+      line-height: 1.5;
+    }
+
+    /* Mobile-specific optimizations */
+    @media (max-width: 640px) {
+      .prose blockquote {
+        line-height: 1.5;
+        padding-left: 1rem;
+      }
+
+      /* Fix markdown heading sizes */
+      .prose h1 {
+        font-size: 1.5rem !important;
+        line-height: 1.3 !important;
+      }
+
+      .prose h2 {
+        font-size: 1.25rem !important;
+        line-height: 1.4 !important;
+      }
+
+      .prose h3 {
+        font-size: 1.125rem !important;
+        line-height: 1.4 !important;
+      }
+
+      .prose h4 {
+        font-size: 1rem !important;
+        line-height: 1.5 !important;
+      }
+
+      .prose h5 {
+        font-size: 0.875rem !important;
+        line-height: 1.5 !important;
+      }
+
+      .prose h6 {
+        font-size: 0.75rem !important;
+        line-height: 1.5 !important;
+      }
+    }
+  `,
+    []
+  );
+
   // Memoize heading component factories to prevent recreation
   const createHeading = useCallback(
     (level) => (props) => <MarkdownHeading level={level} {...props} />,
@@ -253,6 +371,7 @@ const MdRenderCard = React.memo(({ content }) => {
 
   return (
     <div className="w-full overflow-hidden">
+      <style>{markdownStyles}</style>
       <div data-color-mode={themeDataMode} className="w-full">
         <div style={overflowStyle}>
           <MDEditor.Markdown
