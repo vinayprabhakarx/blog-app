@@ -16,7 +16,7 @@ const MarkdownCode = React.memo(({ children = [], className }) => {
 const MarkdownHeading = React.memo(({ level, children, ...props }) => {
   const Tag = `h${level}`;
 
-  // Memoize heading styles to remove default separators
+  // Memoize heading styles to remove default heading separators
   const headingStyle = useMemo(
     () => ({
       borderBottom: "none",
@@ -87,9 +87,6 @@ const MarkdownTable = React.memo(({ children, ...props }) => {
   const tableStyle = useMemo(
     () => ({
       backgroundColor: "transparent",
-      border: "1px solid var(--border)",
-      borderRadius: "8px",
-      overflow: "hidden",
       margin: "1rem 0",
       width: "100%",
     }),
@@ -212,6 +209,37 @@ const MdRenderCard = React.memo(({ content }) => {
     .prose h5 *:not(a),
     .prose h6 *:not(a) {
       pointer-events: auto !important;
+    }
+
+    /* Table width and layout optimization */
+    .prose table {
+      width: 100% !important;
+      table-layout: auto !important;
+      border-collapse: collapse !important;
+      margin: 1rem 0 !important;
+    }
+
+    .prose th,
+    .prose td {
+      border: 1px solid var(--border) !important;
+      padding: 0.75rem !important;
+      word-wrap: break-word !important;
+    }
+
+    .prose th {
+      background-color: var(--muted) !important;
+      font-weight: 600 !important;
+    }
+
+    .prose td {
+      background-color: var(--background) !important;
+    }
+
+    /* Ensure tables expand on larger screens */
+    @media (min-width: 768px) {
+      .prose table {
+        table-layout: fixed !important;
+      }
     }
 
     /* Global code block wrapping rules */
