@@ -15,7 +15,18 @@ const MarkdownCode = React.memo(({ children = [], className }) => {
 
 const MarkdownHeading = React.memo(({ level, children, ...props }) => {
   const Tag = `h${level}`;
-  return React.createElement(Tag, { ...props }, children);
+
+  // Memoize heading styles to remove default separators
+  const headingStyle = useMemo(
+    () => ({
+      borderBottom: "none",
+      paddingBottom: "0",
+      marginBottom: level <= 2 ? "1rem" : "0.75rem",
+    }),
+    [level]
+  );
+
+  return React.createElement(Tag, { style: headingStyle, ...props }, children);
 });
 
 const MarkdownOrderedList = React.memo(({ children, ...props }) => {
@@ -71,6 +82,81 @@ const MarkdownListItem = React.memo(({ children, ...props }) => {
   );
 });
 
+// Memoize table components for consistent theming
+const MarkdownTable = React.memo(({ children, ...props }) => {
+  const tableStyle = useMemo(
+    () => ({
+      backgroundColor: "transparent",
+      border: "1px solid var(--border)",
+      borderRadius: "8px",
+      overflow: "hidden",
+      margin: "1rem 0",
+      width: "100%",
+    }),
+    []
+  );
+
+  return (
+    <table style={tableStyle} {...props}>
+      {children}
+    </table>
+  );
+});
+
+const MarkdownTableHeader = React.memo(({ children, ...props }) => {
+  const thStyle = useMemo(
+    () => ({
+      backgroundColor: "var(--muted)",
+      color: "var(--foreground)",
+      padding: "0.75rem",
+      border: "1px solid var(--border)",
+      fontWeight: "600",
+      textAlign: "left",
+    }),
+    []
+  );
+
+  return (
+    <th style={thStyle} {...props}>
+      {children}
+    </th>
+  );
+});
+
+const MarkdownTableData = React.memo(({ children, ...props }) => {
+  const tdStyle = useMemo(
+    () => ({
+      backgroundColor: "var(--background)",
+      color: "var(--foreground)",
+      padding: "0.75rem",
+      border: "1px solid var(--border)",
+    }),
+    []
+  );
+
+  return (
+    <td style={tdStyle} {...props}>
+      {children}
+    </td>
+  );
+});
+
+// Memoize horizontal rule (separator) component
+const MarkdownHorizontalRule = React.memo((props) => {
+  const hrStyle = useMemo(
+    () => ({
+      border: "none",
+      borderTop: "2px solid var(--border)",
+      margin: "2rem 0",
+      width: "100%",
+      backgroundColor: "transparent",
+    }),
+    []
+  );
+
+  return <hr style={hrStyle} {...props} />;
+});
+
 const MdRenderCard = React.memo(({ content }) => {
   const { theme } = useTheme();
 
@@ -112,6 +198,10 @@ const MdRenderCard = React.memo(({ content }) => {
       ol: MarkdownOrderedList,
       ul: MarkdownUnorderedList,
       li: MarkdownListItem,
+      table: MarkdownTable,
+      th: MarkdownTableHeader,
+      td: MarkdownTableData,
+      hr: MarkdownHorizontalRule,
     }),
     [
       h1Component,
