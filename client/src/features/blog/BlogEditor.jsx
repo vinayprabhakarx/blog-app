@@ -21,7 +21,7 @@ import {
   Heading3,
   Minus,
 } from "lucide-react";
-import MdRenderCard from "./MdRenderCard";
+import MdRenderCardWrapper from "./MdRenderCardWrapper";
 import { useTheme } from "../../utils/ThemeContext";
 const ToolButton = ({ onClick, title, children }) => (
   <button
@@ -352,7 +352,7 @@ const BlogEditor = ({
             } overflow-auto`}
           >
             <div className="p-4">
-              <MdRenderCard
+              <MdRenderCardWrapper
                 content={value || "*Preview will appear here...*"}
               />
             </div>

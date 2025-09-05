@@ -1,7 +1,4 @@
 import React, { useEffect } from "react";
-import { Provider } from "react-redux";
-import { PersistGate } from "redux-persist/integration/react";
-import { store, persistor } from "./app/store";
 import { ThemeProvider } from "./utils/ThemeContext.jsx";
 import { NotificationProvider } from "./utils/NotificationContext";
 import AppRouter from "./utils/AppRouter";
@@ -27,32 +24,28 @@ const AuthInitializer = ({ children }) => {
 
 function App() {
   return (
-    <PersistGate persistor={persistor}>
-      <Provider store={store}>
-        <ThemeProvider>
-          <NotificationProvider>
-              <AuthInitializer>
-                <div className="App w-full min-h-screen bg-background text-foreground ">
-                  <AppRouter />
-                  <ToastContainer
-                    position="top-right"
-                    autoClose={5000}
-                    hideProgressBar={false}
-                    newestOnTop={false}
-                    closeOnClick
-                    rtl={false}
-                    pauseOnFocusLoss
-                    draggable
-                    pauseOnHover
-                    theme="light"
-                  />
-                </div>
-              </AuthInitializer>
-            </NotificationProvider>
-          </ThemeProvider>
-        </Provider>
-      </PersistGate>
-    );
+    <ThemeProvider>
+      <NotificationProvider>
+        <AuthInitializer>
+          <div className="App w-full min-h-screen bg-background text-foreground ">
+            <AppRouter />
+            <ToastContainer
+              position="top-right"
+              autoClose={5000}
+              hideProgressBar={false}
+              newestOnTop={false}
+              closeOnClick
+              rtl={false}
+              pauseOnFocusLoss
+              draggable
+              pauseOnHover
+              theme="light"
+            />
+          </div>
+        </AuthInitializer>
+      </NotificationProvider>
+    </ThemeProvider>
+  );
 }
 
 export default App;

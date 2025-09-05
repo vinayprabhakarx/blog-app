@@ -1,6 +1,6 @@
 import React, { useMemo } from "react";
 
-import MdRenderCard from "./MdRenderCard";
+import MdRenderCardWrapper from "./MdRenderCardWrapper";
 
 const BlogDisplay = React.memo(({ blog }) => {
   // Memoize inline styles to prevent unnecessary re-renders
@@ -37,7 +37,7 @@ const BlogDisplay = React.memo(({ blog }) => {
         }}
       >
         <div className="w-full">
-          <MdRenderCard content={blogContent} />
+          <MdRenderCardWrapper content={blogContent} />
         </div>
 
         <footer

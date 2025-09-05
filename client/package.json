@@ -7,6 +7,7 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build && npm run obfuscate",
+    "build:analyze": "vite build --mode analyze",
     "lint": "eslint .",
     "preview": "vite preview",
     "obfuscate": "javascript-obfuscator dist --output dist --compact true --control-flow-flattening true --disable-console-output true"
