@@ -691,7 +691,7 @@ const UserManagement = () => {
                     <div>
                       {user.personal_info?.username ? (
                         <Link
-                          to={`/profile/${user.personal_info.username}`}
+                          to={`/${user.personal_info.username}`}
                           className="font-medium text-lg hover:text-primary transition-colors cursor-pointer hover:underline"
                         >
                           {user.personal_info?.name || "Unnamed User"}

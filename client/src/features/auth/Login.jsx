@@ -63,7 +63,7 @@ const Login = () => {
     // Validate email format using Zod
     try {
       z.string().email().parse(email);
-    } catch (validationError) {
+    } catch {
       showToast("error", "Please enter a valid email address");
       return;
     }
