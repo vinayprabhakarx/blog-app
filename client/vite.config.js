@@ -46,7 +46,6 @@ export default defineConfig({
             "rehype-highlight",
             "katex",
           ],
-          ckeditor: ["ckeditor5"],
 
           // Firebase
           firebase: [
