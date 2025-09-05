@@ -9,35 +9,11 @@ const api = axios.create({
   },
 });
 
-// Lazy import to avoid circular dependency
-let store = null;
-let logout = null;
-
-const getStore = async () => {
-  if (!store) {
-    const storeModule = await import("../app/store");
-    store = storeModule.store;
-  }
-  return store;
-};
-
-const getLogout = async () => {
-  if (!logout) {
-    const authModule = await import("../features/auth/authSlice");
-    logout = authModule.logout;
-  }
-  return logout;
-};
-
 // Add auth token to requests that need authentication
 api.interceptors.request.use(
-  async (config) => {
-    const storeInstance = await getStore();
-    const reduxToken = storeInstance.getState().auth?.token;
-    const localStorageToken = localStorage.getItem("token");
-
-    // Use Redux token first, fallback to localStorage
-    const token = reduxToken || localStorageToken;
+  (config) => {
+    // Get token from localStorage to avoid circular dependencies
+    const token = localStorage.getItem("token");
 
     const publicGetRoutes = [
       "/blogs?",
@@ -79,15 +55,18 @@ api.interceptors.response.use(
   (response) => {
     return response;
   },
-  async (error) => {
+  (error) => {
     if (error.response && error.response.status === 401) {
       const isPasswordChangeError =
         error.config?.url?.includes("change-password");
 
       if (!isPasswordChangeError) {
-        const storeInstance = await getStore();
-        const logoutAction = await getLogout();
-        storeInstance.dispatch(logoutAction());
+        // Clear token and redirect to login to avoid circular dependencies
+        localStorage.removeItem("token");
+        // Use window.location to avoid router dependencies
+        if (typeof window !== "undefined") {
+          window.location.href = "/login";
+        }
         console.error("Unauthorized access. User has been logged out.");
       }
     }
