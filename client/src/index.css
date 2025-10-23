@@ -1,410 +1,403 @@
-@import url('https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap');
+@import url("https://fonts.googleapis.com/css2?family=Nunito:ital,wght@0,200..1000;1,200..1000&display=swap");
 
 /* Import Tailwind CSS v4 and animations */
 @import "tailwindcss";
 @import "tw-animate-css";
-
 
 /* Define a custom variant for dark mode for easier use in components */
 @custom-variant dark (&:is(.dark *));
 
 /* Map CSS variables to Tailwind's theme object */
 @theme inline {
-    --radius-sm: calc(var(--radius) - 4px);
-    --radius-md: calc(var(--radius) - 2px);
-    --radius-lg: var(--radius);
-    --radius-xl: calc(var(--radius) + 4px);
-    --color-background: var(--background);
-    --color-foreground: var(--foreground);
-    --color-card: var(--card);
-    --color-card-foreground: var(--card-foreground);
-    --color-popover: var(--popover);
-    --color-popover-foreground: var(--popover-foreground);
-    --color-primary: var(--primary);
-    --color-primary-foreground: var(--primary-foreground);
-    --color-secondary: var(--secondary);
-    --color-secondary-foreground: var(--secondary-foreground);
-    --color-muted: var(--muted);
-    --color-muted-foreground: var(--muted-foreground);
-    --color-accent: var(--accent);
-    --color-accent-foreground: var(--accent-foreground);
-    --color-destructive: var(--destructive);
-    --color-destructive-foreground: var(--destructive-foreground);
-    --color-border: var(--border);
-    --color-input: var(--input);
-    --color-ring: var(--ring);
-    --color-success: var(--success);
-    --color-warning: var(--warning);
-    --color-info: var(--info);
+  --radius-sm: calc(var(--radius) - 4px);
+  --radius-md: calc(var(--radius) - 2px);
+  --radius-lg: var(--radius);
+  --radius-xl: calc(var(--radius) + 4px);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --color-info: var(--info);
 }
 
 /* CSS Custom Properties for semantic colors */
 :root {
-    --success: 134 61% 41%;
-    --success-foreground: 134 25% 95%;
-    --warning: 39 100% 50%;
-    --warning-foreground: 39 95% 10%;
-    --info: 354 70% 54%;
-    --info-foreground: 354 25% 95%;
+  --success: 134 61% 41%;
+  --success-foreground: 134 25% 95%;
+  --warning: 39 100% 50%;
+  --warning-foreground: 39 95% 10%;
+  --info: 354 70% 54%;
+  --info-foreground: 354 25% 95%;
 }
 
 .dark {
-    --success: 134 65% 48%;
-    --success-foreground: 134 15% 15%;
-    --warning: 39 100% 65%;
-    --warning-foreground: 39 75% 18%;
-    --info: 354 75% 62%;
-    --info-foreground: 354 20% 12%;
+  --success: 134 65% 48%;
+  --success-foreground: 134 15% 15%;
+  --warning: 39 100% 65%;
+  --warning-foreground: 39 75% 18%;
+  --info: 354 75% 62%;
+  --info-foreground: 354 20% 12%;
 }
 
 /* Prevent horizontal scrolling and improve layout */
 html,
 body {
-    max-width: 100%;
-    overflow-x: hidden;
-    position: relative;
+  max-width: 100%;
+  overflow-x: hidden;
+  position: relative;
 }
 
 /* Ensure all elements stay within viewport */
 * {
-    box-sizing: border-box;
-    max-width: 100%;
+  box-sizing: border-box;
+  max-width: 100%;
 }
 
 /* Line clamp utilities for text truncation */
 .line-clamp-1 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 1;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
 }
 
 /* Hide scrollbar for webkit browsers */
 .scrollbar-hide {
-    -ms-overflow-style: none;
-    /* IE and Edge */
-    scrollbar-width: none;
-    /* Firefox */
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
 }
 
 .scrollbar-hide::-webkit-scrollbar {
-    display: none;
-    /* Chrome, Safari and Opera */
+  display: none;
+  /* Chrome, Safari and Opera */
 }
 
 .line-clamp-2 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 2;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .line-clamp-3 {
-    overflow: hidden;
-    display: -webkit-box;
-    -webkit-box-orient: vertical;
-    -webkit-line-clamp: 3;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
 }
 
 /* --- Light Theme (Default) --- */
 :root {
-    --radius: 0.625rem;
-    --background: oklch(0.975 0.008 60);
-    --foreground: oklch(0.22 0.015 35);
-    --card: oklch(0.985 0.006 55);
-    --card-foreground: oklch(0.22 0.015 35);
-    --popover: oklch(0.985 0.006 55);
-    --popover-foreground: oklch(0.22 0.015 35);
-    --primary: oklch(0.58 0.18 25);
-    --primary-foreground: oklch(0.98 0.006 55);
-    --secondary: oklch(0.92 0.012 75);
-    --secondary-foreground: oklch(0.25 0.015 35);
-    --muted: oklch(0.96 0.008 65);
-    --muted-foreground: oklch(0.52 0.02 45);
-    --accent: oklch(0.90 0.015 70);
-    --accent-foreground: oklch(0.25 0.015 35);
-    --destructive: oklch(0.58 0.18 25);
-    --destructive-foreground: oklch(0.98 0.006 55);
-    --border: oklch(0.82 0.015 40);
-    --input: oklch(0.96 0.008 65);
-    --ring: oklch(0.58 0.18 25);
+  --radius: 0.625rem;
+  --background: #faf8f7;
+  --foreground: #211816;
+  --card: #fef9f6;
+  --card-foreground: #211816;
+  --popover: #fef9f6;
+  --popover-foreground: #211816;
+  --primary: #cf4040;
+  --primary-foreground: #fcf7f5;
+  --secondary: #e9e4dc;
+  --secondary-foreground: #281f1d;
+  --muted: #f6f1ec;
+  --muted-foreground: #736660;
+  --accent: #e5dcd4;
+  --accent-foreground: #281f1d;
+  --destructive: #cf4040;
+  --destructive-foreground: #fcf7f5;
+  --border: #cdc1bd;
+  --input: #f6f1ec;
+  --ring: #cf4040;
 }
 
 /* --- Dark Theme --- */
 .dark {
-    --background: oklch(0.20 0.015 30);
-    --foreground: oklch(0.94 0.008 55);
-    --card: oklch(0.25 0.012 30);
-    --card-foreground: oklch(0.94 0.008 55);
-    --popover: oklch(0.25 0.012 30);
-    --popover-foreground: oklch(0.94 0.008 55);
-    --primary: oklch(0.72 0.15 20);
-    --primary-foreground: oklch(0.20 0.015 30);
-    --secondary: oklch(0.32 0.015 35);
-    --secondary-foreground: oklch(0.90 0.008 55);
-    --muted: oklch(0.28 0.012 32);
-    --muted-foreground: oklch(0.68 0.012 45);
-    --accent: oklch(0.35 0.015 35);
-    --accent-foreground: oklch(0.90 0.008 55);
-    --destructive: oklch(0.72 0.15 20);
-    --destructive-foreground: oklch(0.94 0.008 55);
-    --border: oklch(0.42 0.012 40);
-    --input: oklch(0.28 0.012 32);
-    --ring: oklch(0.72 0.15 20);
+  --background: #2f2727;
+  --foreground: #f0eae6;
+  --card: #27201e;
+  --card-foreground: #f0eae6;
+  --popover: #27201e;
+  --popover-foreground: #f0eae6;
+  --primary: #f47a7d;
+  --primary-foreground: #1c1412;
+  --secondary: #3a302e;
+  --secondary-foreground: #e2ddd9;
+  --muted: #2f2725;
+  --muted-foreground: #9f9692;
+  --accent: #423835;
+  --accent-foreground: #e2ddd9;
+  --destructive: #f47a7d;
+  --destructive-foreground: #f0eae6;
+  --border: #534b48;
+  --input: #2f2725;
+  --ring: #f47a7d;
 }
 
 /* Apply base styles to global elements */
 @layer base {
-    * {
-        @apply border-border outline-ring/50;
-    }
+  * {
+    @apply border-border outline-ring/50;
+  }
 
-    body {
-        @apply bg-background text-foreground;
-        font-family: "Nunito", sans-serif;
-        /* Performance optimizations */
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-rendering: optimizeLegibility;
-        /* Reduce layout shifts */
-        font-display: swap;
-        /* Prevent font style transitions on page load */
-        transition: none !important;
-    }
+  body {
+    @apply bg-background text-foreground;
+    font-family: "Nunito", sans-serif;
+    /* Performance optimizations */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    /* Reduce layout shifts */
+    font-display: swap;
+    /* Prevent font style transitions on page load */
+    transition: none !important;
+  }
 }
 
 /* Lightweight performance optimizations */
 .transition-colors {
-    transition-property: background-color, border-color, color, fill, stroke;
-    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
-    transition-duration: 50ms;
+  transition-property: background-color, border-color, color, fill, stroke;
+  transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  transition-duration: 50ms;
 }
 
 /* Utility for printing */
 @media print {
-    .no-print {
-        display: none !important;
-    }
+  .no-print {
+    display: none !important;
+  }
 }
 
 /* Touch-friendly hover states */
 @media (hover: hover) and (pointer: fine) {
-    .hover-desktop:hover {
-        /* Desktop hover styles */
-    }
+  .hover-desktop:hover {
+    /* Desktop hover styles */
+  }
 }
 
 /* Mobile-specific optimizations */
 @media (max-width: 640px) {
+  /* Prevent content from stretching to edges */
+  .px-2 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
 
-    /* Prevent content from stretching to edges */
-    .px-2 {
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-    }
+  /* Ensure proper spacing on mobile */
+  .px-4 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
 
-    /* Ensure proper spacing on mobile */
-    .px-4 {
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-    }
+  /* Override any excessive padding */
+  .sm\:px-4 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
 
-    /* Override any excessive padding */
-    .sm\:px-4 {
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-    }
+  /* Improve touch targets */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
 
-    /* Improve touch targets */
-    .touch-manipulation {
-        touch-action: manipulation;
-    }
+  /* Optimize text rendering for mobile */
+  body {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
 
-    /* Optimize text rendering for mobile */
-    body {
-        -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
-        text-rendering: optimizeLegibility;
-    }
+  /* Prevent zoom on input focus */
+  input,
+  select,
+  textarea {
+    font-size: 16px;
+  }
 
-    /* Prevent zoom on input focus */
-    input,
-    select,
-    textarea {
-        font-size: 16px;
-    }
+  /* Better button spacing for mobile */
+  button {
+    min-height: 44px;
+    min-width: 44px;
+  }
 
-    /* Better button spacing for mobile */
-    button {
-        min-height: 44px;
-        min-width: 44px;
-    }
+  /* Improve dropdown menu touch interaction */
+  [data-radix-popper-content-wrapper] {
+    z-index: 9999 !important;
+  }
 
-    /* Improve dropdown menu touch interaction */
-    [data-radix-popper-content-wrapper] {
-        z-index: 9999 !important;
-    }
+  /* Ensure dropdown menu items are touch-friendly */
+  [role="menuitem"] {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    touch-action: manipulation;
+  }
 
-    /* Ensure dropdown menu items are touch-friendly */
-    [role="menuitem"] {
-        min-height: 44px;
-        display: flex;
-        align-items: center;
-        padding: 0.75rem 1rem;
-        touch-action: manipulation;
-    }
+  /* Mobile blog content optimizations */
+  .prose {
+    max-width: 100% !important;
+  }
 
-    /* Mobile blog content optimizations */
-    .prose {
-        max-width: 100% !important;
-    }
+  .prose p {
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
 
-    .prose p {
-        line-height: 1.6;
-        margin-bottom: 1rem;
-    }
-
-    .prose li {
-        line-height: 1.5;
-        margin-bottom: 0.25rem;
-    }
+  .prose li {
+    line-height: 1.5;
+    margin-bottom: 0.25rem;
+  }
 }
 
 /* Tablet optimizations */
 @media (min-width: 641px) and (max-width: 1024px) {
-
-    /* Tablet-specific styles */
-    .touch-manipulation {
-        touch-action: manipulation;
-    }
+  /* Tablet-specific styles */
+  .touch-manipulation {
+    touch-action: manipulation;
+  }
 }
 
 /* Consistent comfortable padding across all screen sizes */
 .container {
-    padding-left: 1rem !important;
-    padding-right: 1rem !important;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
 }
 
 /* Mobile-first responsive padding */
 @media (max-width: 480px) {
-    .container {
-        padding-left: 0.75rem !important;
-        padding-right: 0.75rem !important;
-    }
+  .container {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
 }
 
 @media (min-width: 481px) and (max-width: 640px) {
-    .container {
-        padding-left: 1rem !important;
-        padding-right: 1rem !important;
-    }
+  .container {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
 }
 
 @media (min-width: 641px) {
-    .container {
-        padding-left: 1.5rem !important;
-        padding-right: 1.5rem !important;
-    }
+  .container {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+  }
 }
 
 /* Critical fixes for 764-820px range */
 @media (min-width: 764px) and (max-width: 820px) {
+  /* Maintain consistent container padding */
+  .container {
+    padding-left: 1.5rem !important;
+    padding-right: 1.5rem !important;
+    max-width: 100% !important;
+  }
 
-    /* Maintain consistent container padding */
-    .container {
-        padding-left: 1.5rem !important;
-        padding-right: 1.5rem !important;
-        max-width: 100% !important;
-    }
+  /* Minimize grid gaps */
+  .grid {
+    gap: 0.75rem !important;
+  }
 
-    /* Minimize grid gaps */
-    .grid {
-        gap: 0.75rem !important;
-    }
+  /* Ensure blog cards fit perfectly */
+  .blog-card {
+    max-width: 100%;
+    overflow: hidden;
+  }
 
-    /* Ensure blog cards fit perfectly */
-    .blog-card {
-        max-width: 100%;
-        overflow: hidden;
-    }
+  /* Compact navigation */
+  nav {
+    padding-top: 0.5rem !important;
+    padding-bottom: 0.5rem !important;
+  }
 
-    /* Compact navigation */
-    nav {
-        padding-top: 0.5rem !important;
-        padding-bottom: 0.5rem !important;
-    }
+  /* Reduce button padding */
+  button {
+    padding: 0.375rem 0.5rem !important;
+    font-size: 0.875rem !important;
+  }
 
-    /* Reduce button padding */
-    button {
-        padding: 0.375rem 0.5rem !important;
-        font-size: 0.875rem !important;
-    }
+  /* Compact text elements */
+  h1,
+  h2,
+  h3 {
+    font-size: 85% !important;
+    line-height: 1.2 !important;
+  }
 
-    /* Compact text elements */
-    h1,
-    h2,
-    h3 {
-        font-size: 85% !important;
-        line-height: 1.2 !important;
-    }
+  /* Minimize margins */
+  .mb-3,
+  .mb-4 {
+    margin-bottom: 0.5rem !important;
+  }
 
-    /* Minimize margins */
-    .mb-3,
-    .mb-4 {
-        margin-bottom: 0.5rem !important;
-    }
+  .mt-6,
+  .mt-8 {
+    margin-top: 1rem !important;
+  }
 
-    .mt-6,
-    .mt-8 {
-        margin-top: 1rem !important;
-    }
-
-    /* Force 2-column layout with minimal gaps */
-    .grid-cols-1.sm\:grid-cols-2.md\:grid-cols-2.lg\:grid-cols-3 {
-        grid-template-columns: repeat(2, 1fr) !important;
-    }
+  /* Force 2-column layout with minimal gaps */
+  .grid-cols-1.sm\:grid-cols-2.md\:grid-cols-2.lg\:grid-cols-3 {
+    grid-template-columns: repeat(2, 1fr) !important;
+  }
 }
 
 /* Broader tablet landscape optimizations (768px - 850px) */
 @media (min-width: 768px) and (max-width: 850px) {
+  /* Reduce container padding for better space utilization */
+  .container {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
 
-    /* Reduce container padding for better space utilization */
-    .container {
-        padding-left: 1rem;
-        padding-right: 1rem;
-    }
+  /* Optimize grid gaps for this specific range */
+  .grid {
+    gap: 1rem;
+  }
 
-    /* Optimize grid gaps for this specific range */
-    .grid {
-        gap: 1rem;
-    }
+  /* Ensure blog cards don't overflow */
+  .blog-card {
+    max-width: 100%;
+    overflow: hidden;
+  }
 
-    /* Ensure blog cards don't overflow */
-    .blog-card {
-        max-width: 100%;
-        overflow: hidden;
-    }
+  /* Adjust text sizes for better readability */
+  h1,
+  h2,
+  h3 {
+    font-size: 90%;
+  }
 
-    /* Adjust text sizes for better readability */
-    h1,
-    h2,
-    h3 {
-        font-size: 90%;
-    }
-
-    /* Optimize button and interactive element sizes */
-    button {
-        padding: 0.5rem 0.75rem;
-    }
+  /* Optimize button and interactive element sizes */
+  button {
+    padding: 0.5rem 0.75rem;
+  }
 }
 
 /* High DPI display optimizations */
-@media (-webkit-min-device-pixel-ratio: 2),
-(min-resolution: 192dpi) {
-
-    /* Sharper images on retina displays */
-    img {
-        image-rendering: -webkit-optimize-contrast;
-        image-rendering: crisp-edges;
-    }
+@media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi) {
+  /* Sharper images on retina displays */
+  img {
+    image-rendering: -webkit-optimize-contrast;
+    image-rendering: crisp-edges;
+  }
 }
