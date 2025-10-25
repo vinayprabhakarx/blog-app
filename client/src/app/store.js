@@ -11,6 +11,7 @@ import userReducer from "../features/user_management/userSlice";
 import likesReducer from "../features/like/likesSlice";
 import notificationsReducer from "../features/notification/notificationsSlice";
 import settingsReducer from "../features/settings/settingsSlice";
+import galleryReducer from "../features/gallery/gallerySlice";
 
 import {
   syncMiddleware,
@@ -21,7 +22,14 @@ const persistConfig = {
   key: "root",
   storage,
   whitelist: ["auth", "likes"],
-  blacklist: ["blog", "comments", "categories", "user", "notifications"],
+  blacklist: [
+    "blog",
+    "comments",
+    "categories",
+    "user",
+    "notifications",
+    "gallery",
+  ],
 };
 
 const rootReducer = combineReducers({
@@ -33,6 +41,7 @@ const rootReducer = combineReducers({
   likes: likesReducer,
   notifications: notificationsReducer,
   settings: settingsReducer,
+  gallery: galleryReducer,
 });
 
 const persistedReducer = persistReducer(persistConfig, rootReducer);

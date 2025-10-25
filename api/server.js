@@ -13,6 +13,7 @@ import categoryRoutes from "./routes/category.route.js";
 import blogLikeRoutes from "./routes/blogLike.route.js";
 import notificationRoutes from "./routes/notification.route.js";
 import contactRoutes from "./routes/contact.routes.js";
+import galleryRoutes from "./routes/gallery.route.js";
 
 // Load environment variables
 dotenv.config();
@@ -94,6 +95,7 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/likes", blogLikeRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/contact", contactRoutes);
+app.use("/api/gallery", galleryRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {

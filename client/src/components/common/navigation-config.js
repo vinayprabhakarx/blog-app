@@ -12,6 +12,7 @@ import {
   IconPencil,
   IconChartBar,
   IconNotification,
+  IconPhoto,
 } from "@tabler/icons-react";
 
 // Navigation configuration
@@ -65,6 +66,13 @@ export const NAVIGATION_CONFIG = {
     activeIcon: IconEdit,
     roles: ["author", "admin"],
   },
+  gallery: {
+    title: "Gallery",
+    path: "/gallery",
+    icon: IconPhoto,
+    activeIcon: IconPhoto,
+    roles: ["author", "admin"],
+  },
   analytics: {
     title: "Analytics",
     path: "/analytics",
@@ -89,7 +97,7 @@ export const NAVIGATION_SECTIONS = {
   },
   contentManagement: {
     label: "Blog Management",
-    items: ["myBlogs", "createBlog"],
+    items: ["myBlogs", "createBlog", "gallery"],
     showFor: ["author", "admin"],
   },
   admin: {
@@ -123,6 +131,7 @@ export const isRouteActive = (path, pathname) => {
     "/users",
     "/my-blogs",
     "/blogs/create",
+    "/gallery",
     "/comments",
     "/notifications",
   ];

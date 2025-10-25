@@ -59,6 +59,7 @@ const UserManagement = React.lazy(() =>
 const Analytics = React.lazy(() =>
   import("../features/user_management/Analytics")
 );
+const Gallery = React.lazy(() => import("../features/gallery/Gallery"));
 
 // ConditionalCategories component
 const ConditionalCategories = () => {
@@ -123,6 +124,7 @@ const AppRouter = () => {
                 <Route path="write-blog" element={<BlogForm />} />
                 <Route path="edit-blog/:slug" element={<BlogFormWrapper />} />
                 <Route path="editor/:id" element={<BlogFormWrapper />} />
+                <Route path="gallery" element={<Gallery />} />
                 <Route path="comments" element={<CommentManagement />} />
               </Route>
 
