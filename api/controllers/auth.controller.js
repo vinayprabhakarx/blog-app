@@ -22,6 +22,24 @@ import {
 // Promisify the jwt.sign function to use it with async/await
 const signJwt = promisify(jwt.sign);
 
+// Helper function to convert JWT_EXPIRE string to milliseconds
+const getMaxAgeFromJwtExpire = (jwtExpire) => {
+  const match = jwtExpire.match(/^(\d+)([smhd])$/);
+  if (!match) return 12 * 60 * 60 * 1000; // Default to 12 hours
+
+  const value = parseInt(match[1]);
+  const unit = match[2];
+
+  const multipliers = {
+    s: 1000, // seconds
+    m: 60 * 1000, // minutes
+    h: 60 * 60 * 1000, // hours
+    d: 24 * 60 * 60 * 1000, // days
+  };
+
+  return value * (multipliers[unit] || 1000);
+};
+
 // Enhanced helper function to generate and send a JWT response with cookies
 const sendTokenResponse = async (
   res,
@@ -39,17 +57,18 @@ const sendTokenResponse = async (
   };
 
   try {
+    const jwtExpire = process.env.JWT_EXPIRE || "12h";
     const token = await signJwt(payload, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRE || "7d",
+      expiresIn: jwtExpire,
     });
 
-    // Set HTTP-only cookie
+    // Set HTTP-only cookie with maxAge matching JWT expiration
     res.cookie("access_token", token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "None" : "strict",
       path: "/",
-      maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+      maxAge: getMaxAgeFromJwtExpire(jwtExpire),
     });
 
     // Prepare safe user object

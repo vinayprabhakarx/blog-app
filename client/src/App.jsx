@@ -4,20 +4,30 @@ import { NotificationProvider } from "./utils/NotificationContext";
 import AppRouter from "./utils/AppRouter";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { getCurrentUser } from "./features/auth/authSlice";
+import {
+  getCurrentUser,
+  initializationComplete,
+} from "./features/auth/authSlice";
 import "./index.css";
 import { useDispatch, useSelector } from "react-redux";
 
 // Initialize authentication state
 const AuthInitializer = ({ children }) => {
   const dispatch = useDispatch();
-  const { token, isAuthenticated, user } = useSelector((state) => state.auth);
+  const { token, initializing } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (token && (!user || !isAuthenticated)) {
-      dispatch(getCurrentUser());
+    // Only run once on mount
+    if (initializing) {
+      if (token) {
+        // Verify the token by fetching current user
+        dispatch(getCurrentUser());
+      } else {
+        // No token, mark initialization complete
+        dispatch(initializationComplete());
+      }
     }
-  }, [dispatch, token, isAuthenticated, user]);
+  }, [dispatch, token, initializing]);
 
   return children;
 };

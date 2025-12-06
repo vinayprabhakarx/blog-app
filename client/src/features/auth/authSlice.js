@@ -87,6 +87,7 @@ const authSlice = createSlice({
     token: localStorage.getItem("token"),
     isAuthenticated: !!localStorage.getItem("token"),
     loading: false,
+    initializing: true,
     error: null,
     passwordChangeLoading: false,
     passwordChangeSuccess: false,
@@ -107,6 +108,9 @@ const authSlice = createSlice({
     clearPasswordChangeStatus: (state) => {
       state.passwordChangeSuccess = false;
       state.passwordChangeLoading = false;
+    },
+    initializationComplete: (state) => {
+      state.initializing = false;
     },
     updateUserProfile: (state, action) => {
       if (state.user) {
@@ -209,11 +213,13 @@ const authSlice = createSlice({
         };
         state.user = transformedUser;
         state.isAuthenticated = true;
+        state.initializing = false;
       })
       .addCase(getCurrentUser.rejected, (state) => {
         state.user = null;
         state.isAuthenticated = false;
         state.token = null;
+        state.initializing = false;
       });
 
     // Change Password
@@ -238,6 +244,7 @@ export const {
   clearError,
   clearPasswordChangeStatus,
   updateUserProfile,
+  initializationComplete,
 } = authSlice.actions;
 
 // Selectors
