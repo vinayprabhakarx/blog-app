@@ -618,7 +618,6 @@ export const getMonthlyPerformance = async (req, res, next) => {
             month: { $month: "$createdAt" },
           },
           totalViews: { $sum: { $ifNull: ["$activity.total_reads", 0] } },
-          totalLikes: { $sum: { $ifNull: ["$likes", 0] } },
           blogCount: { $sum: 1 },
         },
       },
@@ -677,7 +676,6 @@ export const getMonthlyPerformance = async (req, res, next) => {
         users: registration?.count || 0,
         comments: comments?.count || 0,
         blogs: blogData?.blogCount || 0,
-        likes: blogData?.totalLikes || 0,
       };
     });
 

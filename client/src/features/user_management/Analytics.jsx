@@ -44,7 +44,6 @@ const Analytics = () => {
 
   const [analytics, setAnalytics] = useState({
     totalViews: 0,
-    totalLikes: 0,
     totalComments: 0,
     totalUsers: 0,
     totalBlogs: 0,
@@ -78,7 +77,6 @@ const Analytics = () => {
       const state = store.getState();
       setAnalytics({
         totalViews: state.user.adminStats?.totalViews || 0,
-        totalLikes: state.user.adminStats?.totalLikes || 0,
         totalComments: state.user.adminStats?.totalComments || 0,
         totalUsers: state.user.adminStats?.totalUsers || 0,
         totalBlogs: state.user.adminStats?.totalBlogs || 0,
@@ -112,12 +110,6 @@ const Analytics = () => {
         0
       );
 
-      // Calculate total likes (estimate based on blogs)
-      const totalLikes = blogs.reduce(
-        (sum, blog) => sum + (blog.likes || 0),
-        0
-      );
-
       // Process monthly registrations for trends
       const monthlyRegistrations = adminStats.monthlyRegistrations || [];
       const recentMonths = monthlyRegistrations.slice(-4); // Last 4 months
@@ -148,7 +140,6 @@ const Analytics = () => {
 
       setAnalytics({
         totalViews,
-        totalLikes,
         totalComments: adminStats.totalComments,
         totalUsers: adminStats.totalUsers,
         totalBlogs: adminStats.totalBlogs,
@@ -196,18 +187,12 @@ const Analytics = () => {
         </div>
 
         {/* Main Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <StatCard
             icon={Eye}
             title="Total Views"
             value={analytics.totalViews}
             color="blue"
-          />
-          <StatCard
-            icon={Heart}
-            title="Total Likes"
-            value={analytics.totalLikes}
-            color="red"
           />
           <StatCard
             icon={MessageSquare}

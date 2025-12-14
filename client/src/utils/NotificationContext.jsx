@@ -41,30 +41,39 @@ export const NotificationProvider = ({ children }) => {
       return;
     }
 
+    let isMounted = true;
     setIsPolling(true);
+
     const pollInterval = setInterval(async () => {
+      if (!isMounted) return;
+
       try {
         const unreadResponse = await notificationService.getUnreadCount();
         const currentUnreadCount = unreadResponse.unreadCount;
 
-        if (currentUnreadCount !== unreadCount) {
+        if (isMounted && currentUnreadCount !== unreadCount) {
           await Promise.allSettled([
             dispatch(fetchNotifications()),
             dispatch(getNotificationSummary()),
           ]);
         }
 
-        setLastUpdate(new Date());
+        if (isMounted) {
+          setLastUpdate(new Date());
+        }
       } catch (error) {
-        console.error("Error polling notifications:", error);
+        if (isMounted) {
+          console.error("Error polling notifications:", error);
+        }
       }
-    }, 10000);
+    }, 30000); // Increased to 30 seconds to reduce API calls
 
     return () => {
+      isMounted = false;
       clearInterval(pollInterval);
       setIsPolling(false);
     };
-  }, [isAuthenticated, user, unreadCount, dispatch]);
+  }, [isAuthenticated, user, dispatch]);
 
   const markAsRead = useCallback(
     async (notificationId) => {

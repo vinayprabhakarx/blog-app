@@ -92,28 +92,41 @@ const HomePage = React.memo(() => {
   }, [dispatch, hasFetchedCategories]);
 
   useEffect(() => {
-    // Handle search queries
-    if (isSearchMode) {
-      const searchParams = {
-        page: currentPage,
-        limit: postsPerPage,
-      };
+    let isMounted = true;
 
-      dispatch(searchBlogs({ query: urlParams.search, params: searchParams }));
-      return;
-    }
+    const fetchData = async () => {
+      if (!isMounted) return;
 
-    // Only fetch blogs if categories have been loaded
-    if (!hasFetchedCategories) {
-      return;
-    }
+      // Handle search queries
+      if (isSearchMode) {
+        const searchParams = {
+          page: currentPage,
+          limit: postsPerPage,
+        };
 
-    // Use memoized parameters for blog fetching
-    dispatch(fetchAllBlogs(blogFetchParams));
+        dispatch(
+          searchBlogs({ query: urlParams.search, params: searchParams })
+        );
+        return;
+      }
+
+      // Only fetch blogs if categories have been loaded
+      if (!hasFetchedCategories) {
+        return;
+      }
+
+      // Use memoized parameters for blog fetching
+      dispatch(fetchAllBlogs(blogFetchParams));
+    };
+
+    fetchData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [
     dispatch,
     blogFetchParams,
-    categories,
     isSearchMode,
     urlParams.search,
     currentPage,

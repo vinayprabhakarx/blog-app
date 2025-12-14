@@ -54,12 +54,24 @@ const BlogPage = () => {
   };
 
   useEffect(() => {
-    if (id) {
-      // Fetch by ID (for notifications or preview mode)
-      dispatch(fetchBlogById(id));
-    } else if (slug) {
-      dispatch(fetchBlogBySlug(slug));
-    }
+    let isMounted = true;
+
+    const fetchBlog = async () => {
+      if (isMounted) {
+        if (id) {
+          // Fetch by ID (for notifications or preview mode)
+          dispatch(fetchBlogById(id));
+        } else if (slug) {
+          dispatch(fetchBlogBySlug(slug));
+        }
+      }
+    };
+
+    fetchBlog();
+
+    return () => {
+      isMounted = false;
+    };
   }, [slug, id, dispatch]);
 
   // Initialize like data when blog is loaded
