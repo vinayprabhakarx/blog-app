@@ -231,14 +231,3 @@ export const useCommentWithLikes = (commentId) => {
     toggleLike: handleToggleLike,
   };
 };
-
-// Gallery hooks
-export const useGallery = () => {
-  const dispatch = useAppDispatch();
-  const gallery = useAppSelector((state) => state.gallery);
-
-  return {
-    ...gallery,
-    dispatch,
-  };
-};
