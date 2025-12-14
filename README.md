@@ -7,8 +7,6 @@ The app provides authentication, blog publishing, comments, likes, notifications
 
 </div>
 
----
-
 ## Table of Contents
 
 - [Features](#features)
