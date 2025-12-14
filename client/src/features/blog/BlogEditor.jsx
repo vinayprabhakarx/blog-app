@@ -1,4 +1,10 @@
-import React, { useState, useRef } from "react";
+import React, {
+  useState,
+  useRef,
+  useCallback,
+  useMemo,
+  useEffect,
+} from "react";
 import {
   Eye,
   EyeOff,
@@ -26,7 +32,7 @@ import MdRenderCardWrapper from "./MdRenderCardWrapper";
 import { useTheme } from "../../utils/ThemeContext";
 import ImageCropper from "../../components/common/ImageCropper";
 import { showToast } from "../../utils/showToast";
-const ToolButton = ({ onClick, title, children }) => (
+const ToolButton = React.memo(({ onClick, title, children }) => (
   <button
     type="button"
     onClick={onClick}
@@ -39,7 +45,7 @@ const ToolButton = ({ onClick, title, children }) => (
   >
     {children}
   </button>
-);
+));
 
 const BlogEditor = ({
   value = "",
@@ -47,6 +53,7 @@ const BlogEditor = ({
   height = 500,
   placeholder = "Write your blog content using Markdown...",
   className = "",
+  autoSaveKey = "blog-draft-content", // Unique key for localStorage
 }) => {
   const { theme } = useTheme();
   const [viewMode, setViewMode] = useState("split");
@@ -55,62 +62,121 @@ const BlogEditor = ({
   const [selectedImageForCrop, setSelectedImageForCrop] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const textareaRef = useRef(null);
+  const autoSaveTimerRef = useRef(null);
 
-  const handleChange = (e) => {
-    if (onChange) {
-      onChange(e.target.value);
+  // Auto-save content to localStorage with debouncing
+  useEffect(() => {
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
     }
-  };
+
+    autoSaveTimerRef.current = setTimeout(() => {
+      if (value && value.trim()) {
+        localStorage.setItem(autoSaveKey, value);
+        localStorage.setItem(`${autoSaveKey}-timestamp`, Date.now().toString());
+      }
+    }, 1000); // Save after 1 second of inactivity
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [value, autoSaveKey]);
+
+  const handleChange = useCallback(
+    (e) => {
+      if (onChange) {
+        onChange(e.target.value);
+      }
+    },
+    [onChange]
+  );
 
   // Insert text at cursor position with proper cursor placement
-  const insertAtCursor = (before, after = "", placeholder = "") => {
-    const textarea = textareaRef.current;
-    if (!textarea) return;
+  const insertAtCursor = useCallback(
+    (before, after = "", placeholder = "") => {
+      const textarea = textareaRef.current;
+      if (!textarea) return;
 
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = value.substring(start, end);
-    const textToInsert = selectedText || placeholder;
+      const start = textarea.selectionStart;
+      const end = textarea.selectionEnd;
+      const selectedText = value.substring(start, end);
+      const textToInsert = selectedText || placeholder;
 
-    const newValue =
-      value.substring(0, start) +
-      before +
-      textToInsert +
-      after +
-      value.substring(end);
+      const newValue =
+        value.substring(0, start) +
+        before +
+        textToInsert +
+        after +
+        value.substring(end);
 
-    if (onChange) {
-      onChange(newValue);
-    }
+      if (onChange) {
+        onChange(newValue);
+      }
 
-    // Set cursor position after insertion
-    setTimeout(() => {
-      const newPosition = start + before.length + textToInsert.length;
-      textarea.setSelectionRange(newPosition, newPosition);
-      textarea.focus();
-    }, 0);
-  };
+      // Set cursor position after insertion
+      setTimeout(() => {
+        const newPosition = start + before.length + textToInsert.length;
+        textarea.setSelectionRange(newPosition, newPosition);
+        textarea.focus();
+      }, 0);
+    },
+    [value, onChange]
+  );
 
-  // Formatting functions
-  const formatBold = () => insertAtCursor("**", "**", "bold text");
-  const formatItalic = () => insertAtCursor("*", "*", "italic text");
-  const formatStrikethrough = () =>
-    insertAtCursor("~~", "~~", "strikethrough text");
-  const formatInlineCode = () => insertAtCursor("`", "`", "code");
-  const formatH1 = () => insertAtCursor("# ", "", "Heading 1");
-  const formatH2 = () => insertAtCursor("## ", "", "Heading 2");
-  const formatH3 = () => insertAtCursor("### ", "", "Heading 3");
-  const formatQuote = () => insertAtCursor("> ", "", "Quote text");
-  const formatUnorderedList = () => insertAtCursor("- ", "", "List item");
-  const formatOrderedList = () => insertAtCursor("1. ", "", "List item");
-  const formatHorizontalRule = () => insertAtCursor("\n---\n", "", "");
+  // Formatting functions (memoized)
+  const formatBold = useCallback(
+    () => insertAtCursor("**", "**", "bold text"),
+    [insertAtCursor]
+  );
+  const formatItalic = useCallback(
+    () => insertAtCursor("*", "*", "italic text"),
+    [insertAtCursor]
+  );
+  const formatStrikethrough = useCallback(
+    () => insertAtCursor("~~", "~~", "strikethrough text"),
+    [insertAtCursor]
+  );
+  const formatInlineCode = useCallback(
+    () => insertAtCursor("`", "`", "code"),
+    [insertAtCursor]
+  );
+  const formatH1 = useCallback(
+    () => insertAtCursor("# ", "", "Heading 1"),
+    [insertAtCursor]
+  );
+  const formatH2 = useCallback(
+    () => insertAtCursor("## ", "", "Heading 2"),
+    [insertAtCursor]
+  );
+  const formatH3 = useCallback(
+    () => insertAtCursor("### ", "", "Heading 3"),
+    [insertAtCursor]
+  );
+  const formatQuote = useCallback(
+    () => insertAtCursor("> ", "", "Quote text"),
+    [insertAtCursor]
+  );
+  const formatUnorderedList = useCallback(
+    () => insertAtCursor("- ", "", "List item"),
+    [insertAtCursor]
+  );
+  const formatOrderedList = useCallback(
+    () => insertAtCursor("1. ", "", "List item"),
+    [insertAtCursor]
+  );
+  const formatHorizontalRule = useCallback(
+    () => insertAtCursor("\n---\n", "", ""),
+    [insertAtCursor]
+  );
 
-  const formatLink = () => {
+  const formatLink = useCallback(() => {
     const url = prompt("Enter URL:");
     if (url) {
       insertAtCursor("[", `](${url})`, "link text");
     }
-  };
+  }, [insertAtCursor]);
 
   const formatImage = () => {
     // Create a file input element
@@ -269,8 +335,8 @@ const BlogEditor = ({
     }
   };
 
-  // Extract image URLs from markdown content
-  const getImagesFromContent = () => {
+  // Extract image URLs from markdown content (memoized)
+  const getImagesFromContent = useCallback(() => {
     const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
     const images = [];
     let match;
@@ -282,31 +348,31 @@ const BlogEditor = ({
       });
     }
     return images;
-  };
+  }, [value]);
 
-  const formatCodeBlock = () => {
+  const formatCodeBlock = useCallback(() => {
     const language = prompt("Enter language (optional):") || "";
     insertAtCursor("\n```" + language + "\n", "\n```\n", "Your code here");
-  };
+  }, [insertAtCursor]);
 
-  const formatTable = () => {
+  const formatTable = useCallback(() => {
     const tableTemplate =
       "\n| Header 1 | Header 2 | Header 3 |\n|----------|----------|----------|\n| Cell 1   | Cell 2   | Cell 3   |\n| Cell 4   | Cell 5   | Cell 6   |\n";
     insertAtCursor(tableTemplate, "", "");
-  };
+  }, [insertAtCursor]);
 
-  const toggleViewMode = () => {
+  const toggleViewMode = useCallback(() => {
     const modes = ["edit", "split", "preview"];
     const currentIndex = modes.indexOf(viewMode);
     const nextIndex = (currentIndex + 1) % modes.length;
     setViewMode(modes[nextIndex]);
-  };
+  }, [viewMode]);
 
-  const toggleFullscreen = () => {
+  const toggleFullscreen = useCallback(() => {
     setIsFullscreen(!isFullscreen);
-  };
+  }, [isFullscreen]);
 
-  const getViewModeIcon = () => {
+  const getViewModeIcon = useMemo(() => {
     switch (viewMode) {
       case "edit":
         return <Type className="w-3 h-3 sm:w-4 sm:h-4" />;
@@ -317,20 +383,23 @@ const BlogEditor = ({
       default:
         return <Type className="w-3 h-3 sm:w-4 sm:h-4" />;
     }
-  };
+  }, [viewMode]);
 
-  const editorStyle = {
-    height: isFullscreen ? "100vh" : `${height}px`,
-    border: "1px solid var(--border)",
-    borderRadius: "8px",
-    overflow: "hidden",
-    backgroundColor: "var(--card)",
-    position: isFullscreen ? "fixed" : "relative",
-    top: isFullscreen ? "0" : "auto",
-    left: isFullscreen ? "0" : "auto",
-    width: isFullscreen ? "100vw" : "100%",
-    zIndex: isFullscreen ? 9999 : "auto",
-  };
+  const editorStyle = useMemo(
+    () => ({
+      height: isFullscreen ? "100vh" : `${height}px`,
+      border: "1px solid var(--border)",
+      borderRadius: "8px",
+      overflow: "hidden",
+      backgroundColor: "var(--card)",
+      position: isFullscreen ? "fixed" : "relative",
+      top: isFullscreen ? "0" : "auto",
+      left: isFullscreen ? "0" : "auto",
+      width: isFullscreen ? "100vw" : "100%",
+      zIndex: isFullscreen ? 9999 : "auto",
+    }),
+    [isFullscreen, height]
+  );
 
   return (
     <div
@@ -452,7 +521,7 @@ const BlogEditor = ({
               color: "var(--accent-foreground)",
             }}
           >
-            {getViewModeIcon()}
+            {getViewModeIcon}
             <span className="capitalize hidden sm:inline">{viewMode}</span>
           </button>
 

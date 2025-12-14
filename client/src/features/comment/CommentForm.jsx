@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useDispatch } from "react-redux";
 import { Send, AtSign } from "lucide-react";
 import { cn } from "@/lib/utils";
@@ -12,6 +12,10 @@ import {
   clearUpdateError,
 } from "./commentsSlice";
 
+// Cache for user search results to avoid redundant API calls
+const userSearchCache = new Map();
+const CACHE_EXPIRY = 5 * 60 * 1000; // 5 minutes
+
 const CommentForm = ({
   blogId,
   parentId = null,
@@ -23,7 +27,6 @@ const CommentForm = ({
   onSuccess = null,
 }) => {
   const dispatch = useDispatch();
-  // Removed loading selectors for instant UI updates
 
   const [content, setContent] = useState(initialContent);
   const [userSuggestions, setUserSuggestions] = useState([]);
@@ -31,8 +34,9 @@ const CommentForm = ({
   const [selectedSuggestionIndex, setSelectedSuggestionIndex] = useState(-1);
   const [mentionStartPos, setMentionStartPos] = useState(-1);
   const textareaRef = useRef(null);
+  const debounceTimerRef = useRef(null);
+  const abortControllerRef = useRef(null);
 
-  // Removed loading states for instant UI updates
   const isValid = content.trim().length > 0 && content.trim().length <= 1000;
 
   useEffect(() => {
@@ -47,32 +51,91 @@ const CommentForm = ({
     }
   }, [dispatch, mode, commentId]);
 
-  // Handle user search for mentions
-  const searchUsers = async (query) => {
+  // Cleanup on unmount
+  useEffect(() => {
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+      if (abortControllerRef.current) {
+        abortControllerRef.current.abort();
+      }
+    };
+  }, []);
+
+  // Handle user search for mentions with caching and debouncing
+  const searchUsers = useCallback(async (query) => {
     if (query.length < 1) {
       setUserSuggestions([]);
       setShowSuggestions(false);
       return;
     }
 
+    // Check cache first
+    const cacheKey = query.toLowerCase();
+    const cachedResult = userSearchCache.get(cacheKey);
+
+    if (cachedResult && Date.now() - cachedResult.timestamp < CACHE_EXPIRY) {
+      setUserSuggestions(cachedResult.users);
+      setShowSuggestions(true);
+      setSelectedSuggestionIndex(-1);
+      return;
+    }
+
+    // Cancel previous request
+    if (abortControllerRef.current) {
+      abortControllerRef.current.abort();
+    }
+
     try {
-      const result = await commentService.searchUsers(query);
-      setUserSuggestions(result.users || []);
+      abortControllerRef.current = new AbortController();
+      const result = await commentService.searchUsers(
+        query,
+        abortControllerRef.current.signal
+      );
+
+      // Remove duplicates by user ID and limit to top 3 results
+      const uniqueUsers = (result.users || []).filter(
+        (user, index, self) =>
+          index === self.findIndex((u) => u._id === user._id)
+      );
+      const limitedUsers = uniqueUsers.slice(0, 3);
+
+      // Cache the result
+      userSearchCache.set(cacheKey, {
+        users: limitedUsers,
+        timestamp: Date.now(),
+      });
+
+      // Clear old cache entries if cache gets too large
+      if (userSearchCache.size > 50) {
+        const oldestKey = userSearchCache.keys().next().value;
+        userSearchCache.delete(oldestKey);
+      }
+
+      setUserSuggestions(limitedUsers);
       setShowSuggestions(true);
       setSelectedSuggestionIndex(-1);
     } catch (error) {
-      console.error("Error searching users:", error);
-      setUserSuggestions([]);
-      setShowSuggestions(false);
+      if (error.name !== "AbortError") {
+        console.error("Error searching users:", error);
+        setUserSuggestions([]);
+        setShowSuggestions(false);
+      }
     }
-  };
+  }, []);
 
-  // Handle content change with mention detection
+  // Handle content change with mention detection and debouncing
   const handleContentChange = (e) => {
     const newContent = e.target.value;
     const cursorPos = e.target.selectionStart;
 
     setContent(newContent);
+
+    // Clear existing debounce timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
 
     // Detect @ mentions for user suggestions
     const textUpToCursor = newContent.substring(0, cursorPos);
@@ -85,7 +148,18 @@ const CommentForm = ({
         const mentionQuery = textUpToCursor.substring(lastAtPos + 1);
         if (!mentionQuery.includes(" ") && !mentionQuery.includes("\n")) {
           setMentionStartPos(lastAtPos);
-          searchUsers(mentionQuery);
+
+          // Show @ and wait for user to type
+          if (mentionQuery.length === 0) {
+            setShowSuggestions(true);
+            setUserSuggestions([]);
+            return;
+          }
+
+          // Debounce API call by 300ms to reduce requests
+          debounceTimerRef.current = setTimeout(() => {
+            searchUsers(mentionQuery);
+          }, 300);
           return;
         }
       }
@@ -241,40 +315,43 @@ const CommentForm = ({
       </div>
 
       {/* User Suggestions Dropdown */}
-      {showSuggestions && userSuggestions.length > 0 && (
+      {showSuggestions && (
         <div className="absolute top-full left-0 right-0 z-50 mt-1 bg-background border border-border rounded-lg shadow-lg max-h-48 overflow-y-auto">
-          {userSuggestions.map((user, index) => (
-            <div
-              key={user._id}
-              className={cn(
-                "flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-muted transition-colors",
-                selectedSuggestionIndex === index && "bg-muted"
-              )}
-              onClick={() => selectSuggestion(user)}
-            >
-              <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium">
-                {user.personal_info?.profile_img ? (
-                  <img
-                    src={user.personal_info.profile_img}
-                    alt={user.personal_info?.username || "User"}
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                ) : (
-                  <AtSign className="w-4 h-4" />
-                )}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-medium text-sm">
-                  @{user.personal_info?.username || "unknown"}
-                </div>
-                {user.personal_info?.username && (
-                  <div className="text-xs text-muted-foreground">
-                    @{user.personal_info.username}
-                  </div>
-                )}
-              </div>
+          {userSuggestions.length === 0 ? (
+            <div className="px-3 py-2 text-sm text-muted-foreground flex items-center gap-2">
+              <AtSign className="w-4 h-4" />
+              <span>Type to search users...</span>
             </div>
-          ))}
+          ) : (
+            userSuggestions.map((user, index) => (
+              <div
+                key={user._id}
+                className={cn(
+                  "flex items-center gap-3 px-3 py-2 cursor-pointer hover:bg-muted transition-colors",
+                  selectedSuggestionIndex === index && "bg-muted"
+                )}
+                onClick={() => selectSuggestion(user)}
+              >
+                <div className="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium">
+                  {user.personal_info?.profile_img ? (
+                    <img
+                      src={user.personal_info.profile_img}
+                      alt={user.personal_info?.username || "User"}
+                      className="w-8 h-8 rounded-full object-cover"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <AtSign className="w-4 h-4" />
+                  )}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <div className="font-medium text-sm truncate break-all">
+                    @{user.personal_info?.username || "unknown"}
+                  </div>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       )}
     </form>

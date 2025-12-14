@@ -75,6 +75,28 @@ const BlogForm = ({ existingBlog }) => {
       if (existingBlog.banner) {
         setPreview(existingBlog.banner);
       }
+    } else {
+      // For new blogs, try to restore from localStorage
+      const savedContent = localStorage.getItem("blog-draft-content");
+      const savedTimestamp = localStorage.getItem(
+        "blog-draft-content-timestamp"
+      );
+
+      if (savedContent && savedTimestamp) {
+        const hoursSinceLastSave =
+          (Date.now() - parseInt(savedTimestamp)) / (1000 * 60 * 60);
+
+        // Only restore if saved within last 24 hours
+        if (hoursSinceLastSave < 24) {
+          // Automatically restore without confirmation
+          setFormData((prev) => ({ ...prev, content: savedContent }));
+          showToast("success", "Draft content restored!");
+        } else {
+          // Auto-clear old drafts
+          localStorage.removeItem("blog-draft-content");
+          localStorage.removeItem("blog-draft-content-timestamp");
+        }
+      }
     }
   }, [existingBlog]);
 
@@ -207,6 +229,9 @@ const BlogForm = ({ existingBlog }) => {
           tags: "",
           draft: false,
         });
+        // Clear auto-saved content after successful submission
+        localStorage.removeItem("blog-draft-content");
+        localStorage.removeItem("blog-draft-content-timestamp");
       }
       setFormErrors({});
       setFile(null);
@@ -571,18 +596,56 @@ const BlogForm = ({ existingBlog }) => {
             </div>
 
             {/* Draft Toggle */}
-            <div className="flex items-center mb-4">
-              <input
-                type="checkbox"
-                id="draft"
-                checked={formData.draft}
-                onChange={handleToggleDraft}
-                disabled={isEditing ? updateLoading : createLoading}
-                className="mr-2 h-4 w-4 text-primary focus:ring-primary border-input rounded cursor-pointer"
-              />
-              <label htmlFor="draft" className="text-sm text-foreground">
-                Save as Draft
-              </label>
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center">
+                <input
+                  type="checkbox"
+                  id="draft"
+                  checked={formData.draft}
+                  onChange={handleToggleDraft}
+                  disabled={isEditing ? updateLoading : createLoading}
+                  className="mr-2 h-4 w-4 text-primary focus:ring-primary border-input rounded cursor-pointer"
+                />
+                <label htmlFor="draft" className="text-sm text-foreground">
+                  Save as Draft
+                </label>
+              </div>
+
+              {!isEditing && (
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (
+                      window.confirm(
+                        "Are you sure you want to clear the form? All unsaved content will be lost."
+                      )
+                    ) {
+                      setFormData({
+                        category: "",
+                        title: "",
+                        slug: "",
+                        content: "",
+                        excerpt: "",
+                        tags: "",
+                        draft: false,
+                      });
+                      setFormErrors({});
+                      setFile(null);
+                      setCroppedFile(null);
+                      setPreview(null);
+                      localStorage.removeItem("blog-draft-content");
+                      localStorage.removeItem("blog-draft-content-timestamp");
+                      showToast("success", "Form cleared successfully!");
+                    }
+                  }}
+                  className="text-sm text-destructive hover:underline cursor-pointer"
+                  disabled={
+                    (isEditing ? updateLoading : createLoading) || submitSuccess
+                  }
+                >
+                  Clear Form
+                </button>
+              )}
             </div>
 
             <LoadingButton

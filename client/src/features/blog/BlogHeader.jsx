@@ -25,75 +25,55 @@ const handlePrint = () => {
   window.print();
 };
 
-const BlogHeader = React.memo(({ blog, onCommentClick }) => {
+const BlogHeader = ({ blog, onCommentClick }) => {
   const [isShareDropdownOpen, setIsShareDropdownOpen] = useState(false);
   const [hoverTimeout, setHoverTimeout] = useState(null);
   const shareButtonRef = useRef(null);
 
-  // Use custom hook for optimized like functionality - memoized with blog ID
-  const blogId = useMemo(() => blog?._id, [blog?._id]);
+  // Use custom hook for optimized like functionality
+  const blogId = blog?._id;
   const likeButtonState = useBlogLike(blogId, blog?.category);
   const { user } = useSelector((state) => state.auth);
 
-  // Memoize computed values
-  const isAdmin = useMemo(() => user?.role === "admin", [user?.role]);
-  const currentUserId = useMemo(
-    () => user?._id || user?.id,
-    [user?._id, user?.id]
-  );
-  const blogAuthorId = useMemo(
-    () => blog?.author?._id || blog?.author?.id || blog?.author || null,
-    [blog?.author]
-  );
-  const isAuthorOfBlog = useMemo(
-    () =>
-      currentUserId &&
-      blogAuthorId &&
-      String(blogAuthorId) === String(currentUserId),
-    [currentUserId, blogAuthorId]
-  );
-  const canEdit = useMemo(
-    () => Boolean(isAdmin || isAuthorOfBlog),
-    [isAdmin, isAuthorOfBlog]
-  );
+  // Computed values
+  const isAdmin = user?.role === "admin";
+  const currentUserId = user?._id || user?.id;
+  const blogAuthorId =
+    blog?.author?._id || blog?.author?.id || blog?.author || null;
+  const isAuthorOfBlog =
+    currentUserId &&
+    blogAuthorId &&
+    String(blogAuthorId) === String(currentUserId);
+  const canEdit = Boolean(isAdmin || isAuthorOfBlog);
 
-  // Memoize data objects and computed values
-  const blogMetadata = useMemo(
-    () => ({
-      title: blog?.title || "",
-      createdAt: blog?.createdAt,
-      content: blog?.content,
-      banner: blog?.banner,
-      tags: blog?.tags || [],
-      slug: blog?.slug,
-      draft: blog?.draft,
-      excerpt: blog?.excerpt,
-      category: blog?.category,
-    }),
-    [blog]
-  );
+  // Data objects and computed values
+  const blogMetadata = {
+    title: blog?.title || "",
+    createdAt: blog?.createdAt,
+    content: blog?.content,
+    banner: blog?.banner,
+    tags: blog?.tags || [],
+    slug: blog?.slug,
+    draft: blog?.draft,
+    excerpt: blog?.excerpt,
+    category: blog?.category,
+  };
 
-  const authorInfo = useMemo(
-    () => ({
-      username:
-        blog?.author?.personal_info?.username ||
-        blog?.authorInfo?.username ||
-        "vinayprabhakarx",
-      profileImg:
-        blog?.author?.personal_info?.profile_img ||
-        blog?.author?.avatar ||
-        blog?.authorInfo?.profile_img,
-    }),
-    [blog?.author, blog?.authorInfo]
-  );
+  const authorInfo = {
+    username:
+      blog?.author?.personal_info?.username ||
+      blog?.authorInfo?.username ||
+      "vinayprabhakarx",
+    profileImg:
+      blog?.author?.personal_info?.profile_img ||
+      blog?.author?.avatar ||
+      blog?.authorInfo?.profile_img,
+  };
 
-  const activityStats = useMemo(
-    () => ({
-      totalReads: blog?.activity?.total_reads || 0,
-      totalComments: blog?.activity?.total_comments || 0,
-    }),
-    [blog?.activity]
-  );
+  const activityStats = {
+    totalReads: blog?.activity?.total_reads || 0,
+    totalComments: blog?.activity?.total_comments || 0,
+  };
 
   // Memoize utility functions
   const formatDate = useCallback((date, short = false) => {
@@ -228,22 +208,18 @@ const BlogHeader = React.memo(({ blog, onCommentClick }) => {
     [onCommentClick]
   );
 
-  // Memoize inline styles to prevent re-creation
-  const containerStyle = useMemo(
-    () => ({
-      maxWidth: window.innerWidth < 768 ? "100%" : "800px",
-      margin: window.innerWidth < 768 ? 0 : "0 auto",
-    }),
-    []
-  );
+  // Inline styles
+  const containerStyle = {
+    maxWidth: window.innerWidth < 768 ? "100%" : "800px",
+    margin: window.innerWidth < 768 ? 0 : "0 auto",
+  };
 
-  // Memoize image source with error handling
-  const bannerImageSrc = useMemo(() => {
-    if (!blogMetadata.banner) return null;
-    return blogMetadata.banner.startsWith("http")
-      ? blogMetadata.banner
-      : `/api${blogMetadata.banner}`;
-  }, [blogMetadata.banner]);
+  // Image source with error handling
+  const bannerImageSrc = !blogMetadata.banner
+    ? null
+    : blogMetadata.banner.startsWith("http")
+    ? blogMetadata.banner
+    : `/api${blogMetadata.banner}`;
 
   // Memoize image error handler
   const handleImageError = useCallback((e) => {
@@ -372,23 +348,8 @@ const BlogHeader = React.memo(({ blog, onCommentClick }) => {
       </div>
     </div>
   );
-});
+};
 
 BlogHeader.displayName = "BlogHeader";
 
-// Add a custom comparison function to prevent unnecessary re-renders
-const arePropsEqual = (prevProps, nextProps) => {
-  // Only re-render if blog ID, title, or like-related activity changes
-  return (
-    prevProps.blog?._id === nextProps.blog?._id &&
-    prevProps.blog?.title === nextProps.blog?.title &&
-    prevProps.blog?.activity?.total_likes ===
-      nextProps.blog?.activity?.total_likes &&
-    prevProps.blog?.createdAt === nextProps.blog?.createdAt &&
-    prevProps.blog?.excerpt === nextProps.blog?.excerpt &&
-    prevProps.blog?.banner === nextProps.blog?.banner &&
-    prevProps.onCommentClick === nextProps.onCommentClick
-  );
-};
-
-export default React.memo(BlogHeader, arePropsEqual);
+export default BlogHeader;

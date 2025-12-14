@@ -106,9 +106,10 @@ const commentService = {
   },
 
   // Search users by username for tagging
-  searchUsers: async (query) => {
+  searchUsers: async (query, signal) => {
     const response = await api.get(
-      `/comments/search-users/${encodeURIComponent(query)}`
+      `/comments/search-users/${encodeURIComponent(query)}?limit=3`,
+      { signal }
     );
     return response.data;
   },

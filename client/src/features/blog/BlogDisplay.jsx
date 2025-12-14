@@ -1,32 +1,15 @@
-import React, { useMemo } from "react";
+import React from "react";
 
 import MdRenderCardWrapper from "./MdRenderCardWrapper";
 
-const BlogDisplay = React.memo(({ blog }) => {
-  // Memoize inline styles to prevent unnecessary re-renders
-  const containerStyle = useMemo(
-    () => ({
-      backgroundColor: "var(--background)",
-      color: "var(--foreground)",
-    }),
-    []
-  );
-
-  const footerStyle = useMemo(
-    () => ({
-      borderColor: "var(--border)",
-      color: "var(--muted-foreground)",
-    }),
-    []
-  );
-
-  // Memoize blog content to prevent unnecessary prop drilling
-  const blogContent = useMemo(() => blog?.content || "", [blog?.content]);
-
+const BlogDisplay = ({ blog }) => {
   return (
     <div
       className="w-full transition-colors duration-300"
-      style={containerStyle}
+      style={{
+        backgroundColor: "var(--background)",
+        color: "var(--foreground)",
+      }}
     >
       <article
         id="article"
@@ -37,16 +20,19 @@ const BlogDisplay = React.memo(({ blog }) => {
         }}
       >
         <div className="w-full">
-          <MdRenderCardWrapper content={blogContent} />
+          <MdRenderCardWrapper content={blog?.content || ""} />
         </div>
 
         <footer
           className="mt-12 pt-6 border-t w-full"
-          style={footerStyle}
+          style={{
+            borderColor: "var(--border)",
+            color: "var(--muted-foreground)",
+          }}
         ></footer>
       </article>
     </div>
   );
-});
+};
 
 export default BlogDisplay;

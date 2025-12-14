@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useCallback, useMemo } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { cn } from "@/lib/utils";
@@ -14,56 +14,44 @@ import BlogDisplay from "../features/blog/BlogDisplay";
 import { CommentSection } from "../features/comment";
 import NotFound from "../components/common/NotFound";
 
-const BlogPage = React.memo(() => {
+const BlogPage = () => {
   const { slug, id } = useParams();
   const { currentBlog, currentBlogError, dispatch } = useBlog();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const mainDispatch = useDispatch();
   const [showComments, setShowComments] = useState(false);
 
-  // Memoize blog data for stable references
-  const blogData = useMemo(
-    () => ({
-      id: currentBlog?._id,
-      title: currentBlog?.title,
-      category: currentBlog?.category,
-      author: currentBlog?.author,
-      activity: currentBlog?.activity,
-      draft: currentBlog?.draft,
-    }),
-    [currentBlog]
-  );
+  // Blog data for stable references
+  const blogData = {
+    id: currentBlog?._id,
+    title: currentBlog?.title,
+    category: currentBlog?.category,
+    author: currentBlog?.author,
+    activity: currentBlog?.activity,
+    draft: currentBlog?.draft,
+  };
 
-  // Memoize user authentication check
-  const isAuthorized = useMemo(() => {
-    if (!blogData.draft) return true;
-    if (!isAuthenticated || !user) return false;
-    return (
-      user.role === "admin" ||
-      (user._id || user.id) === (blogData.author?._id || blogData.author)
-    );
-  }, [blogData.draft, blogData.author, isAuthenticated, user]);
+  // User authentication check
+  const isAuthorized =
+    !blogData.draft ||
+    (isAuthenticated &&
+      user &&
+      (user.role === "admin" ||
+        (user._id || user.id) === (blogData.author?._id || blogData.author)));
 
-  // Memoize comment data
-  const commentData = useMemo(
-    () => ({
-      count: blogData.activity?.total_comments || 0,
-      categoryId:
-        blogData.category?._id || blogData.category || "uncategorized",
-    }),
-    [blogData.activity, blogData.category]
-  );
+  // Comment data
+  const commentData = {
+    count: blogData.activity?.total_comments || 0,
+    categoryId: blogData.category?._id || blogData.category || "uncategorized",
+  };
 
-  // Memoize breadcrumb data
-  const breadcrumbData = useMemo(
-    () => ({
-      categoryName:
-        blogData.category?.name || blogData.category?.slug || "Category",
-      categorySlug: blogData.category?.slug || blogData.category,
-      title: blogData.title,
-    }),
-    [blogData.category, blogData.title]
-  );
+  // Breadcrumb data
+  const breadcrumbData = {
+    categoryName:
+      blogData.category?.name || blogData.category?.slug || "Category",
+    categorySlug: blogData.category?.slug || blogData.category,
+    title: blogData.title,
+  };
 
   useEffect(() => {
     if (id) {
@@ -74,75 +62,53 @@ const BlogPage = React.memo(() => {
     }
   }, [slug, id, dispatch]);
 
-  // Memoize like data initialization to prevent unnecessary dispatches
-  const likeInitData = useMemo(() => {
-    if (!currentBlog?._id) return null;
-    return {
-      blogId: currentBlog._id,
-      likeCount: currentBlog.activity?.total_likes || 0,
-    };
-  }, [currentBlog?._id, currentBlog?.activity?.total_likes]);
-
-  // Memoize user authentication state for like initialization
-  const userAuthState = useMemo(
-    () => ({
-      isAuthenticated,
-      userId: user?._id || user?.id,
-    }),
-    [isAuthenticated, user?._id, user?.id]
-  );
-
-  // Initialize like data when blog is loaded (optimized to prevent unnecessary calls)
+  // Initialize like data when blog is loaded
   useEffect(() => {
-    if (likeInitData) {
-      const likeItems = [
-        {
-          id: likeInitData.blogId,
-          type: "blog",
-          count: likeInitData.likeCount,
-        },
-      ];
-      mainDispatch(setLikeData({ items: likeItems }));
+    if (!currentBlog?._id) return;
 
-      // Fetch user's like status if authenticated
-      if (userAuthState.isAuthenticated && userAuthState.userId) {
-        mainDispatch(
-          getUserLikeStatus({
-            likeableId: likeInitData.blogId,
-            onModel: "Blog",
-          })
-        );
-      }
+    const likeItems = [
+      {
+        id: currentBlog._id,
+        type: "blog",
+        count: currentBlog.activity?.total_likes || 0,
+      },
+    ];
+    mainDispatch(setLikeData({ items: likeItems }));
+
+    // Fetch user's like status if authenticated
+    if (isAuthenticated && (user?._id || user?.id)) {
+      mainDispatch(
+        getUserLikeStatus({
+          likeableId: currentBlog._id,
+          onModel: "Blog",
+        })
+      );
     }
-  }, [likeInitData, userAuthState, mainDispatch]);
+  }, [
+    currentBlog?._id,
+    currentBlog?.activity?.total_likes,
+    isAuthenticated,
+    user?._id,
+    user?.id,
+    mainDispatch,
+  ]);
 
-  // Memoize callback functions
-  const toggleComments = useCallback((e) => {
+  // Callback functions
+  const toggleComments = (e) => {
     e.preventDefault();
     e.stopPropagation();
     setShowComments((prev) => !prev);
-  }, []);
+  };
 
-  const handleCommentClick = useCallback(
-    (e) => {
-      e.preventDefault();
-      e.stopPropagation();
+  const handleCommentClick = (e) => {
+    e.preventDefault();
+    e.stopPropagation();
 
-      // Always show comments when clicked from header
-      if (!showComments) {
-        setShowComments(true);
-        // Scroll to comments after they're shown
-        setTimeout(() => {
-          const commentSection = document.getElementById("comment-section");
-          if (commentSection) {
-            commentSection.scrollIntoView({
-              behavior: "smooth",
-              block: "start",
-            });
-          }
-        }, 200);
-      } else {
-        // If comments are already shown, just scroll to them
+    // Always show comments when clicked from header
+    if (!showComments) {
+      setShowComments(true);
+      // Scroll to comments after they're shown
+      setTimeout(() => {
         const commentSection = document.getElementById("comment-section");
         if (commentSection) {
           commentSection.scrollIntoView({
@@ -150,10 +116,18 @@ const BlogPage = React.memo(() => {
             block: "start",
           });
         }
+      }, 200);
+    } else {
+      // If comments are already shown, just scroll to them
+      const commentSection = document.getElementById("comment-section");
+      if (commentSection) {
+        commentSection.scrollIntoView({
+          behavior: "smooth",
+          block: "start",
+        });
       }
-    },
-    [showComments]
-  );
+    }
+  };
 
   // Error state
   if (currentBlogError) {
@@ -281,9 +255,7 @@ const BlogPage = React.memo(() => {
       <BackToTopButton />
     </div>
   );
-});
-
-BlogPage.displayName = "BlogPage";
+};
 
 // Back to Top Button Component
 const BackToTopButton = React.memo(() => {

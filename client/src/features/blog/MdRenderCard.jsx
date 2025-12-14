@@ -144,8 +144,10 @@ const MarkdownImage = React.memo(({ src, alt, onDeleteImage, ...props }) => {
   );
 
   if (!onDeleteImage) {
-    // If no delete handler, render normal image
-    return <img src={src} alt={alt} style={imageStyle} {...props} />;
+    // If no delete handler, render normal image with lazy loading
+    return (
+      <img src={src} alt={alt} style={imageStyle} loading="lazy" {...props} />
+    );
   }
 
   return (
@@ -154,7 +156,7 @@ const MarkdownImage = React.memo(({ src, alt, onDeleteImage, ...props }) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <img src={src} alt={alt} style={imageStyle} {...props} />
+      <img src={src} alt={alt} style={imageStyle} loading="lazy" {...props} />
       <button
         type="button"
         onClick={handleDelete}
