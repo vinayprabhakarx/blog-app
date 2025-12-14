@@ -241,7 +241,8 @@ export const selectAllCategories = (state) => state.categories.categories;
 // Selector for fetched flag
 export const selectCategoriesFetched = (state) => state.categories.fetched;
 export const selectCategoriesLoading = (state) => state.categories.loading;
-export const selectCurrentCategory = (state) => state.categories.currentCategory;
+export const selectCurrentCategory = (state) =>
+  state.categories.currentCategory;
 export const selectCurrentCategoryLoading = (state) =>
   state.categories.currentCategoryLoading;
 export const selectCategoriesError = (state) => state.categories.error;
@@ -280,9 +281,11 @@ export const selectCategoriesWithBlogCount = createSelector(
 export const selectFeaturedCategories = createSelector(
   [(state) => state.categories.categories],
   (categories) =>
-    categories
-      .filter((category) => category.featured && category.articleCount > 0)
-      .slice(0, 5)
+    Array.isArray(categories)
+      ? categories
+          .filter((category) => category.featured && category.articleCount > 0)
+          .slice(0, 5)
+      : []
 );
 
 // Selector for all categories (including non-featured) for admin/dropdown use

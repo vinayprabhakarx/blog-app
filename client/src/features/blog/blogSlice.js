@@ -79,9 +79,7 @@ export const searchBlogs = createAsyncThunk(
       const data = await blogService.advancedSearch(query, params);
       return { ...data, searchQuery: query };
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Search failed"
-      );
+      return rejectWithValue(error.response?.data?.message || "Search failed");
     }
   }
 );
@@ -265,7 +263,9 @@ const blogSlice = createSlice({
       })
       .addCase(fetchAllBlogs.fulfilled, (state, action) => {
         state.allBlogsLoading = false;
-        state.allBlogs = action.payload.blogs || action.payload;
+        state.allBlogs =
+          action.payload.blogs ||
+          (Array.isArray(action.payload) ? action.payload : []);
         state.allBlogsPagination = action.payload.pagination;
       })
       .addCase(fetchAllBlogs.rejected, (state, action) => {
@@ -441,9 +441,9 @@ export const {
 } = blogSlice.actions;
 
 // Selectors
-export const selectAllBlogs = (state) => state.blog.allBlogs;
-export const selectMyBlogs = (state) => state.blog.myBlogs;
-export const selectAuthorBlogs = (state) => state.blog.authorBlogs;
+export const selectAllBlogs = (state) => state.blog.allBlogs || [];
+export const selectMyBlogs = (state) => state.blog.myBlogs || [];
+export const selectAuthorBlogs = (state) => state.blog.authorBlogs || [];
 export const selectCurrentBlog = (state) => state.blog.currentBlog;
 export const selectBlogFilters = (state) => state.blog.filters;
 export const selectBlogLoading = createSelector(
