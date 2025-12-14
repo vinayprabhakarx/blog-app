@@ -29,6 +29,8 @@ const corsOptions = {
 
     const allowedOrigins = [
       "https://blog.vinayprabhakar.dev",
+      "http://blog.vinayprabhakar.dev",
+      "https://www.vinayprabhakar.dev",
       "https://vinayprabhakar.dev",
       "http://localhost:5173",
     ];
