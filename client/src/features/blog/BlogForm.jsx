@@ -14,7 +14,6 @@ import BlogEditor from "./BlogEditor";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { createBlog, updateBlog } from "./blogSlice";
-import { FaPen } from "react-icons/fa";
 import { fetchAllCategories } from "../category/categoriesSlice";
 import { useCategories } from "../../hooks/useRedux";
 import LoadingButton from "../../components/common/LoadingButton";

@@ -4,7 +4,7 @@ import LoadingSpinner from "../../components/common/LoadingSpinner";
 // Lazy load the heavy markdown component
 const MdRenderCardLazy = React.lazy(() => import("./MdRenderCard"));
 
-const MdRenderCardWrapper = ({ content, ...props }) => {
+const MdRenderCardWrapper = ({ content, onDeleteImage, ...props }) => {
   return (
     <Suspense
       fallback={
@@ -13,7 +13,11 @@ const MdRenderCardWrapper = ({ content, ...props }) => {
         </div>
       }
     >
-      <MdRenderCardLazy content={content} {...props} />
+      <MdRenderCardLazy
+        content={content}
+        onDeleteImage={onDeleteImage}
+        {...props}
+      />
     </Suspense>
   );
 };

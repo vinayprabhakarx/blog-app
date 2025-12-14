@@ -7,6 +7,7 @@ import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import "katex/dist/katex.min.css";
 import { useTheme } from "../../utils/ThemeContext";
+import { Trash2 } from "lucide-react";
 
 // Memoize markdown component renderers to prevent re-creation on every render
 const MarkdownCode = React.memo(({ children = [], className }) => {
@@ -82,6 +83,98 @@ const MarkdownListItem = React.memo(({ children, ...props }) => {
   );
 });
 
+// Custom image component with delete button
+const MarkdownImage = React.memo(({ src, alt, onDeleteImage, ...props }) => {
+  const [isHovered, setIsHovered] = React.useState(false);
+
+  const containerStyle = useMemo(
+    () => ({
+      position: "relative",
+      display: "inline-block",
+      maxWidth: "100%",
+      margin: "1rem 0",
+    }),
+    []
+  );
+
+  const imageStyle = useMemo(
+    () => ({
+      maxWidth: "100%",
+      maxHeight: onDeleteImage ? "300px" : "none",
+      width: "auto",
+      height: "auto",
+      display: "block",
+      borderRadius: "8px",
+      objectFit: "contain",
+    }),
+    [onDeleteImage]
+  );
+
+  const buttonStyle = useMemo(
+    () => ({
+      position: "absolute",
+      top: "0.5rem",
+      right: "0.5rem",
+      padding: "0.5rem",
+      borderRadius: "0.375rem",
+      backgroundColor: "hsl(var(--warning))",
+      color: "hsl(var(--warning-foreground))",
+      border: "none",
+      cursor: "pointer",
+      display: "flex",
+      alignItems: "center",
+      justifyContent: "center",
+      opacity: isHovered ? 1 : 0,
+      transition: "all 0.2s ease",
+      boxShadow: "0 2px 8px rgba(0, 0, 0, 0.3)",
+      zIndex: 10,
+    }),
+    [isHovered]
+  );
+
+  const handleDelete = useCallback(
+    (e) => {
+      e.preventDefault();
+      e.stopPropagation();
+      if (onDeleteImage && src) {
+        onDeleteImage(src);
+      }
+    },
+    [onDeleteImage, src]
+  );
+
+  if (!onDeleteImage) {
+    // If no delete handler, render normal image
+    return <img src={src} alt={alt} style={imageStyle} {...props} />;
+  }
+
+  return (
+    <div
+      style={containerStyle}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <img src={src} alt={alt} style={imageStyle} {...props} />
+      <button
+        type="button"
+        onClick={handleDelete}
+        style={buttonStyle}
+        title="Delete this image"
+        onMouseOver={(e) => {
+          e.currentTarget.style.opacity = "0.85";
+          e.currentTarget.style.transform = "scale(1.05)";
+        }}
+        onMouseOut={(e) => {
+          e.currentTarget.style.opacity = "1";
+          e.currentTarget.style.transform = "scale(1)";
+        }}
+      >
+        <Trash2 size={18} />
+      </button>
+    </div>
+  );
+});
+
 // Memoize table components for consistent theming
 const MarkdownTable = React.memo(({ children, ...props }) => {
   const tableStyle = useMemo(
@@ -154,7 +247,7 @@ const MarkdownHorizontalRule = React.memo((props) => {
   return <hr style={hrStyle} {...props} />;
 });
 
-const MdRenderCard = React.memo(({ content }) => {
+const MdRenderCard = React.memo(({ content = "", onDeleteImage }) => {
   const { theme } = useTheme();
 
   // Memoize content to prevent unnecessary re-renders
@@ -331,6 +424,12 @@ const MdRenderCard = React.memo(({ content }) => {
   const h5Component = useMemo(() => createHeading(5), [createHeading]);
   const h6Component = useMemo(() => createHeading(6), [createHeading]);
 
+  // Create image component with delete handler
+  const imageComponent = useCallback(
+    (props) => <MarkdownImage {...props} onDeleteImage={onDeleteImage} />,
+    [onDeleteImage]
+  );
+
   // Memoize components object
   const components = useMemo(
     () => ({
@@ -348,6 +447,7 @@ const MdRenderCard = React.memo(({ content }) => {
       th: MarkdownTableHeader,
       td: MarkdownTableData,
       hr: MarkdownHorizontalRule,
+      img: imageComponent,
     }),
     [
       h1Component,
@@ -356,6 +456,7 @@ const MdRenderCard = React.memo(({ content }) => {
       h4Component,
       h5Component,
       h6Component,
+      imageComponent,
     ]
   );
 

@@ -568,3 +568,59 @@ export const recalculateAllCommentCounts = async (req, res, next) => {
     next(serverError("Failed to recalculate comment counts", error));
   }
 };
+
+// @route   POST /api/blogs/upload-image
+// @desc    Upload an image for blog content
+// @access  Private (Author, Admin)
+export const uploadContentImage = async (req, res, next) => {
+  try {
+    if (!req.file) {
+      return next(handleError(400, "No image file provided"));
+    }
+
+    const uploadResult = await uploadImage(req.file.path, {
+      folder: "notion-blog-app/content-images",
+    });
+
+    if (!uploadResult.success) {
+      return next(
+        handleError(500, "Failed to upload image", uploadResult.error)
+      );
+    }
+
+    res.status(200).json({
+      success: true,
+      url: uploadResult.url,
+      message: "Image uploaded successfully",
+    });
+  } catch (error) {
+    next(serverError("Failed to upload content image", error));
+  }
+};
+
+// @route   DELETE /api/blogs/delete-image
+// @desc    Delete an image from Cloudinary
+// @access  Private (Author, Admin)
+export const deleteContentImage = async (req, res, next) => {
+  try {
+    const { imageUrl } = req.body;
+
+    if (!imageUrl) {
+      return next(handleError(400, "Image URL is required"));
+    }
+
+    // Extract public ID from Cloudinary URL
+    const urlParts = imageUrl.split("/");
+    const publicIdWithExt = urlParts.slice(-2).join("/");
+    const publicId = publicIdWithExt.replace(/\.[^/.]+$/, "");
+
+    await deleteImage(`notion-blog-app/content-images/${publicId}`);
+
+    res.status(200).json({
+      success: true,
+      message: "Image deleted successfully",
+    });
+  } catch (error) {
+    next(serverError("Failed to delete content image", error));
+  }
+};

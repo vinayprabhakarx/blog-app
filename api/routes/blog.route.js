@@ -11,6 +11,8 @@ import {
   deleteBlog,
   getBlogsByAuthorForAdmin,
   recalculateAllCommentCounts,
+  uploadContentImage,
+  deleteContentImage,
 } from "../controllers/blog.controller.js";
 import {
   createComment,
@@ -106,6 +108,29 @@ router.get(
   authenticate,
   authorize("admin", "author"),
   asyncHandler(getBlogById)
+);
+
+// --- Content Image Routes (must come before /:slug) ---
+
+// @route   POST /api/blogs/upload-image
+// @desc    Upload an image for blog content
+// @access  Private (Author, Admin)
+router.post(
+  "/upload-image",
+  authenticate,
+  authorize("admin", "author"),
+  upload.single("image"),
+  asyncHandler(uploadContentImage)
+);
+
+// @route   DELETE /api/blogs/delete-image
+// @desc    Delete an image from blog content
+// @access  Private (Author, Admin)
+router.delete(
+  "/delete-image",
+  authenticate,
+  authorize("admin", "author"),
+  asyncHandler(deleteContentImage)
 );
 
 // @route   GET /api/blogs/:slug
