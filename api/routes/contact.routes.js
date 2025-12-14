@@ -35,7 +35,7 @@ const contactValidation = [
     .escape(),
 ];
 
-// @route   POST /api/contact
+// @route   POST /api/send-email
 // @desc    Send contact form message from portfolio
 // @access  Public
 router.post("/", contactValidation, sendContactMessage);

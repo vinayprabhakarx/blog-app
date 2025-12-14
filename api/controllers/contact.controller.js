@@ -35,7 +35,7 @@ export const sendContactMessage = async (req, res, next) => {
       subject,
       message,
     });
-    const confirmationEmail = buildContactConfirmationEmail(userName);
+    const confirmationEmail = buildContactConfirmationEmail(userName, message);
 
     const recipientEmail =
       process.env.RECIPIENT_EMAIL || "info@vinayprabhakar.dev";

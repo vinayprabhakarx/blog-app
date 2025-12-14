@@ -93,7 +93,7 @@ app.use("/api/categories/:categoryId/blogs", blogRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/likes", blogLikeRoutes);
 app.use("/api/notifications", notificationRoutes);
-app.use("/api/contact", contactRoutes);
+app.use("/api/send-email", contactRoutes);
 
 // Global Error Handler
 app.use((err, req, res, next) => {
