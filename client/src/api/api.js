@@ -59,8 +59,16 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       const isPasswordChangeError =
         error.config?.url?.includes("change-password");
+      const isLoginError = error.config?.url?.includes("/auth/login");
+      const isRegisterError = error.config?.url?.includes("/auth/register");
+      const isAuthAttempt = isLoginError || isRegisterError;
+      const isAlreadyOnLoginPage =
+        typeof window !== "undefined" &&
+        (window.location.pathname === "/login" ||
+          window.location.pathname === "/signup");
 
-      if (!isPasswordChangeError) {
+      // Don't redirect if it's a login/register attempt, password change, or already on login page
+      if (!isPasswordChangeError && !isAuthAttempt && !isAlreadyOnLoginPage) {
         // Clear token and redirect to login to avoid circular dependencies
         localStorage.removeItem("token");
         // Use window.location to avoid router dependencies
@@ -68,6 +76,9 @@ api.interceptors.response.use(
           window.location.href = "/login";
         }
         console.error("Unauthorized access. User has been logged out.");
+      } else if (isAlreadyOnLoginPage) {
+        // If already on login page and got 401, just clear token without redirecting
+        localStorage.removeItem("token");
       }
     }
     return Promise.reject(error);

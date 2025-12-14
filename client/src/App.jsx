@@ -19,11 +19,26 @@ const AuthInitializer = ({ children }) => {
   useEffect(() => {
     // Only run once on mount
     if (initializing) {
-      if (token) {
+      // Public routes that don't need auth verification
+      const publicRoutes = [
+        "/login",
+        "/signup",
+        "/forgot-password",
+        "/reset-password",
+        "/verify-email",
+      ];
+      const isPublicRoute = publicRoutes.some((route) =>
+        window.location.pathname.startsWith(route)
+      );
+
+      if (token && !isPublicRoute) {
         // Verify the token by fetching current user
-        dispatch(getCurrentUser());
+        dispatch(getCurrentUser()).catch(() => {
+          // If token validation fails, clear it
+          localStorage.removeItem("token");
+        });
       } else {
-        // No token, mark initialization complete
+        // No token or on public route, mark initialization complete
         dispatch(initializationComplete());
       }
     }

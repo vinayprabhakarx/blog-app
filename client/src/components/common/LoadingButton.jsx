@@ -8,6 +8,7 @@ const LoadingButton = ({
   children,
   disabled,
   onClick,
+  type,
   ...props
 }) => {
   const handleClick = (e) => {
@@ -26,6 +27,7 @@ const LoadingButton = ({
   return (
     <Button
       {...props}
+      type={type}
       disabled={isLoading || disabled}
       onClick={handleClick}
       className={`${props.className || ""} ${

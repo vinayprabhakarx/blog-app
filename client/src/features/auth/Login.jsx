@@ -48,7 +48,14 @@ const Login = () => {
       showToast("success", "Login successful!");
       navigate(redirectPath);
     } catch (error) {
-      showToast("error", error || "Login failed");
+      console.error("Login error:", error);
+      const errorMessage =
+        typeof error === "string"
+          ? error
+          : error?.message ||
+            error?.error ||
+            "Login failed. Please check your credentials.";
+      showToast("error", errorMessage);
     }
   }
 
