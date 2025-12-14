@@ -1,35 +1,12 @@
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  useCallback,
-  useMemo,
-} from "react";
+import React, { useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
-import {
-  Eye,
-  MessageCircle,
-  Heart,
-  Share2,
-  Clock,
-  Printer,
-  Pencil,
-} from "lucide-react";
+import { MessageCircle, Heart, Clock, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 
-import ShareDropdown from "../../components/common/ShareDropdown";
 import LikeButton from "../../components/common/LikeButton";
 import useBlogLike from "../../hooks/useBlogLike";
 
-const handlePrint = () => {
-  window.print();
-};
-
 const BlogHeader = ({ blog, onCommentClick }) => {
-  const [isShareDropdownOpen, setIsShareDropdownOpen] = useState(false);
-  const [hoverTimeout, setHoverTimeout] = useState(null);
-  const shareButtonRef = useRef(null);
-
   // Use custom hook for optimized like functionality
   const blogId = blog?._id;
   const likeButtonState = useBlogLike(blogId, blog?.category);
@@ -71,7 +48,6 @@ const BlogHeader = ({ blog, onCommentClick }) => {
   };
 
   const activityStats = {
-    totalReads: blog?.activity?.total_reads || 0,
     totalComments: blog?.activity?.total_comments || 0,
   };
 
@@ -113,88 +89,6 @@ const BlogHeader = ({ blog, onCommentClick }) => {
     () => calculateReadTime(blogMetadata.content, true),
     [blogMetadata.content, calculateReadTime]
   );
-
-  // For sharing
-  const shareData = useMemo(
-    () => ({
-      url: window.location.href,
-      title: blogMetadata.title || "Check out this blog",
-      description:
-        blogMetadata.excerpt ||
-        blogMetadata.content?.substring(0, 150) + "..." ||
-        "",
-    }),
-    [blogMetadata.title, blogMetadata.excerpt, blogMetadata.content]
-  );
-
-  // Memoize callback functions
-  const handleShare = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    setIsShareDropdownOpen((prev) => !prev);
-  }, []);
-
-  const handleShareMouseEnter = useCallback(() => {
-    if (!("ontouchstart" in window)) {
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout);
-      }
-      setIsShareDropdownOpen(true);
-    }
-  }, [hoverTimeout]);
-
-  const handleShareMouseLeave = useCallback(() => {
-    if (!("ontouchstart" in window)) {
-      const timeout = setTimeout(() => {
-        setIsShareDropdownOpen(false);
-      }, 200);
-      setHoverTimeout(timeout);
-    }
-  }, []);
-
-  const handleDropdownMouseEnter = useCallback(() => {
-    if (!("ontouchstart" in window) && hoverTimeout) {
-      clearTimeout(hoverTimeout);
-    }
-  }, [hoverTimeout]);
-
-  const handleDropdownMouseLeave = useCallback(() => {
-    if (!("ontouchstart" in window)) {
-      setIsShareDropdownOpen(false);
-    }
-  }, []);
-
-  useEffect(() => {
-    return () => {
-      if (hoverTimeout) {
-        clearTimeout(hoverTimeout);
-      }
-    };
-  }, [hoverTimeout]);
-
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if ("ontouchstart" in window && isShareDropdownOpen) {
-        if (
-          shareButtonRef.current &&
-          !shareButtonRef.current.contains(event.target)
-        ) {
-          const dropdownElement = document.querySelector(
-            "[data-share-dropdown]"
-          );
-          if (dropdownElement && !dropdownElement.contains(event.target)) {
-            setIsShareDropdownOpen(false);
-          }
-        }
-      }
-    };
-
-    if (isShareDropdownOpen) {
-      document.addEventListener("mousedown", handleClickOutside);
-      return () =>
-        document.removeEventListener("mousedown", handleClickOutside);
-    }
-  }, [isShareDropdownOpen]);
 
   const handleCommentClick = useCallback(
     (e) => {
@@ -253,10 +147,6 @@ const BlogHeader = ({ blog, onCommentClick }) => {
           </div>
           {/* Stats Row */}
           <div className="flex flex-nowrap items-center gap-4 md:gap-6 lg:gap-8 text-sm sm:text-base text-muted-foreground mt-4 min-w-0">
-            <div className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
-              <Eye className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-              <span className="flex-shrink-0">{activityStats.totalReads}</span>
-            </div>
             <button
               type="button"
               onClick={handleCommentClick}
@@ -276,59 +166,28 @@ const BlogHeader = ({ blog, onCommentClick }) => {
               <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>{readTimeTextMobile}</span>
             </div>
-            <div className="relative flex items-center gap-1">
-              <button
-                type="button"
-                ref={shareButtonRef}
-                onClick={handleShare}
-                onMouseEnter={handleShareMouseEnter}
-                onMouseLeave={handleShareMouseLeave}
-                className="flex items-center hover:text-primary transition-colors cursor-pointer"
-                aria-label="Share"
-              >
-                <Share2 className="w-4 h-4 sm:w-5 sm:h-5" />
-              </button>
-              <ShareDropdown
-                isOpen={isShareDropdownOpen}
-                onClose={() => setIsShareDropdownOpen(false)}
-                onMouseEnter={handleDropdownMouseEnter}
-                onMouseLeave={handleDropdownMouseLeave}
-                url={shareData.url}
-                title={shareData.title}
-                description={shareData.description}
-                buttonRef={shareButtonRef}
-              />
-              {canEdit &&
-                (blogMetadata.draft ? (
+            {canEdit &&
+              (blogMetadata.draft ? (
+                <Link
+                  to={`/editor/${blog._id}`}
+                  className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors"
+                  aria-label="Edit draft"
+                >
+                  <Pencil className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                  <span className="hidden xs:inline">Edit</span>
+                </Link>
+              ) : (
+                blogMetadata.slug && (
                   <Link
-                    to={`/editor/${blog._id}`}
+                    to={`/blogs/edit/${blogMetadata.slug}`}
                     className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors"
-                    aria-label="Edit draft"
+                    aria-label="Edit blog"
                   >
                     <Pencil className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
                     <span className="hidden xs:inline">Edit</span>
                   </Link>
-                ) : (
-                  blogMetadata.slug && (
-                    <Link
-                      to={`/blogs/edit/${blogMetadata.slug}`}
-                      className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors"
-                      aria-label="Edit blog"
-                    >
-                      <Pencil className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-                      <span className="hidden xs:inline">Edit</span>
-                    </Link>
-                  )
-                ))}
-            </div>
-            <button
-              type="button"
-              onClick={handlePrint}
-              className="hidden sm:flex items-center hover:text-primary cursor-pointer transition-colors"
-              aria-label="Print"
-            >
-              <Printer className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
-            </button>
+                )
+              ))}
           </div>
         </header>
         {/* Banner image below header */}

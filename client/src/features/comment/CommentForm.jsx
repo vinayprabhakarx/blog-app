@@ -286,7 +286,7 @@ const CommentForm = ({
       onSubmit={handleSubmit}
       className="relative flex items-center gap-2 w-full max-w-md"
     >
-      <div className="flex-1 min-w-0 bg-muted rounded-full flex items-center pr-1 sm:pr-2 h-8 sm:h-9">
+      <div className="flex-1 min-w-0 bg-muted rounded-full flex items-center pr-1 sm:pr-2 h-8 sm:h-9 border border-border shadow-sm">
         <input
           ref={textareaRef}
           type="text"
@@ -294,7 +294,7 @@ const CommentForm = ({
           onChange={handleContentChange}
           onKeyDown={handleKeyDown}
           placeholder={placeholder}
-          className="flex-1 min-w-0 text-sm px-3 py-1 sm:px-4 sm:py-1.5 bg-transparent border-none outline-none placeholder-muted-foreground text-foreground"
+          className="flex-1 min-w-0 text-sm px-3 py-1 sm:px-4 sm:py-1.5 bg-transparent border-none outline-none placeholder-muted-foreground text-foreground focus:outline-none"
           maxLength={1000}
           disabled={false}
         />

@@ -300,7 +300,7 @@ const SearchBar = React.memo(() => {
             value={searchQuery}
             onChange={handleInputChange}
             onFocus={handleInputFocus}
-            className="h-9 pl-10 pr-10 rounded-full bg-background border-input focus:border-primary focus:ring-1 focus:ring-primary"
+            className="h-9 pl-10 pr-10 rounded-full bg-muted border border-border shadow-sm focus:border-primary focus:ring-2 focus:ring-primary/20"
           />
           {searchQuery && (
             <button
