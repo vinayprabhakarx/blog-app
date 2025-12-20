@@ -116,6 +116,9 @@ const BlogPage = () => {
     e.preventDefault();
     e.stopPropagation();
 
+    // Pause chunk loading to prevent page height changes during scroll
+    window.dispatchEvent(new CustomEvent("blog-chunk-pause"));
+
     // Always show comments when clicked from header
     if (!showComments) {
       setShowComments(true);
