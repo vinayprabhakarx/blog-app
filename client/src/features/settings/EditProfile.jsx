@@ -128,24 +128,6 @@ const EditProfile = () => {
 
         // Clear profile update status
         dispatch(clearProfileUpdateStatus());
-
-        // Refresh user data
-        try {
-          const refreshedUser = await userService.getCurrentUserProfile();
-          if (refreshedUser.success && refreshedUser.user) {
-            dispatch(
-              updateUserProfile({
-                ...refreshedUser.user,
-                personal_info: refreshedUser.user.personal_info,
-                avatar:
-                  refreshedUser.user.personal_info?.profile_img ||
-                  refreshedUser.user.avatar,
-              })
-            );
-          }
-        } catch (error) {
-          console.error("Failed to refresh user data:", error);
-        }
       } else {
         throw new Error(result.message || "Image upload failed");
       }

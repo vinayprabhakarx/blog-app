@@ -146,7 +146,7 @@ const Topbar = React.memo(() => {
                   >
                     <Avatar className=" w-6 h-6 sm:w-7 sm:h-7 md:w-9 md:h-8 transition-transform duration-200 hover:scale-105 active:scale-95">
                       <AvatarImage
-                        src={userData.avatar}
+                        src={userData.avatar || null}
                         className="w-full h-full object-cover rounded-full"
                       />
                       <AvatarFallback>

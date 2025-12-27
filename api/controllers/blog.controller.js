@@ -472,6 +472,7 @@ export const updateBlog = async (req, res, next) => {
     }
   }
 
+  // Handle banner image update or removal
   if (req.file) {
     // If there's an old banner, delete it from Cloudinary
     if (blog.banner) {
@@ -488,6 +489,13 @@ export const updateBlog = async (req, res, next) => {
       );
     }
     blog.banner = uploadResult.url;
+  } else if (req.body.removeBanner === "true" || req.body.removeBanner === true) {
+    // User explicitly removed the banner - delete from Cloudinary and clear from DB
+    if (blog.banner) {
+      const publicId = blog.banner.split("/").pop().split(".")[0];
+      await deleteImage(`notion-blog-app/banners/${publicId}`);
+      blog.banner = ""; // Clear the banner field
+    }
   }
 
   const updatedBlog = await blog.save().catch((err) => {

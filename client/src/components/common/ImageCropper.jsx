@@ -7,6 +7,7 @@ import {
   DialogContent,
   DialogHeader,
   DialogTitle,
+  DialogDescription,
 } from "../../components/ui/dialog";
 import { Badge } from "../../components/ui/badge";
 
@@ -106,6 +107,9 @@ const ImageCropper = ({ imageUrl, onClose, onCrop }) => {
           <DialogTitle className="text-sm sm:text-base md:text-lg pr-8 sm:pr-10">
             Crop Image
           </DialogTitle>
+          <DialogDescription className="sr-only">
+            Adjust the crop area, zoom level, and aspect ratio for your image
+          </DialogDescription>
           <button
             onClick={handleClose}
             disabled={isProcessing}

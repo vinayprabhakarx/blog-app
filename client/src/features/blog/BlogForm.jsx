@@ -53,6 +53,7 @@ const BlogForm = ({ existingBlog }) => {
   const [croppedFile, setCroppedFile] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isCropping, setIsCropping] = useState(false);
+  const [imageRemoved, setImageRemoved] = useState(false); // Track if user removed existing banner
   
 
 
@@ -207,10 +208,14 @@ const BlogForm = ({ existingBlog }) => {
         submitData.tags = formData.tags.trim();
       }
 
-      // Use cropped file if available, otherwise use original file
+      // Handle banner image
       const fileToUpload = croppedFile || file;
       if (fileToUpload) {
+        // New image uploaded
         submitData.banner = fileToUpload;
+      } else if (isEditing && imageRemoved) {
+        // User explicitly removed existing banner - send empty string to delete it
+        submitData.removeBanner = true;
       }
 
       let result;
@@ -380,6 +385,7 @@ const BlogForm = ({ existingBlog }) => {
     setFile(null);
     setCroppedFile(null);
     setPreview(null);
+    setImageRemoved(true); // Mark that image was intentionally removed
     showToast("success", "Image removed successfully!");
   };
 
