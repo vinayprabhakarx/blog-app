@@ -288,8 +288,8 @@ const AppSidebar = React.memo(() => {
         .unwrap()
         .then(() => setHasFetched(true))
         .catch(() => {
-          // Handle error silently or add error handling as needed
-          setHasFetched(false);
+          // Handle error silently, but mark as fetched to prevent infinite retry loop
+          setHasFetched(true);
         });
     }
   }, [isAuthenticated, hasFetched, categoriesLoading, dispatch]);

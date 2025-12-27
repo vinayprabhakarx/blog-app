@@ -73,7 +73,7 @@ export const NotificationProvider = ({ children }) => {
       clearInterval(pollInterval);
       setIsPolling(false);
     };
-  }, [isAuthenticated, user, dispatch]);
+  }, [isAuthenticated, user, dispatch, unreadCount]);
 
   const markAsRead = useCallback(
     async (notificationId) => {

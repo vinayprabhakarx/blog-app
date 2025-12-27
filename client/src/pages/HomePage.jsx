@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import BlogCard from "../features/blog/BlogCard";
+import BlogCardSkeleton from "../features/blog/BlogCardSkeleton";
 import Pagination from "../components/common/Pagination";
 
 import {
@@ -115,6 +116,17 @@ const HomePage = React.memo(() => {
         return;
       }
 
+      // Skip fetch if we already have blogs for page 1 and not loading
+      // This prevents refetch when navigating back from a blog page
+      if (
+        allBlogs.length > 0 &&
+        currentPage === 1 &&
+        selectedCategory === "all" &&
+        !blogLoading.allBlogs
+      ) {
+        return;
+      }
+
       // Use memoized parameters for blog fetching
       dispatch(fetchAllBlogs(blogFetchParams));
     };
@@ -132,6 +144,8 @@ const HomePage = React.memo(() => {
     currentPage,
     postsPerPage,
     hasFetchedCategories,
+    selectedCategory,
+    // Removed allBlogs.length and blogLoading.allBlogs to prevent infinite loop on fetch error
   ]);
 
   useEffect(() => {
@@ -251,16 +265,16 @@ const HomePage = React.memo(() => {
 
         {/* Blog Grid */}
         <section className="mb-8">
-          <div
-            className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 transition-all duration-300 ${
-              blogLoading.allBlogs
-                ? "opacity-50 pointer-events-none"
-                : "opacity-100"
-            }`}
-          >
-            {allBlogs.map((blog) => (
-              <BlogCard key={blog._id} blog={blog} />
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {blogLoading.allBlogs ? (
+              // Show skeleton loaders while loading
+              Array.from({ length: postsPerPage }).map((_, index) => (
+                <BlogCardSkeleton key={`skeleton-${index}`} />
+              ))
+            ) : (
+              // Show actual blog cards when loaded
+              allBlogs.map((blog) => <BlogCard key={blog._id} blog={blog} />)
+            )}
           </div>
         </section>
 

@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from "react-redux";
 import { cn } from "@/lib/utils";
 // Redux and hooks
 import { useBlog } from "../hooks/useRedux";
-import { fetchBlogBySlug, fetchBlogById } from "../features/blog/blogSlice";
+import { fetchBlogBySlug, fetchBlogById, clearCurrentBlog } from "../features/blog/blogSlice";
 import { setLikeData, getUserLikeStatus } from "../features/like/likesSlice";
 // Icons
 import { MessageCircle, MessageCircleOff } from "lucide-react";
@@ -13,10 +13,11 @@ import BlogHeader from "../features/blog/BlogHeader";
 import BlogDisplay from "../features/blog/BlogDisplay";
 import { CommentSection } from "../features/comment";
 import NotFound from "../components/common/NotFound";
+import BlogPageSkeleton from "../components/common/BlogPageSkeleton";
 
 const BlogPage = () => {
   const { slug, id } = useParams();
-  const { currentBlog, currentBlogError, dispatch } = useBlog();
+  const { currentBlog, currentBlogError, currentBlogLoading, dispatch } = useBlog();
   const { user, isAuthenticated } = useSelector((state) => state.auth);
   const mainDispatch = useDispatch();
   const [showComments, setShowComments] = useState(false);
@@ -58,6 +59,15 @@ const BlogPage = () => {
 
     const fetchBlog = async () => {
       if (isMounted) {
+        // Only clear if we're navigating to a different blog
+        const currentSlug = currentBlog?.slug;
+        const currentId = currentBlog?._id;
+        const isDifferentBlog = (slug && slug !== currentSlug) || (id && id !== currentId);
+        
+        if (isDifferentBlog) {
+          dispatch(clearCurrentBlog());
+        }
+        
         if (id) {
           // Fetch by ID (for notifications or preview mode)
           dispatch(fetchBlogById(id));
@@ -72,7 +82,7 @@ const BlogPage = () => {
     return () => {
       isMounted = false;
     };
-  }, [slug, id, dispatch]);
+  }, [slug, id, dispatch, currentBlog?.slug, currentBlog?._id]);
 
   // Initialize like data when blog is loaded
   useEffect(() => {
@@ -106,11 +116,20 @@ const BlogPage = () => {
   ]);
 
   // Callback functions
-  const toggleComments = (e) => {
-    e.preventDefault();
-    e.stopPropagation();
+  const toggleComments = useCallback((e) => {
+    if (e) {
+      e.preventDefault();
+      e.stopPropagation();
+    }
     setShowComments((prev) => !prev);
-  };
+  }, []);
+
+
+
+  // Show skeleton while loading or no blog data
+  if (currentBlogLoading || (!currentBlog && !currentBlogError)) {
+    return <BlogPageSkeleton />;
+  }
 
   const handleCommentClick = (e) => {
     e.preventDefault();

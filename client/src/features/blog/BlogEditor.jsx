@@ -288,73 +288,7 @@ const BlogEditor = ({
     }
   };
 
-  const handleDeleteImage = async (imageUrl) => {
-    if (
-      !window.confirm(
-        "Are you sure you want to delete this image from the server?"
-      )
-    ) {
-      return;
-    }
 
-    try {
-      const token = localStorage.getItem("token");
-      const response = await fetch(
-        `${
-          import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
-        }/api/blogs/delete-image`,
-        {
-          method: "DELETE",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ imageUrl }),
-        }
-      );
-
-      const data = await response.json();
-
-      if (data.success) {
-        // Remove the image markdown from the content
-        const imageRegex = new RegExp(
-          `!\\[[^\\]]*\\]\\(${imageUrl.replace(
-            /[.*+?^${}()|[\]\\]/g,
-            "\\$&"
-          )}\\)`,
-          "g"
-        );
-        const newValue = value.replace(imageRegex, "");
-        if (onChange) {
-          onChange(newValue);
-        }
-        showToast("success", "Image deleted successfully!");
-      } else {
-        showToast(
-          "error",
-          "Failed to delete image: " + (data.message || "Unknown error")
-        );
-      }
-    } catch (error) {
-      console.error("Delete error:", error);
-      showToast("error", "Failed to delete image. Please try again.");
-    }
-  };
-
-  // Extract image URLs from markdown content (memoized)
-  const getImagesFromContent = useCallback(() => {
-    const imageRegex = /!\[([^\]]*)\]\(([^)]+)\)/g;
-    const images = [];
-    let match;
-    while ((match = imageRegex.exec(value)) !== null) {
-      images.push({
-        alt: match[1],
-        url: match[2],
-        fullMatch: match[0],
-      });
-    }
-    return images;
-  }, [value]);
 
   const formatCodeBlock = useCallback(() => {
     const language = prompt("Enter language (optional):") || "";
