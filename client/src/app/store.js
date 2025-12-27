@@ -1,4 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
+import { cleanupStaleToken } from "../utils/authTokenCleanup";
+
+// CRITICAL: Clean up stale tokens BEFORE Redux initializes
+// This must happen before authSlice reads localStorage
+cleanupStaleToken();
 import { persistStore, persistReducer } from "redux-persist";
 import storage from "redux-persist/lib/storage";
 import { combineReducers } from "@reduxjs/toolkit";

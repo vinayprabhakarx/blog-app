@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -38,6 +38,18 @@ const Login = () => {
       password: "",
     },
   });
+
+  // Clear any stale tokens on mount to prevent redirect loops
+  useEffect(() => {
+    // Clear all auth-related items from localStorage
+    const token = localStorage.getItem("token");
+    if (token) {
+      console.log("Login page: Clearing stale token and auth state");
+      localStorage.removeItem("token");
+      // CRITICAL: Also clear Redux state to prevent PublicRoute from redirecting
+      dispatch({ type: 'auth/logout' });
+    }
+  }, [dispatch]);
 
   async function onSubmit(values) {
     try {

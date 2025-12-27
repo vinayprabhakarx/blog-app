@@ -19,7 +19,7 @@ const AuthInitializer = ({ children }) => {
   useEffect(() => {
     // Only run once on mount
     if (initializing) {
-      // Public routes that don't need auth verification
+      const currentPath = window.location.pathname;
       const publicRoutes = [
         "/login",
         "/signup",
@@ -28,17 +28,33 @@ const AuthInitializer = ({ children }) => {
         "/verify-email",
       ];
       const isPublicRoute = publicRoutes.some((route) =>
-        window.location.pathname.startsWith(route)
+        currentPath.startsWith(route)
       );
 
-      if (token && !isPublicRoute) {
+      // CRITICAL: If on auth pages AND we have a token, clear it immediately
+      // This prevents redirect loops from stale/invalid tokens
+      if (isPublicRoute && token) {
+        console.log("AuthInitializer: Clearing stale token on auth page");
+        localStorage.removeItem("token");
+        dispatch({ type: "auth/logout" });
+        dispatch(initializationComplete());
+        return;
+      }
+
+      // If on auth pages without token, just complete initialization
+      if (isPublicRoute) {
+        dispatch(initializationComplete());
+        return;
+      }
+
+      // Only verify token if we have one AND we're not on a public route
+      if (token) {
         // Verify the token by fetching current user
         dispatch(getCurrentUser()).catch(() => {
-          // If token validation fails, clear it
-          localStorage.removeItem("token");
+          // Token verification failed - 401 interceptor handles redirect
         });
       } else {
-        // No token or on public route, mark initialization complete
+        // No token, mark initialization complete
         dispatch(initializationComplete());
       }
     }

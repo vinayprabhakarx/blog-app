@@ -56,29 +56,32 @@ api.interceptors.response.use(
     return response;
   },
   (error) => {
+    // Handle 401 Unauthorized errors
     if (error.response && error.response.status === 401) {
-      const isPasswordChangeError =
-        error.config?.url?.includes("change-password");
-      const isLoginError = error.config?.url?.includes("/auth/login");
-      const isRegisterError = error.config?.url?.includes("/auth/register");
-      const isAuthAttempt = isLoginError || isRegisterError;
-      const isAlreadyOnLoginPage =
-        typeof window !== "undefined" &&
-        (window.location.pathname === "/login" ||
-          window.location.pathname === "/signup");
+      const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
+      const isAuthPage = currentPath === "/login" || currentPath === "/signup";
+      const isAuthEndpoint = 
+        error.config?.url?.includes("/auth/login") || 
+        error.config?.url?.includes("/auth/register");
 
-      // Don't redirect if it's a login/register attempt, password change, or already on login page
-      if (!isPasswordChangeError && !isAuthAttempt && !isAlreadyOnLoginPage) {
-        // Clear token and redirect to login to avoid circular dependencies
+      // If we are already on the login page, just clear the token to be safe
+      if (isAuthPage) {
         localStorage.removeItem("token");
-        // Use window.location to avoid router dependencies
-        if (typeof window !== "undefined") {
-          window.location.href = "/login";
-        }
-        console.error("Unauthorized access. User has been logged out.");
-      } else if (isAlreadyOnLoginPage) {
-        // If already on login page and got 401, just clear token without redirecting
-        localStorage.removeItem("token");
+        return Promise.reject(error);
+      }
+
+      // If the error comes from a login attempt, we don't redirect (let the form show the error)
+      if (isAuthEndpoint) {
+         return Promise.reject(error);
+      }
+      
+      // For all other 401s (expired token, invalid token on protected route)
+      // We must clear the token and force a redirect to login.
+      console.warn("Session expired or invalid token. Logging out...");
+      localStorage.removeItem("token");
+      
+      if (typeof window !== "undefined") {
+        window.location.href = "/login";
       }
     }
     return Promise.reject(error);
