@@ -53,6 +53,11 @@ const BlogForm = ({ existingBlog }) => {
   const [croppedFile, setCroppedFile] = useState(null);
   const [selectedImage, setSelectedImage] = useState(null);
   const [isCropping, setIsCropping] = useState(false);
+  
+
+
+  // Reset Key to force component remounting
+  const [resetKey, setResetKey] = useState(0);
 
   useEffect(() => {
     if (existingBlog) {
@@ -75,6 +80,8 @@ const BlogForm = ({ existingBlog }) => {
       if (existingBlog.banner) {
         setPreview(existingBlog.banner);
       }
+
+
     } else {
       // For new blogs, try to restore from localStorage
       const savedContent = localStorage.getItem("blog-draft-content");
@@ -232,6 +239,7 @@ const BlogForm = ({ existingBlog }) => {
         // Clear auto-saved content after successful submission
         localStorage.removeItem("blog-draft-content");
         localStorage.removeItem("blog-draft-content-timestamp");
+        setResetKey((prev) => prev + 1); // Force remount of editors to clear internal state/timers
       }
       setFormErrors({});
       setFile(null);
@@ -300,7 +308,10 @@ const BlogForm = ({ existingBlog }) => {
       }
 
       showToast("error", errorMessage);
+      return; // Stop execution on error
     }
+    
+
   };
 
   const handleFileSelection = (e) => {
@@ -573,12 +584,13 @@ const BlogForm = ({ existingBlog }) => {
               )}
             </div>
 
-            <div className="mb-3">
+            <div className="mb-6">
               <label className="block text-sm font-medium mb-2">
                 Blog Content{" "}
                 {!formData.draft && <span className="text-destructive">*</span>}
               </label>
               <BlogEditor
+                key={`editor-${resetKey}`}
                 value={formData.content}
                 onChange={(value) => handleInputChange("content", value)}
                 disabled={isEditing ? updateLoading : createLoading}
@@ -594,6 +606,8 @@ const BlogForm = ({ existingBlog }) => {
                 </p>
               )}
             </div>
+            
+
 
             {/* Draft Toggle */}
             <div className="flex items-center justify-between mb-4">
@@ -615,11 +629,6 @@ const BlogForm = ({ existingBlog }) => {
                 <button
                   type="button"
                   onClick={() => {
-                    if (
-                      window.confirm(
-                        "Are you sure you want to clear the form? All unsaved content will be lost."
-                      )
-                    ) {
                       setFormData({
                         category: "",
                         title: "",
@@ -629,14 +638,16 @@ const BlogForm = ({ existingBlog }) => {
                         tags: "",
                         draft: false,
                       });
+
+                      setResetKey((prev) => prev + 1); // Force remount of editors
                       setFormErrors({});
                       setFile(null);
                       setCroppedFile(null);
                       setPreview(null);
+                      setSelectedImage(null);
                       localStorage.removeItem("blog-draft-content");
                       localStorage.removeItem("blog-draft-content-timestamp");
                       showToast("success", "Form cleared successfully!");
-                    }
                   }}
                   className="text-sm text-destructive hover:underline cursor-pointer"
                   disabled={

@@ -28,7 +28,13 @@ import {
   Minus,
   Trash2,
 } from "lucide-react";
-import MdRenderCardWrapper from "./MdRenderCardWrapper";
+import VirtualizedMdPreview from "./VirtualizedMdPreview";
+
+// ... (other imports)
+
+// ... inside component ...
+
+
 import { useTheme } from "../../utils/ThemeContext";
 import ImageCropper from "../../components/common/ImageCropper";
 import { showToast } from "../../utils/showToast";
@@ -401,13 +407,28 @@ const BlogEditor = ({
     [isFullscreen, height]
   );
 
+  // Debounce preview content to prevent lag during typing
+  const [previewContent, setPreviewContent] = useState(value);
+
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      setPreviewContent(value);
+    }, 500); // 500ms delay for heavy content
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [value]);
+
   return (
     <div
       data-color-mode={theme}
       className={`blog-editor ${className}`}
       style={editorStyle}
     >
-      {/* Toolbar */}
+      {/* (Toolbar code omitted for brevity as it is unchanged, but we are inside the component) */}
+      
+      {/* ... Toolbar ... */}
       <div
         className="flex items-center justify-between p-2 border-b sticky top-0 gap-2"
         style={{
@@ -417,129 +438,55 @@ const BlogEditor = ({
           overflowX: "auto",
         }}
       >
+        {/* ... Toolbar content same as before ... */}
         <div className="flex items-center gap-2 flex-1 min-w-0 overflow-x-auto">
-          {/* Formatting Buttons in Main Toolbar */}
-          {(viewMode === "edit" || viewMode === "split") && (
-            <div className="flex items-center gap-1 flex-1 min-w-0">
-              {/* Headings */}
-              <div
-                className="flex items-center gap-1 pr-2 border-r"
-                style={{ borderColor: "var(--border)" }}
-              >
-                <ToolButton onClick={formatH1} title="Heading 1">
-                  <Heading1 className="w-3 h-3 sm:w-4 sm:h-4" />
-                </ToolButton>
-                <ToolButton onClick={formatH2} title="Heading 2">
-                  <Heading2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                </ToolButton>
-                <ToolButton onClick={formatH3} title="Heading 3">
-                  <Heading3 className="w-3 h-3 sm:w-4 sm:h-4" />
-                </ToolButton>
-              </div>
-
-              {/* Text Formatting */}
-              <div
-                className="flex items-center gap-1 pr-2 border-r"
-                style={{ borderColor: "var(--border)" }}
-              >
-                <ToolButton onClick={formatBold} title="Bold">
-                  <Bold className="w-3 h-3 sm:w-4 sm:h-4" />
-                </ToolButton>
-                <ToolButton onClick={formatItalic} title="Italic">
-                  <Italic className="w-3 h-3 sm:w-4 sm:h-4" />
-                </ToolButton>
-                <ToolButton onClick={formatStrikethrough} title="Strikethrough">
-                  <Strikethrough className="w-3 h-3 sm:w-4 sm:h-4" />
-                </ToolButton>
-              </div>
-
-              {/* Links and Images */}
-              <div
-                className="flex items-center gap-1 pr-2 border-r"
-                style={{ borderColor: "var(--border)" }}
-              >
-                <ToolButton onClick={formatLink} title="Link">
-                  <Link className="w-3 h-3 sm:w-4 sm:h-4" />
-                </ToolButton>
-                <ToolButton onClick={formatImage} title="Image">
-                  <Image className="w-3 h-3 sm:w-4 sm:h-4" />
-                </ToolButton>
-              </div>
-
-              {/* Lists */}
-              <div
-                className="flex items-center gap-1 pr-2 border-r"
-                style={{ borderColor: "var(--border)" }}
-              >
-                <ToolButton onClick={formatUnorderedList} title="Bullet List">
-                  <List className="w-3 h-3 sm:w-4 sm:h-4" />
-                </ToolButton>
-                <ToolButton onClick={formatOrderedList} title="Numbered List">
-                  <ListOrdered className="w-3 h-3 sm:w-4 sm:h-4" />
-                </ToolButton>
-              </div>
-
-              {/* Code and Quote */}
-              <div
-                className="flex items-center gap-1 pr-2 border-r"
-                style={{ borderColor: "var(--border)" }}
-              >
-                <ToolButton onClick={formatInlineCode} title="Inline Code">
-                  <Code className="w-3 h-3 sm:w-4 sm:h-4" />
-                </ToolButton>
-                <ToolButton onClick={formatCodeBlock} title="Code Block">
-                  <Code2 className="w-3 h-3 sm:w-4 sm:h-4" />
-                </ToolButton>
-                <ToolButton onClick={formatQuote} title="Quote">
-                  <Quote className="w-3 h-3 sm:w-4 sm:h-4" />
-                </ToolButton>
-              </div>
-
-              {/* Table and Horizontal Rule */}
-              <div className="flex items-center gap-1">
-                <ToolButton onClick={formatTable} title="Table">
-                  <Table className="w-3 h-3 sm:w-4 sm:h-4" />
-                </ToolButton>
-                <ToolButton
-                  onClick={formatHorizontalRule}
-                  title="Horizontal Rule"
-                >
-                  <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
-                </ToolButton>
-              </div>
-            </div>
-          )}
+           {(viewMode === "edit" || viewMode === "split") && (
+             <div className="flex items-center gap-1 flex-1 min-w-0">
+               {/* Headings */}
+               <div className="flex items-center gap-1 pr-2 border-r" style={{ borderColor: "var(--border)" }}>
+                 <ToolButton onClick={formatH1} title="Heading 1"><Heading1 className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
+                 <ToolButton onClick={formatH2} title="Heading 2"><Heading2 className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
+                 <ToolButton onClick={formatH3} title="Heading 3"><Heading3 className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
+               </div>
+               {/* Text Formatting */}
+               <div className="flex items-center gap-1 pr-2 border-r" style={{ borderColor: "var(--border)" }}>
+                 <ToolButton onClick={formatBold} title="Bold"><Bold className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
+                 <ToolButton onClick={formatItalic} title="Italic"><Italic className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
+                 <ToolButton onClick={formatStrikethrough} title="Strikethrough"><Strikethrough className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
+               </div>
+               {/* Links/Images */}
+               <div className="flex items-center gap-1 pr-2 border-r" style={{ borderColor: "var(--border)" }}>
+                 <ToolButton onClick={formatLink} title="Link"><Link className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
+                 <ToolButton onClick={formatImage} title="Image"><Image className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
+               </div>
+               {/* Lists */}
+               <div className="flex items-center gap-1 pr-2 border-r" style={{ borderColor: "var(--border)" }}>
+                 <ToolButton onClick={formatUnorderedList} title="Bullet List"><List className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
+                 <ToolButton onClick={formatOrderedList} title="Numbered List"><ListOrdered className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
+               </div>
+               {/* Code/Quote */}
+               <div className="flex items-center gap-1 pr-2 border-r" style={{ borderColor: "var(--border)" }}>
+                 <ToolButton onClick={formatInlineCode} title="Inline Code"><Code className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
+                 <ToolButton onClick={formatCodeBlock} title="Code Block"><Code2 className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
+                 <ToolButton onClick={formatQuote} title="Quote"><Quote className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
+               </div>
+               {/* Table/HR */}
+               <div className="flex items-center gap-1">
+                 <ToolButton onClick={formatTable} title="Table"><Table className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
+                 <ToolButton onClick={formatHorizontalRule} title="Horizontal Rule"><Minus className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
+               </div>
+             </div>
+           )}
         </div>
-
+        
         <div className="flex items-center gap-2 flex-shrink-0">
-          <button
-            type="button"
-            onClick={toggleViewMode}
-            className="flex items-center gap-1 px-2 py-1 rounded text-sm hover:bg-opacity-80 cursor-pointer"
-            style={{
-              backgroundColor: "var(--accent)",
-              color: "var(--accent-foreground)",
-            }}
-          >
-            {getViewModeIcon}
-            <span className="capitalize hidden sm:inline">{viewMode}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={toggleFullscreen}
-            className="flex items-center gap-1 px-2 py-1 rounded text-sm hover:bg-opacity-80 cursor-pointer"
-            style={{
-              backgroundColor: "var(--secondary)",
-              color: "var(--secondary-foreground)",
-            }}
-          >
-            {isFullscreen ? (
-              <Minimize className="w-3 h-3 sm:w-4 sm:h-4" />
-            ) : (
-              <Maximize className="w-3 h-3 sm:w-4 sm:h-4" />
-            )}
-          </button>
+           <button type="button" onClick={toggleViewMode} className="flex items-center gap-1 px-2 py-1 rounded text-sm hover:bg-opacity-80 cursor-pointer" style={{ backgroundColor: "var(--accent)", color: "var(--accent-foreground)" }}>
+             {getViewModeIcon}
+             <span className="capitalize hidden sm:inline">{viewMode}</span>
+           </button>
+           <button type="button" onClick={toggleFullscreen} className="flex items-center gap-1 px-2 py-1 rounded text-sm hover:bg-opacity-80 cursor-pointer" style={{ backgroundColor: "var(--secondary)", color: "var(--secondary-foreground)" }}>
+             {isFullscreen ? <Minimize className="w-3 h-3 sm:w-4 sm:h-4" /> : <Maximize className="w-3 h-3 sm:w-4 sm:h-4" />}
+           </button>
         </div>
       </div>
 
@@ -592,18 +539,19 @@ const BlogEditor = ({
             <div
               className={`${
                 viewMode === "split" ? "w-1/2" : "w-full"
-              } overflow-auto`}
+              }`}
             >
-              <div className="p-4">
-                <MdRenderCardWrapper
-                  content={value || "*Preview will appear here...*"}
-                  onDeleteImage={handleDeleteImage}
+              <div className="h-full p-4">
+                 {/* Virtualized Preview handles its own scrolling */}
+                <VirtualizedMdPreview
+                  content={previewContent || "*Preview will appear here...*"}
                 />
               </div>
             </div>
           )}
         </div>
       </div>
+
 
       {/* Image Cropper Modal */}
       {showCropper && selectedImageForCrop && (

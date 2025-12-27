@@ -122,6 +122,11 @@ const BlogHeader = ({ blog, onCommentClick }) => {
 
   return (
     <div className="w-full overflow-hidden">
+      {/* 
+        This container controls the centering of the header.
+        - On mobile (<768px): 100% width, no margin.
+        - On desktop: Max width 800px, centered with margin: 0 auto.
+      */}
       <div className="w-full px-2 sm:px-4 md:px-0 pb-6" style={containerStyle}>
         <header className="mb-6 border-b border-border pb-4">
           {/* Title */}

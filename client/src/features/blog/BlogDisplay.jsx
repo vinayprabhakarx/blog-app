@@ -235,6 +235,11 @@ const BlogDisplay = ({ blog }) => {
         id="article"
         className="w-full px-2 sm:px-4 md:px-0"
         style={{
+          /* 
+            CENTRAL ALIGNMENT LOGIC:
+            - Max-width is correctly limited to 800px on desktop to maintain readability and alignment.
+            - Margin is set to "0 auto" to center the content within the available space.
+          */
           maxWidth: window.innerWidth < 768 ? "100%" : "800px",
           margin: window.innerWidth < 768 ? 0 : "0 auto",
         }}
