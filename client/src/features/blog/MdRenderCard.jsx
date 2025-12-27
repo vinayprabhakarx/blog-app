@@ -35,7 +35,7 @@ const MarkdownOrderedList = React.memo(({ children, ...props }) => {
   const listStyle = useMemo(
     () => ({
       listStyleType: "decimal",
-      paddingLeft: "1.25rem",
+      paddingLeft: "2.5rem",
       marginBottom: "1rem",
     }),
     []
@@ -276,7 +276,7 @@ const MdRenderCard = React.memo(({ content = "", onDeleteImage }) => {
     .prose ol,
     .prose ul {
       list-style-position: outside;
-      padding-left: 1.5rem;
+      padding-left: 2.5rem;
       margin-bottom: 1rem;
       max-width: 100%;
       width: 100%;
