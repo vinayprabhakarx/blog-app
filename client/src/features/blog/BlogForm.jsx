@@ -43,6 +43,7 @@ const BlogForm = ({ existingBlog }) => {
     excerpt: "",
     tags: "",
     draft: false,
+    isFeatured: false,
   });
 
   const [formErrors, setFormErrors] = useState({});
@@ -76,6 +77,7 @@ const BlogForm = ({ existingBlog }) => {
           ? existingBlog.tags.join(", ")
           : "",
         draft: existingBlog.draft || false,
+        isFeatured: existingBlog.isFeatured || false,
       });
 
       if (existingBlog.banner) {
@@ -122,8 +124,8 @@ const BlogForm = ({ existingBlog }) => {
   }, [formData.title, isEditing]);
 
   const handleInputChange = (name, value) => {
-    if (name === "excerpt" && value.length > 200) {
-      value = value.substring(0, 200);
+    if (name === "excerpt" && value.length > 500) {
+      value = value.substring(0, 500);
     }
 
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -156,8 +158,8 @@ const BlogForm = ({ existingBlog }) => {
       errors.slug = "Slug must be at least 3 characters long";
     }
 
-    if (formData.excerpt.trim().length > 200) {
-      errors.excerpt = "Excerpt must be less than 200 characters long";
+    if (formData.excerpt.trim().length > 500) {
+      errors.excerpt = "Excerpt must be less than 500 characters long";
     }
 
     if (!formData.draft) {
@@ -194,6 +196,7 @@ const BlogForm = ({ existingBlog }) => {
         title: formData.title.trim(),
         slug: formData.slug.trim(),
         draft: formData.draft.toString(),
+        isFeatured: formData.isFeatured,
         category: formData.category,
         content: formData.content.trim(),
       };
@@ -240,6 +243,7 @@ const BlogForm = ({ existingBlog }) => {
           excerpt: "",
           tags: "",
           draft: false,
+          isFeatured: false,
         });
         // Clear auto-saved content after successful submission
         localStorage.removeItem("blog-draft-content");
@@ -507,16 +511,16 @@ const BlogForm = ({ existingBlog }) => {
               <div className="flex justify-between items-center mt-1">
                 <span
                   className={`text-sm ${
-                    formData.excerpt.length > 180
+                    formData.excerpt.length > 450
                       ? "text-warning"
-                      : formData.excerpt.length === 200
+                      : formData.excerpt.length === 500
                       ? "text-destructive"
                       : "text-muted-foreground"
                   }`}
                 >
-                  {formData.excerpt.length}/200 characters
+                  {formData.excerpt.length}/500 characters
                 </span>
-                {formData.excerpt.length >= 200 && (
+                {formData.excerpt.length >= 500 && (
                   <span className="text-destructive text-sm">
                     Character limit reached
                   </span>
@@ -617,18 +621,34 @@ const BlogForm = ({ existingBlog }) => {
 
             {/* Draft Toggle */}
             <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center">
-                <input
-                  type="checkbox"
-                  id="draft"
-                  checked={formData.draft}
-                  onChange={handleToggleDraft}
-                  disabled={isEditing ? updateLoading : createLoading}
-                  className="mr-2 h-4 w-4 text-primary focus:ring-primary border-input rounded cursor-pointer"
-                />
-                <label htmlFor="draft" className="text-sm text-foreground">
-                  Save as Draft
-                </label>
+              <div className="flex items-center gap-6">
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="draft"
+                    checked={formData.draft}
+                    onChange={handleToggleDraft}
+                    disabled={isEditing ? updateLoading : createLoading}
+                    className="mr-2 h-4 w-4 text-primary focus:ring-primary border-input rounded cursor-pointer"
+                  />
+                  <label htmlFor="draft" className="text-sm text-foreground">
+                    Save as Draft
+                  </label>
+                </div>
+
+                <div className="flex items-center">
+                  <input
+                    type="checkbox"
+                    id="isFeatured"
+                    checked={formData.isFeatured}
+                    onChange={() => setFormData(prev => ({ ...prev, isFeatured: !prev.isFeatured }))}
+                    disabled={isEditing ? updateLoading : createLoading}
+                    className="mr-2 h-4 w-4 text-primary focus:ring-primary border-input rounded cursor-pointer"
+                  />
+                  <label htmlFor="isFeatured" className="text-sm text-foreground">
+                    Feature Post
+                  </label>
+                </div>
               </div>
 
               {!isEditing && (
