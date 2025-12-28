@@ -1,6 +1,9 @@
 import { toast, Bounce } from "react-toastify";
 
 export const showToast = (type, message) => {
+  // Detect if dark mode is active
+  const isDarkMode = document.documentElement.classList.contains('dark');
+  
   const config = {
     position: "top-right",
     autoClose: 5000,
@@ -9,7 +12,7 @@ export const showToast = (type, message) => {
     pauseOnHover: true,
     draggable: true,
     progress: undefined,
-    theme: "light",
+    theme: isDarkMode ? "dark" : "light",
     transition: Bounce,
   };
 

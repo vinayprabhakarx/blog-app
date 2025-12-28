@@ -10,6 +10,7 @@ import {
 } from "./features/auth/authSlice";
 import "./index.css";
 import { useDispatch, useSelector } from "react-redux";
+import { useTheme } from "./utils/ThemeContext.jsx";
 
 // Initialize authentication state
 const AuthInitializer = ({ children }) => {
@@ -63,28 +64,36 @@ const AuthInitializer = ({ children }) => {
   return children;
 };
 
+const AppContent = () => {
+  const { theme } = useTheme();
+  
+  return (
+    <NotificationProvider>
+      <AuthInitializer>
+        <div className="App w-full min-h-screen bg-background text-foreground ">
+          <AppRouter />
+          <ToastContainer
+            position="top-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={false}
+            closeOnClick
+            rtl={false}
+            pauseOnFocusLoss
+            draggable
+            pauseOnHover
+            theme={theme}
+          />
+        </div>
+      </AuthInitializer>
+    </NotificationProvider>
+  );
+};
+
 function App() {
   return (
     <ThemeProvider>
-      <NotificationProvider>
-        <AuthInitializer>
-          <div className="App w-full min-h-screen bg-background text-foreground ">
-            <AppRouter />
-            <ToastContainer
-              position="top-right"
-              autoClose={5000}
-              hideProgressBar={false}
-              newestOnTop={false}
-              closeOnClick
-              rtl={false}
-              pauseOnFocusLoss
-              draggable
-              pauseOnHover
-              theme="light"
-            />
-          </div>
-        </AuthInitializer>
-      </NotificationProvider>
+      <AppContent />
     </ThemeProvider>
   );
 }
