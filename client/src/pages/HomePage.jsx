@@ -3,6 +3,8 @@ import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import BlogCard from "../features/blog/BlogCard";
 import BlogCardSkeleton from "../features/blog/BlogCardSkeleton";
+import FeaturedBlogSkeleton from "../features/blog/FeaturedBlogSkeleton";
+import FeaturedBlogCard from "../features/blog/FeaturedBlogCard";
 import Pagination from "../components/common/Pagination";
 
 import {
@@ -263,17 +265,41 @@ const HomePage = React.memo(() => {
           </section>
         )}
 
+        {/* Featured Post Section */}
+        {!isSearchMode &&
+          currentPage === 1 &&
+          !blogLoading.allBlogs &&
+          allBlogs.length > 0 && 
+          allBlogs[0].isFeatured && (
+            <section className="mb-8">
+              <FeaturedBlogCard blog={allBlogs[0]} />
+            </section>
+          )}
+
         {/* Blog Grid */}
         <section className="mb-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
             {blogLoading.allBlogs ? (
               // Show skeleton loaders while loading
-              Array.from({ length: postsPerPage }).map((_, index) => (
-                <BlogCardSkeleton key={`skeleton-${index}`} />
-              ))
+              <>
+                {/* Show Featured Skeleton only on first page if not searching */}
+                {!isSearchMode && currentPage === 1 && (
+                   <div className="col-span-full">
+                     <FeaturedBlogSkeleton />
+                   </div>
+                )}
+                {Array.from({ length: postsPerPage - (!isSearchMode && currentPage === 1 ? 1 : 0) }).map((_, index) => (
+                  <BlogCardSkeleton key={`skeleton-${index}`} />
+                ))}
+              </>
             ) : (
               // Show actual blog cards when loaded
-              allBlogs.map((blog) => <BlogCard key={blog._id} blog={blog} />)
+              // If showing featured post (and it IS featured), slice the first one off
+              // Otherwise show all posts in grid
+              (!isSearchMode && currentPage === 1 && allBlogs.length > 0 && allBlogs[0].isFeatured
+                ? allBlogs.slice(1)
+                : allBlogs
+              ).map((blog) => <BlogCard key={blog._id} blog={blog} />)
             )}
           </div>
         </section>
