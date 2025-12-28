@@ -92,7 +92,7 @@ const CategoriesView = () => {
           <h2 className="text-xl font-semibold text-destructive mb-2">
             Failed to Load Categories
           </h2>
-          <p className="text-muted-foreground mb-6 max-w-md mx-auto">
+          <p className="text-base sm:text-lg text-muted-foreground mb-6 max-w-md mx-auto">
             {error ||
               "Something went wrong while fetching categories. Please try again."}
           </p>
@@ -119,7 +119,7 @@ const CategoriesView = () => {
               No Categories Yet
             </h2>
           </div>
-          <p className="text-muted-foreground max-w-md mx-auto">
+          <p className="text-base sm:text-lg text-muted-foreground max-w-md mx-auto">
             Categories will appear here once they are created. Check back later
             for organized content.
           </p>

@@ -118,7 +118,7 @@ const CategoryManagement = () => {
               <h2 className="text-xl font-semibold mb-2 text-muted-foreground">
                 No Categories Yet
               </h2>
-              <p className="text-muted-foreground max-w-md mx-auto mb-4">
+              <p className="text-base sm:text-lg text-muted-foreground max-w-md mx-auto mb-4">
                 Create your first category to start organizing your content.
               </p>
               <Button asChild variant="outline">
