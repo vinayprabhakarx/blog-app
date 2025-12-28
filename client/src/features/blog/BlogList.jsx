@@ -41,6 +41,7 @@ import {
   FileCheck,
   FilePenLine,
   Plus,
+  Star,
 } from "lucide-react";
 import { formatDate } from "../../utils/formatDate";
 import { showToast } from "../../utils/showToast";
@@ -173,7 +174,7 @@ const BlogList = () => {
     return `${readTime} min read`;
   };
 
-  const truncateContent = (content, maxLength = 150) => {
+  const truncateContent = (content, maxLength = 250) => {
     const textContent = content?.replace(/<[^>]*>/g, "") || "";
     if (textContent.length <= maxLength) return textContent;
     return textContent.substring(0, maxLength) + "...";
@@ -651,34 +652,41 @@ const BlogList = () => {
                               : `/blog/${blog.slug}`
                           }
                         >
-                          <h2 className="text-lg sm:text-xl font-semibold mb-2 cursor-pointer hover:text-primary transition-colors">
+                          <h2 className="font-bold text-foreground mb-2 cursor-pointer hover:text-primary transition-colors text-lg sm:text-xl lg:text-2xl">
                             {blog.title}
                           </h2>
                         </Link>
 
-                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-muted-foreground mb-3">
-                          <div className="flex items-center gap-1">
-                            <User className="w-3 h-3 sm:w-4 sm:h-4" />
-                            <span>
+                        <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-base text-muted-foreground mb-3">
+                          <div className="flex items-center gap-1 hover:text-primary transition-colors">
+                            <User className="w-4 h-4" />
+                            <Link
+                              to={`/${
+                                blog.author?.personal_info?.username ||
+                                blog.authorInfo?.username ||
+                                ""
+                              }`}
+                              className="text-base font-medium text-foreground hover:text-primary transition-colors duration-200 hover:underline"
+                            >
                               {blog.author?.personal_info?.username ||
                                 blog.authorInfo?.username ||
                                 "Unknown Author"}
-                            </span>
+                            </Link>
                           </div>
 
                           <div className="flex items-center gap-1">
-                            <Calendar className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <Calendar className="w-4 h-4" />
                             <span>{formatDate(blog.createdAt)}</span>
                           </div>
 
                           <div className="flex items-center gap-1">
-                            <Clock className="w-3 h-3 sm:w-4 sm:h-4" />
+                            <Clock className="w-4 h-4" />
                             <span>{formatReadTime(blog.content)}</span>
                           </div>
 
                           {blog.views && (
                             <div className="flex items-center gap-1">
-                              <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                              <Eye className="w-4 h-4" />
                               <span>{blog.views} views</span>
                             </div>
                           )}
@@ -686,8 +694,14 @@ const BlogList = () => {
 
                         <div className="mb-3 flex flex-wrap gap-2">
                           {blog.category && (
-                            <Badge variant="secondary" className="text-xs">
-                              <Tag className="w-3 h-3 mr-1" />
+                            <Link
+                              to={`/category/${
+                                categories.find(
+                                  (cat) => cat.slug === blog.category
+                                )?.slug || blog.category
+                              }`}
+                              className="text-sm font-medium text-primary hover:underline underline-offset-4 decoration-primary/30 transition-all uppercase tracking-wide"
+                            >
                               {categories.find(
                                 (cat) => cat.slug === blog.category
                               )?.name ||
@@ -695,6 +709,12 @@ const BlogList = () => {
                                   ? blog.category.name
                                   : blog.category) ||
                                 "Unknown Category"}
+                            </Link>
+                          )}
+                          {blog.isFeatured && (
+                            <Badge className="bg-primary/10 text-primary hover:bg-primary/20 border-primary/20 text-xs">
+                              <Star className="w-3 h-3 mr-1 fill-primary" />
+                              Featured
                             </Badge>
                           )}
                           {isMyBlogsPage && (
@@ -717,7 +737,7 @@ const BlogList = () => {
                           )}
                         </div>
 
-                        <p className="text-muted-foreground mb-4 text-sm sm:text-base">
+                        <p className="text-muted-foreground mb-4 text-lg line-clamp-3 sm:line-clamp-4 lg:line-clamp-5 leading-relaxed">
                           {truncateContent(blog.excerpt || blog.content || "")}
                         </p>
                       </div>

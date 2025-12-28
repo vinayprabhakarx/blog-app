@@ -76,7 +76,7 @@ const BlogCard = React.memo(
       return { name, slug };
     }, [blog?.category, blog?.categories, blog?.Category]);
     const excerptText = useMemo(() => {
-      const maxLength = variant === "compact" ? 100 : 150;
+      const maxLength = variant === "compact" ? 100 : 250;
       return truncateText(blogExcerpt || blogContent, maxLength);
     }, [truncateText, blogExcerpt, blogContent, variant]);
 
@@ -150,8 +150,14 @@ const BlogCard = React.memo(
 
         {/* Category pill - visible on all breakpoints */}
         {categoryInfo?.name && (
-          <div className="mb-2 text-xs text-muted-foreground">
-            {categoryInfo.name}
+          <div className="mb-2">
+            <Link
+              to={`/category/${categoryInfo.slug || categoryInfo.name}`}
+              className="text-sm font-medium text-primary hover:underline underline-offset-4 decoration-primary/30 transition-all uppercase tracking-wide"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {categoryInfo.name}
+            </Link>
           </div>
         )}
 
@@ -183,17 +189,19 @@ const BlogCard = React.memo(
             <div className="flex items-center justify-between py-1">
               <div className="flex items-center gap-2 sm:gap-3">
                 {/* Author Avatar */}
-                <Avatar className="h-5 w-5 sm:h-6 sm:w-6">
-                  <AvatarImage src={authorData.avatar} />
-                  <AvatarFallback>
-                    <User className="h-3 w-3 sm:h-3 sm:w-3" />
-                  </AvatarFallback>
-                </Avatar>
+                <Link to={`/${authorData.username}`} onClick={(e) => e.stopPropagation()}>
+                  <Avatar className="h-5 w-5 sm:h-6 sm:w-6 hover:opacity-80 transition-opacity">
+                    <AvatarImage src={authorData.avatar} />
+                    <AvatarFallback>
+                      <User className="h-3 w-3 sm:h-3 sm:w-3" />
+                    </AvatarFallback>
+                  </Avatar>
+                </Link>
 
                 {/* Author Name */}
                 <Link
                   to={`/${authorData.username}`}
-                  className="text-xs sm:text-sm font-medium text-muted-foreground truncate hover:text-primary transition-colors duration-200"
+                  className="text-base font-medium text-foreground hover:text-primary transition-colors duration-200"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {authorData.displayName}
@@ -202,8 +210,8 @@ const BlogCard = React.memo(
 
               {/* Date */}
               <div className="flex items-center gap-1 flex-shrink-0">
-                <Calendar className="w-3 h-3 sm:w-4 sm:h-4 text-muted-foreground" />
-                <span className="text-xs sm:text-sm text-muted-foreground">
+                <Calendar className="w-4 h-4 text-muted-foreground" />
+                <span className="text-base text-muted-foreground">
                   {formattedDate}
                 </span>
               </div>
@@ -213,7 +221,7 @@ const BlogCard = React.memo(
           {/* Excerpt */}
           <p
             className={cn(
-              "text-muted-foreground line-clamp-3 sm:line-clamp-4 lg:line-clamp-5 text-sm sm:text-base",
+              "text-muted-foreground line-clamp-3 sm:line-clamp-4 lg:line-clamp-5 text-lg leading-relaxed",
               variant === "compact" && "line-clamp-2 text-sm"
             )}
           >
