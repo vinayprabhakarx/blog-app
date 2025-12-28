@@ -19,6 +19,7 @@ const ResetPassword = React.lazy(() =>
   import("../features/auth/ResetPassword")
 );
 const VerifyEmail = React.lazy(() => import("../features/auth/VerifyEmail"));
+const ResendEmail = React.lazy(() => import("../features/auth/ResendEmail"));
 const ProfilePage = React.lazy(() => import("../pages/ProfilePage"));
 const EditProfile = React.lazy(() =>
   import("../features/settings/EditProfile")
@@ -84,6 +85,7 @@ const AppRouter = () => {
               <Route path="register" element={<Signup />} />
               <Route path="forgot-password" element={<ForgotPassword />} />
               <Route path="reset-password" element={<ResetPassword />} />
+              <Route path="resend-email" element={<ResendEmail />} />
             </Route>
 
             {/* Email Verification Route - Public access */}
