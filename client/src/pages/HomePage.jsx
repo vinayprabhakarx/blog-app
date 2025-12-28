@@ -116,16 +116,15 @@ const HomePage = React.memo(() => {
         return;
       }
 
-      // Skip fetch if we already have blogs for page 1 and not loading
-      // This prevents refetch when navigating back from a blog page
-      // Use memoized parameters for blog fetching
       // Optimization: Skip fetch if we already have the correct data for Page 1
+      // AND the loaded category matches the selected category
       if (
         allBlogs.length > 0 &&
         currentPage === 1 &&
         selectedCategory === "all" &&
         !blogLoading.allBlogs &&
-        blogPagination?.currentPage === 1
+        blogPagination?.currentPage === 1 &&
+        blogPagination?.loadedCategory === "all"
       ) {
         return;
       }
@@ -147,7 +146,6 @@ const HomePage = React.memo(() => {
     postsPerPage,
     hasFetchedCategories,
     selectedCategory,
-    // Removed allBlogs.length and blogLoading.allBlogs to prevent infinite loop on fetch error
   ]);
 
   useEffect(() => {

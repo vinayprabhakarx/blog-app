@@ -266,7 +266,11 @@ const blogSlice = createSlice({
         state.allBlogs =
           action.payload.blogs ||
           (Array.isArray(action.payload) ? action.payload : []);
-        state.allBlogsPagination = action.payload.pagination;
+        // Store pagination including the category that was loaded
+        state.allBlogsPagination = {
+          ...action.payload.pagination,
+          loadedCategory: action.meta.arg.category || "all",
+        };
       })
       .addCase(fetchAllBlogs.rejected, (state, action) => {
         state.allBlogsLoading = false;
