@@ -92,12 +92,12 @@ const FeaturedBlogCard = React.memo(({ blog, className, ...props }) => {
                  <img
                     src={imageSrc}
                     alt={blogTitle}
-                    className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
+                    className="h-full w-full object-cover transition-transform duration-500 group-hover/image:scale-105"
                     loading="eager"
                     onError={handleImageError}
                   />
                   {/* Click indicator - same as BlogCard */}
-                  <div className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                  <div className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm rounded-full p-1.5 opacity-0 group-hover/image:opacity-100 transition-opacity duration-200">
                     <svg
                       className="w-3 h-3 text-foreground"
                       fill="none"
