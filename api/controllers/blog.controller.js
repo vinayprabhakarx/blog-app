@@ -16,7 +16,7 @@ import { serverError } from "../utils/handleError.js";
 // @desc    Create a new blog post
 // @access  Private (Author, Admin)
 export const createBlog = async (req, res, next) => {
-  const { title, content, excerpt, tags, category, draft } = req.body;
+  const { title, content, excerpt, tags, category, draft, isFeatured } = req.body;
   const { id: authorId } = req.user;
 
   if (!title || !content || !category) {
@@ -55,6 +55,7 @@ export const createBlog = async (req, res, next) => {
     tags: tags ? tags.split(",").map((tag) => tag.trim()) : [], // Parse comma-separated tags
     category,
     draft: draft === "true",
+    isFeatured: isFeatured === "true" || isFeatured === true,
     author: authorId,
     // Store author backup info
     authorInfo: {
@@ -87,85 +88,106 @@ export const createBlog = async (req, res, next) => {
 // @route   GET /api/blogs
 // @desc    Get all published blogs with filtering and pagination
 // @access  Public
+// @route   GET /api/blogs
+// @desc    Get all published blogs with filtering and pagination
+// @access  Public
 export const getAllBlogs = async (req, res, next) => {
   const {
     page = 1,
-    limit = 10,
+    limit = 9,
     search = "",
     category = "",
     tag = "",
     username = "",
   } = req.query;
 
-  const query = { draft: false };
+  // Determine if this is a standard homepage feed request (no filters)
+  const isHomeFeed = !search && !category && !tag && !username;
+  
+  let query = { draft: false };
+  let heroPost = null;
+
+  // 1. If Home Feed, find the single latest featured post
+  if (isHomeFeed) {
+    heroPost = await Blog.findOne({ draft: false, isFeatured: true })
+      .populate("author", "personal_info.name personal_info.username personal_info.profile_img")
+      .populate("category", "name slug")
+      .sort({ updatedAt: -1 })
+      .lean();
+  }
+
+  // 2. Build the main query (for everything else)
+  if (isHomeFeed && heroPost) {
+    // Exclude the hero post from the main list so it doesn't duplicate
+    query._id = { $ne: heroPost._id };
+  }
 
   if (search) {
-    // Find authors whose names match the search query
     const authors = await User.find({
       "personal_info.name": { $regex: search, $options: "i" },
     }).select("_id");
     const authorIds = authors.map((author) => author._id);
-
-    // Create a search condition for either the blog title or the author
     query.$or = [
       { title: { $regex: search, $options: "i" } },
       { author: { $in: authorIds } },
     ];
   }
 
-  if (category) {
-    query.category = category;
-  }
-  if (tag) {
-    query.tags = tag;
-  }
-
+  if (category) query.category = category;
+  if (tag) query.tags = tag;
   if (username) {
-    // Find user by username and filter blogs by that author
     const user = await User.findOne({
       "personal_info.username": username.toLowerCase(),
     }).select("_id");
-
-    if (user) {
-      query.author = user._id;
-    } else {
-      // If username not found, return empty result
-      return res.status(200).json({
-        success: true,
-        blogs: [],
-        pagination: {
-          currentPage: parseInt(page),
-          totalPages: 0,
-          totalBlogs: 0,
-        },
-      });
-    }
+    if (user) query.author = user._id;
+    else return res.status(200).json({ success: true, blogs: [], pagination: { currentPage: parseInt(page), totalBlogs: 0, totalPages: 0 } });
   }
 
-  const skip = (parseInt(page) - 1) * parseInt(limit);
+  // 3. Calculate Pagination
+  let skip, limitNum = parseInt(limit);
+  
+  if (isHomeFeed && heroPost) {
+    // Special Home Feed Pagination
+    if (parseInt(page) === 1) {
+      // Page 1: Hero takes 1 slot, need (limit-1) others
+      skip = 0;
+      limitNum = limitNum - 1;
+    } else {
+      // Page > 1: Skip the standard items we showed on page 1 (which was limit-1 items)
+      // + all full pages in between
+      skip = (parseInt(page) - 1) * parseInt(limit) - 1; 
+    }
+  } else {
+    // Standard Pagination
+    skip = (parseInt(page) - 1) * parseInt(limit);
+  }
 
-  const blogs = await Blog.find(query)
-    .populate(
-      "author",
-      "personal_info.name personal_info.username personal_info.profile_img"
-    )
+  // 4. Fetch the "Other" blogs
+  const standardBlogs = await Blog.find(query)
+    .populate("author", "personal_info.name personal_info.username personal_info.profile_img")
     .populate("category", "name slug")
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(parseInt(limit))
-    .lean() // Use lean for faster queries when not modifying docs
+    .sort({ createdAt: -1 }) // Sort strictly by date, ignoring isFeatured
+    .skip(Math.max(0, skip)) // Protect against negative skip
+    .limit(limitNum)
+    .lean()
     .catch((err) => {
       throw databaseError("fetching all blogs", err);
     });
 
-  const totalBlogs = await Blog.countDocuments(query).catch((err) => {
-    throw databaseError("counting blogs", err);
-  });
+  // 5. Combine results
+  let finalBlogs = standardBlogs;
+  
+  if (isHomeFeed && heroPost && parseInt(page) === 1) {
+    finalBlogs = [heroPost, ...standardBlogs];
+  }
 
+  // 6. Get Counts
+  const totalStandard = await Blog.countDocuments(query);
+  const totalBlogs = (isHomeFeed && heroPost) ? totalStandard + 1 : totalStandard;
   const totalPages = Math.ceil(totalBlogs / parseInt(limit));
 
-  // Map blogs to set author to "Admin" if null
-  const blogsWithAdmin = blogs.map((blog) => ({
+  // 7. Normalize Author (Admin check)
+  const blogsWithAdmin = finalBlogs.map((blog) => ({
     ...blog,
     author: blog.author || { personal_info: { name: "Admin" } },
   }));
@@ -426,7 +448,7 @@ export const getBlogBySlug = async (req, res, next) => {
 // @access  Private (Author, Admin)
 export const updateBlog = async (req, res, next) => {
   const { id } = req.params;
-  const { title, content, excerpt, tags, category, draft } = req.body;
+  const { title, content, excerpt, tags, category, draft, isFeatured } = req.body;
   const { id: userId, role: userRole } = req.user;
 
   const blog = await Blog.findById(id).catch((err) => {
@@ -448,6 +470,7 @@ export const updateBlog = async (req, res, next) => {
   if (excerpt !== undefined) blog.excerpt = excerpt;
   if (category) blog.category = category;
   if (draft !== undefined) blog.draft = draft;
+  if (isFeatured !== undefined) blog.isFeatured = isFeatured === "true" || isFeatured === true;
   if (tags) blog.tags = tags.split(",").map((tag) => tag.trim());
 
   // Ensure authorInfo exists for validation (for blogs created before authorInfo was added)

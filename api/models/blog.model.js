@@ -20,7 +20,7 @@ const blogSchema = new mongoose.Schema(
     excerpt: {
       type: String,
       trim: true,
-      maxlength: [200, "Excerpt must be less than 300 characters long"],
+      maxlength: [500, "Excerpt must be less than 500 characters long"],
       default: "",
     },
     tags: {
@@ -71,6 +71,10 @@ const blogSchema = new mongoose.Schema(
       lowercase: true,
     },
     draft: {
+      type: Boolean,
+      default: false,
+    },
+    isFeatured: {
       type: Boolean,
       default: false,
     },
