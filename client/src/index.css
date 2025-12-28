@@ -105,51 +105,52 @@ body {
   -webkit-line-clamp: 3;
 }
 
+
 /* --- Light Theme (Default) --- */
 :root {
   --radius: 0.625rem;
-  --background: #faf8f7;
-  --foreground: #211816;
-  --card: #fef9f6;
-  --card-foreground: #211816;
-  --popover: #fef9f6;
-  --popover-foreground: #211816;
-  --primary: #cf4040;
-  --primary-foreground: #fcf7f5;
-  --secondary: #e9e4dc;
-  --secondary-foreground: #281f1d;
-  --muted: #f6f1ec;
-  --muted-foreground: #736660;
-  --accent: #e5dcd4;
-  --accent-foreground: #281f1d;
-  --destructive: #cf4040;
-  --destructive-foreground: #fcf7f5;
-  --border: #cdc1bd;
-  --input: #f6f1ec;
-  --ring: #cf4040;
+  --background: #faf8f6;
+  --foreground: #1a1a1a;
+  --card: #ffffff;
+  --card-foreground: #1a1a1a;
+  --popover: #ffffff;
+  --popover-foreground: #1a1a1a;
+  --primary: #18181b;
+  --primary-foreground: #fafafa;
+  --secondary: #f4f4f5;
+  --secondary-foreground: #27272a;
+  --muted: #f9f9f9;
+  --muted-foreground: #71717a;
+  --accent: #e4e4e7;
+  --accent-foreground: #27272a;
+  --destructive: #dc2626;
+  --destructive-foreground: #fafafa;
+  --border: #e4e4e7;
+  --input: #f4f4f5;
+  --ring: #18181b;
 }
 
 /* --- Dark Theme --- */
 .dark {
-  --background: #2f2727;
-  --foreground: #f0eae6;
-  --card: #27201e;
-  --card-foreground: #f0eae6;
-  --popover: #27201e;
-  --popover-foreground: #f0eae6;
-  --primary: #f47a7d;
-  --primary-foreground: #1c1412;
-  --secondary: #3a302e;
-  --secondary-foreground: #e2ddd9;
-  --muted: #2f2725;
-  --muted-foreground: #9f9692;
-  --accent: #423835;
-  --accent-foreground: #e2ddd9;
-  --destructive: #f47a7d;
-  --destructive-foreground: #f0eae6;
-  --border: #534b48;
-  --input: #2f2725;
-  --ring: #f47a7d;
+  --background: #1e1e1e;
+  --foreground: #d4d4d4;
+  --card: #252526;
+  --card-foreground: #cccccc;
+  --popover: #252526;
+  --popover-foreground: #cccccc;
+  --primary: #007acc;
+  --primary-foreground: #ffffff;
+  --secondary: #2d2d30;
+  --secondary-foreground: #cccccc;
+  --muted: #2d2d30;
+  --muted-foreground: #858585;
+  --accent: #094771;
+  --accent-foreground: #ffffff;
+  --destructive: #f48771;
+  --destructive-foreground: #ffffff;
+  --border: #3e3e42;
+  --input: #3c3c3c;
+  --ring: #007acc;
 }
 
 /* Apply base styles to global elements */
@@ -167,9 +168,17 @@ body {
     text-rendering: optimizeLegibility;
     /* Reduce layout shifts */
     font-display: swap;
-    /* Prevent font style transitions on page load */
-    transition: none !important;
   }
+}
+
+/* Global Smooth Theme Transitions */
+/* Apply transitions only when the transition class is present */
+.theme-transition,
+.theme-transition *,
+.theme-transition *::before,
+.theme-transition *::after {
+  transition: all 0.3s ease-in-out !important;
+  transition-delay: 0s !important;
 }
 
 /* Lightweight performance optimizations */

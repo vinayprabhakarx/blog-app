@@ -31,8 +31,18 @@ export const ThemeProvider = ({ children }) => {
   });
 
   useEffect(() => {
+    // Add transition class
+    document.documentElement.classList.add("theme-transition");
+    
     localStorage.setItem("theme", theme);
     document.documentElement.classList.toggle("dark", theme === "dark");
+    
+    // Remove transition class after transition completes
+    const timeout = setTimeout(() => {
+      document.documentElement.classList.remove("theme-transition");
+    }, 300); // 300ms matches CSS transition duration
+    
+    return () => clearTimeout(timeout);
   }, [theme]);
 
   const toggleTheme = () => {

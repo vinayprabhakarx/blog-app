@@ -140,15 +140,15 @@ const BlogHeader = ({ blog, onCommentClick }) => {
             </div>
           )}
           {/* Byline and Date */}
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mb-2">
-            <span>By&nbsp;</span>
+          <div className="flex flex-wrap items-center gap-2 text-lg mb-2">
+            <span className="text-muted-foreground">By&nbsp;</span>
             <Link
               to={`/${authorInfo.username}`}
-              className="font-semibold hover:underline"
+              className="font-semibold hover:underline text-foreground hover:text-primary transition-colors"
             >
               {authorInfo.username}
             </Link>
-            <span className="italic">&nbsp;|&nbsp;{formattedDateMobile}</span>
+            <span className="text-muted-foreground italic">&nbsp;|&nbsp;{formattedDateMobile}</span>
           </div>
           {/* Stats Row */}
           <div className="flex flex-nowrap items-center gap-4 md:gap-6 lg:gap-8 text-sm sm:text-base text-muted-foreground mt-4 min-w-0">
