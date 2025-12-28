@@ -59,18 +59,6 @@ const FeaturedBlogCard = React.memo(({ blog, className, ...props }) => {
     [formatDate, blogCreatedAt]
   );
 
-  // Extract category information
-  const categoryInfo = useMemo(() => {
-    const primaryCategory =
-      blog?.category || blog?.categories?.[0] || blog?.Category;
-    const name =
-      primaryCategory?.name ||
-      primaryCategory?.title ||
-      primaryCategory?.slug ||
-      null;
-    return name;
-  }, [blog?.category, blog?.categories, blog?.Category]);
-
   const excerptText = useMemo(() => {
     return truncateText(blogExcerpt || blogContent, 500);
   }, [truncateText, blogExcerpt, blogContent]);
