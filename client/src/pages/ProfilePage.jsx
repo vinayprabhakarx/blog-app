@@ -139,18 +139,37 @@ const ProfilePage = React.memo(() => {
   // Check if profile exists
   if (!profile) {
     return (
-      <div className="min-h-screen bg-background text-foreground">
-        <div className="flex justify-center items-center min-h-[50vh]">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-muted-foreground mb-4">
+      <div className="min-h-screen bg-background">
+        <div className="flex justify-center items-center min-h-screen p-6">
+          <div className="text-center max-w-2xl w-full space-y-8">
+            {/* Error Code */}
+            <div>
+              <h2 className="text-8xl sm:text-9xl font-bold text-primary/20 select-none">
+                404
+              </h2>
+            </div>
+
+            {/* Error Title */}
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
               Profile Not Found
-            </h2>
-            <p className="text-muted-foreground mb-4">
+            </h1>
+
+            {/* Error Message */}
+            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-md mx-auto">
               The requested profile could not be loaded.
             </p>
-            <Button onClick={handleBackClick} variant="outline">
-              Go Back
-            </Button>
+
+            {/* Action Button */}
+            <div className="pt-4">
+              <Button 
+                onClick={handleBackClick} 
+                variant="outline"
+                size="lg"
+                className="px-6 py-3 text-base min-w-[200px]"
+              >
+                Go Back
+              </Button>
+            </div>
           </div>
         </div>
       </div>
@@ -186,7 +205,7 @@ const ProfilePage = React.memo(() => {
 
         {/* Mobile Layout - Small screens */}
         <div className="block sm:hidden">
-          <div className="flex items-center gap-2 sm:gap-3 mb-3 sm:mb-4">
+          <div className="flex items-center gap-4 sm:gap-3 mb-3 sm:mb-4">
             {/* Avatar */}
             <div className="relative flex-shrink-0">
               <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 p-1">
@@ -212,7 +231,7 @@ const ProfilePage = React.memo(() => {
                   {profile.personal_info?.username || profile.username}
                 </span>
               </p>
-              <h1 className="text-lg font-bold text-foreground mb-1 leading-tight break-words uppercase">
+              <h1 className="text-base sm:text-lg font-bold text-foreground mb-1 leading-tight break-words uppercase">
                 {profile.personal_info?.name || profile.name}
               </h1>
             </div>
@@ -259,7 +278,7 @@ const ProfilePage = React.memo(() => {
           </div>
 
           {/* Profile Details */}
-          <div className="space-y-3 sm:space-y-4 text-base mb-6 sm:mb-8">
+          <div className="space-y-3 sm:space-y-4 text-sm sm:text-base mb-6 sm:mb-8">
             {profile.personal_info?.education && (
               <div className="flex items-center gap-2 sm:gap-3 text-muted-foreground">
                 <FaGraduationCap className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
@@ -330,7 +349,7 @@ const ProfilePage = React.memo(() => {
           {/* About Section */}
           <div className="border-t pt-6 sm:pt-8">
             <div className="flex items-center mb-4 sm:mb-6">
-              <h2 className="text-lg sm:text-xl font-semibold">About</h2>
+              <h2 className="text-base sm:text-lg sm:text-xl font-semibold">About</h2>
               <div className="ml-3 sm:ml-4 h-0.5 bg-primary w-6 sm:w-8"></div>
             </div>
 
@@ -339,11 +358,11 @@ const ProfilePage = React.memo(() => {
                 Bio
               </h3>
               {profile.personal_info?.bio ? (
-                <p className="text-foreground leading-relaxed text-sm sm:text-base">
+                <p className="text-foreground leading-relaxed text-base sm:text-lg">
                   {profile.personal_info.bio}
                 </p>
               ) : (
-                <p className="text-muted-foreground italic text-sm sm:text-base">
+                <p className="text-muted-foreground italic text-base sm:text-lg">
                   No bio available.
                 </p>
               )}
@@ -426,7 +445,7 @@ const ProfilePage = React.memo(() => {
           </div>
 
           {/* Profile Details */}
-          <div className="space-y-4 text-sm mb-8">
+          <div className="space-y-4 text-base mb-8">
             {profile.personal_info?.education && (
               <div className="flex items-center gap-3 text-muted-foreground">
                 <FaGraduationCap className="w-4 h-4 flex-shrink-0" />
@@ -485,7 +504,7 @@ const ProfilePage = React.memo(() => {
                         className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors"
                       >
                         <IconComponent className="w-4 h-4 flex-shrink-0" />
-                        <span className="text-sm truncate">{displayName}</span>
+                        <span className="text-base truncate">{displayName}</span>
                       </a>
                     );
                   }
@@ -504,11 +523,11 @@ const ProfilePage = React.memo(() => {
             <div>
               <h3 className="font-semibold mb-4 text-foreground">Bio</h3>
               {profile.personal_info?.bio ? (
-                <p className="text-foreground leading-relaxed text-base">
+                <p className="text-foreground leading-relaxed text-base sm:text-lg">
                   {profile.personal_info.bio}
                 </p>
               ) : (
-                <p className="text-muted-foreground italic text-base">
+                <p className="text-muted-foreground italic text-base sm:text-lg">
                   No bio available.
                 </p>
               )}
@@ -557,21 +576,21 @@ const ProfilePage = React.memo(() => {
                     </h1>
 
                     {/* Joined Date Above Social Links */}
-                    {(profile.joinedAt || profile.createdAt) && (
-                      <div className="flex items-center gap-2 mb-3">
-                        <FaCalendar className="w-4 h-4 text-muted-foreground" />
-                        <span className="text-sm text-muted-foreground">
-                          Joined{" "}
-                          {new Date(
-                            profile.joinedAt || profile.createdAt
-                          ).toLocaleDateString("en-US", {
-                            year: "numeric",
-                            month: "long",
-                            day: "numeric",
-                          })}
-                        </span>
-                      </div>
-                    )}
+                      {(profile.joinedAt || profile.createdAt) && (
+                        <div className="flex items-center gap-2 mb-3">
+                          <FaCalendar className="w-4 h-4 text-muted-foreground" />
+                          <span className="text-base text-muted-foreground">
+                            Joined{" "}
+                            {new Date(
+                              profile.joinedAt || profile.createdAt
+                            ).toLocaleDateString("en-US", {
+                              year: "numeric",
+                              month: "long",
+                              day: "numeric",
+                            })}
+                          </span>
+                        </div>
+                      )}
 
                     {/* Social Links - Desktop */}
                     {hasSocialLinks && (
@@ -601,7 +620,7 @@ const ProfilePage = React.memo(() => {
                                 className="flex items-center gap-2 text-muted-foreground hover:text-foreground transition-colors"
                               >
                                 <IconComponent className="w-3 h-3 sm:w-4 sm:h-4 flex-shrink-0" />
-                                <span className="text-sm truncate">
+                                <span className="text-base truncate">
                                   {displayName}
                                 </span>
                               </a>
@@ -656,7 +675,7 @@ const ProfilePage = React.memo(() => {
                 </div>
 
                 {/* Profile Details - Below Profile */}
-                <div className="space-y-4 text-sm">
+                <div className="space-y-4 text-base">
                   {profile.personal_info?.education && (
                     <div className="flex items-start gap-3 text-muted-foreground">
                       <FaGraduationCap className="w-4 h-4 mt-0.5 flex-shrink-0" />
@@ -684,7 +703,7 @@ const ProfilePage = React.memo(() => {
               <div>
                 <h3 className="font-semibold mb-4 text-foreground">Bio</h3>
                 {profile.personal_info?.bio ? (
-                  <p className="text-foreground leading-relaxed text-base">
+                  <p className="text-foreground leading-relaxed text-base sm:text-lg">
                     {profile.personal_info.bio}
                   </p>
                 ) : (
