@@ -265,6 +265,16 @@ const HomePage = React.memo(() => {
           </section>
         )}
 
+        {/* Featured Post Skeleton - Show when loading on page 1 with 'All' category */}
+        {!isSearchMode &&
+          currentPage === 1 &&
+          selectedCategory === "all" &&
+          blogLoading.allBlogs && (
+            <section className="mb-8">
+              <FeaturedBlogSkeleton />
+            </section>
+          )}
+
         {/* Featured Post Section */}
         {!isSearchMode &&
           currentPage === 1 &&
@@ -282,12 +292,6 @@ const HomePage = React.memo(() => {
             {blogLoading.allBlogs ? (
               // Show skeleton loaders while loading
               <>
-                {/* Show Featured Skeleton only on first page if not searching */}
-                {!isSearchMode && currentPage === 1 && (
-                   <div className="col-span-full">
-                     <FeaturedBlogSkeleton />
-                   </div>
-                )}
                 {Array.from({ length: postsPerPage - (!isSearchMode && currentPage === 1 ? 1 : 0) }).map((_, index) => (
                   <BlogCardSkeleton key={`skeleton-${index}`} />
                 ))}
