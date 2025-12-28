@@ -16,9 +16,11 @@ import {
   FaGraduationCap,
   FaMapMarkerAlt,
 } from "react-icons/fa";
+import { User } from "lucide-react";
 import { FaXTwitter } from "react-icons/fa6";
 import { Link } from "react-router-dom";
 import LoadingSpinner from "../components/common/LoadingSpinner";
+import NotFound from "../components/common/NotFound";
 
 const ProfilePage = React.memo(() => {
   const { username } = useParams();
@@ -120,59 +122,28 @@ const ProfilePage = React.memo(() => {
   // Show error state if profile loading failed
   if (error) {
     return (
-      <div className="min-h-screen bg-background text-foreground">
-        <div className="flex justify-center items-center min-h-[50vh]">
-          <div className="text-center">
-            <h2 className="text-2xl font-bold text-destructive mb-4">
-              Error Loading Profile
-            </h2>
-            <p className="text-muted-foreground mb-4">{error}</p>
-            <Button onClick={handleBackClick} variant="outline">
-              Go Back
-            </Button>
-          </div>
-        </div>
-      </div>
+      <NotFound
+        title="Profile Not Found"
+        customMessage="The profile you're looking for doesn't exist or may have been removed."
+        customIcon={<User className="w-12 h-12" />}
+        showBackButton={true}
+        backPath="/"
+        backText="Go Home"
+      />
     );
   }
 
   // Check if profile exists
   if (!profile) {
     return (
-      <div className="min-h-screen bg-background">
-        <div className="flex justify-center items-center min-h-screen p-6">
-          <div className="text-center max-w-2xl w-full space-y-8">
-            {/* Error Code */}
-            <div>
-              <h2 className="text-8xl sm:text-9xl font-bold text-primary/20 select-none">
-                404
-              </h2>
-            </div>
-
-            {/* Error Title */}
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
-              Profile Not Found
-            </h1>
-
-            {/* Error Message */}
-            <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-md mx-auto">
-              The requested profile could not be loaded.
-            </p>
-
-            {/* Action Button */}
-            <div className="pt-4">
-              <Button 
-                onClick={handleBackClick} 
-                variant="outline"
-                size="lg"
-                className="px-6 py-3 text-base min-w-[200px]"
-              >
-                Go Back
-              </Button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <NotFound
+        title="Profile Not Found"
+        customMessage="The requested profile could not be loaded."
+        customIcon={<User className="w-12 h-12" />}
+        showBackButton={true}
+        backPath="/"
+        backText="Go Home"
+      />
     );
   }
 

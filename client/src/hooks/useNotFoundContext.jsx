@@ -1,9 +1,9 @@
-import { useMemo } from 'react';
+import React, { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from './useAuth';
 import { useSelector } from 'react-redux';
 import { selectAllCategories } from '../features/category/categoriesSlice';
-import { Home, Search, BookOpen, Users, Settings, Shield, MessageCircle, BarChart } from 'lucide-react';
+import { Home, Search, BookOpen, Users, Settings, Shield, MessageCircle, BarChart, FileText, Lock, UserX, Globe, Folder, User, PenTool } from 'lucide-react';
 
 export const useNotFoundContext = () => {
   const location = useLocation();
@@ -102,7 +102,7 @@ export const useNotFoundContext = () => {
       let content = {
         title: 'Page Not Found',
         message: "The page you're looking for doesn't exist.",
-        errorIcon: '📄',
+        errorIcon: <FileText className="w-12 h-12" />,
         primaryAction: { path: '/', text: 'Go Home', icon: Home },
         suggestions: [],
         errorType: 'not_found'
@@ -114,7 +114,7 @@ export const useNotFoundContext = () => {
           return {
             title: 'Login Required',
             message: 'You need to log in to access the admin area.',
-            errorIcon: '🔐',
+            errorIcon: <Lock className="w-12 h-12" />,
             primaryAction: { path: '/login', text: 'Log In', icon: Users },
             suggestions: generateSuggestions(context),
             errorType: 'auth_required'
@@ -125,7 +125,7 @@ export const useNotFoundContext = () => {
           return {
             title: 'Admin Access Required',
             message: "You don't have permission to access this admin area.",
-            errorIcon: '🔒',
+            errorIcon: <Lock className="w-12 h-12" />,
             primaryAction: getUserDashboard(),
             suggestions: generateSuggestions(context),
             errorType: 'access_denied'
@@ -136,7 +136,7 @@ export const useNotFoundContext = () => {
         content = {
           title: 'Admin Page Not Found',
           message: 'The admin page you\'re looking for doesn\'t exist or may have been moved.',
-          errorIcon: '⚙️',
+          errorIcon: <Settings className="w-12 h-12" />,
           primaryAction: { path: '/admin', text: 'Admin Dashboard', icon: Shield },
           suggestions: [
             { path: '/admin/blogs', text: 'Manage Blogs', icon: BookOpen },
@@ -154,7 +154,7 @@ export const useNotFoundContext = () => {
           return {
             title: 'Login Required',
             message: 'You need to log in to access author features.',
-            errorIcon: '🔐',
+            errorIcon: <Lock className="w-12 h-12" />,
             primaryAction: { path: '/login', text: 'Log In', icon: Users },
             suggestions: generateSuggestions(context),
             errorType: 'auth_required'
@@ -165,7 +165,7 @@ export const useNotFoundContext = () => {
           return {
             title: 'Author Access Required',
             message: 'You need author privileges to access this area.',
-            errorIcon: '✍️',
+            errorIcon: <PenTool className="w-12 h-12" />,
             primaryAction: { path: '/profile', text: 'Go to Profile', icon: Settings },
             suggestions: generateSuggestions(context),
             errorType: 'author_required'
@@ -175,7 +175,7 @@ export const useNotFoundContext = () => {
         content = {
           title: 'Author Page Not Found',
           message: 'The author page you\'re looking for doesn\'t exist.',
-          errorIcon: '✍️',
+          errorIcon: <PenTool className="w-12 h-12" />,
           primaryAction: { path: '/author', text: 'Author Dashboard', icon: BookOpen },
           suggestions: [
             { path: '/author/my-blogs', text: 'My Blogs', icon: BookOpen },
@@ -194,7 +194,7 @@ export const useNotFoundContext = () => {
           message: blogSlug 
             ? `The blog post "${decodeURIComponent(blogSlug)}" doesn't exist or may have been removed.`
             : 'The blog you\'re looking for doesn\'t exist.',
-          errorIcon: '📝',
+          errorIcon: <BookOpen className="w-12 h-12" />,
           primaryAction: { path: '/', text: 'Browse All Articles', icon: BookOpen },
           suggestions: [
             { path: '/blogs', text: 'View All Blogs', icon: BookOpen },
@@ -212,7 +212,7 @@ export const useNotFoundContext = () => {
           message: categorySlug 
             ? `The category "${decodeURIComponent(categorySlug)}" doesn't exist.`
             : 'The category you\'re looking for doesn\'t exist.',
-          errorIcon: '📂',
+          errorIcon: <Folder className="w-12 h-12" />,
           primaryAction: { path: '/categories', text: 'Browse Categories', icon: Search },
           suggestions: [
             { path: '/', text: 'All Articles', icon: BookOpen },
@@ -232,7 +232,7 @@ export const useNotFoundContext = () => {
           return {
             title: 'Login Required',
             message: 'You need to log in to access your profile.',
-            errorIcon: '🔐',
+            errorIcon: <Lock className="w-12 h-12" />,
             primaryAction: { path: '/login', text: 'Log In', icon: Users },
             suggestions: [
               { path: '/', text: 'Browse Articles', icon: BookOpen },
@@ -245,7 +245,7 @@ export const useNotFoundContext = () => {
         content = {
           title: 'Profile Page Not Found',
           message: 'The profile page you\'re looking for doesn\'t exist.',
-          errorIcon: '👤',
+          errorIcon: <User className="w-12 h-12" />,
           primaryAction: { path: '/profile', text: 'My Profile', icon: Users },
           suggestions: generateSuggestions(context),
           errorType: 'profile_not_found'
@@ -257,7 +257,7 @@ export const useNotFoundContext = () => {
         content = {
           title: 'Page Not Found',
           message: 'The page you\'re looking for doesn\'t exist. Explore our articles or create an account to get started.',
-          errorIcon: '🌐',
+          errorIcon: <Globe className="w-12 h-12" />,
           primaryAction: { path: '/', text: 'Explore Articles', icon: BookOpen },
           suggestions: generateSuggestions(context),
           errorType: 'public_not_found'

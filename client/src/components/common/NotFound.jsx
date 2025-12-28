@@ -2,7 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "../ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useNotFoundContext } from "../../hooks/useNotFoundContext";
+import { useNotFoundContext } from "../../hooks/useNotFoundContext.jsx";
 
 const NotFound = ({
   title,
@@ -12,6 +12,7 @@ const NotFound = ({
   backText,
   customMessage,
   errorCode = "404",
+  customIcon,
 }) => {
   const navigate = useNavigate();
   const { content } = useNotFoundContext();
@@ -39,7 +40,7 @@ const NotFound = ({
 
         {/* Error Icon */}
         <div className="flex items-center justify-center text-5xl text-muted-foreground">
-          {contextualContent.errorIcon}
+          {customIcon || contextualContent.errorIcon}
         </div>
 
         {/* Error Title */}
