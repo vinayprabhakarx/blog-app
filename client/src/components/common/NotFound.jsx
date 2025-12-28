@@ -28,41 +28,48 @@ const NotFound = ({
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen p-6 bg-background">
-      <div className="text-center max-w-2xl w-full">
+    <div className="flex justify-center items-center py-20 px-6 bg-background">
+      <div className="text-center max-w-2xl w-full space-y-8">
+        {/* Error Code */}
+        <div>
+          <h2 className="text-8xl sm:text-9xl font-bold text-primary/20 select-none">
+            {errorCode}
+          </h2>
+        </div>
+
         {/* Error Icon */}
-        <div className="flex items-center justify-center text-6xl mb-4">
+        <div className="flex items-center justify-center text-5xl text-muted-foreground">
           {contextualContent.errorIcon}
         </div>
 
-        {/* Error Code */}
-        <div className="flex items-center justify-center text-5xl font-bold text-destructive mb-2.5">
-          {errorCode}
-        </div>
-
         {/* Error Title */}
-        <h1 className="text-3xl font-semibold mb-3 text-foreground">
+        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
           {finalTitle}
         </h1>
-        <p className="text-muted-foreground mb-8 text-lg leading-relaxed">
+
+        {/* Error Message */}
+        <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-md mx-auto">
           {finalMessage}
         </p>
 
-        {/* Primary Action */}
+        {/* Action Buttons */}
         {showBackButton && (
-          <div className="flex flex-col items-center gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
             <Link to={finalBackPath}>
-              <Button className="flex items-center gap-2 px-6 py-3 text-base">
+              <Button 
+                size="lg"
+                className="flex items-center gap-2 px-6 py-3 text-base w-full sm:w-auto min-w-[200px]"
+              >
                 <PrimaryIcon className="w-5 h-5" />
                 {finalBackText}
               </Button>
             </Link>
 
-            {/* Back Button */}
             <Button
-              variant="ghost"
+              variant="outline"
+              size="lg"
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 text-muted-foreground hover:text-foreground"
+              className="flex items-center gap-2 px-6 py-3 text-base w-full sm:w-auto min-w-[200px]"
             >
               <ArrowLeft className="w-4 h-4" />
               Go Back

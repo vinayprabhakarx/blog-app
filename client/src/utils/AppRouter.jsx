@@ -141,10 +141,10 @@ const AppRouter = () => {
 
               <Route path="blog/preview/:id" element={<BlogPage />} />
             </Route>
-          </Route>
 
-          {/* Not Found Route */}
-          <Route path="*" element={<NotFound />} />
+            {/* Not Found Route - inside AppLayout to show header/footer */}
+            <Route path="*" element={<NotFound />} />
+          </Route>
         </Routes>
       </Suspense>
     </Router>
