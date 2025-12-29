@@ -121,14 +121,8 @@ const ResendEmail = () => {
         {/* Header */}
         <div className="text-center mb-6">
           <div className="flex justify-center mb-4">
-            <div className="w-14 h-14 bg-primary/10 rounded-full flex items-center justify-center">
-              <Mail className="w-7 h-7 text-primary" />
-            </div>
           </div>
           <h1 className="text-2xl font-bold mb-2">Resend Verification Email</h1>
-          <p className="text-muted-foreground text-sm">
-            Enter your email address and we'll send you a new verification link.
-          </p>
         </div>
 
         {/* Form */}
