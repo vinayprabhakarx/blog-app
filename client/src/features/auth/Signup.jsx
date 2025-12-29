@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useRef, useCallback } from "react";
 import {
   Form,
   FormControl,
@@ -25,18 +25,25 @@ const SignUp = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading } = useSelector((state) => state.auth);
+  const debounceTimerRef = useRef(null);
 
   const formSchema = z
     .object({
-      name: z.string().min(3, "Name must be at least 3 characters long."),
+      name: z.string().min(1, "Name is required").min(3, "Name must be at least 3 characters long."),
       username: z
         .string()
+        .min(1, "Username is required")
         .min(3, "Username must be at least 3 characters long."),
-      email: z.string().email(),
+      email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
       password: z
         .string()
-        .min(6, "Password must be at least 6 characters long"),
-      confirmPassword: z.string(),
+        .min(1, "Password is required")
+        .min(6, "Password must be at least 6 characters long")
+        .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+        .regex(/[a-z]/, "Password must contain at least one lowercase letter")
+        .regex(/[0-9]/, "Password must contain at least one number")
+        .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
+      confirmPassword: z.string().min(1, "Please confirm your password"),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: "Password and confirm password should be same.",
@@ -45,6 +52,7 @@ const SignUp = () => {
 
   const form = useForm({
     resolver: zodResolver(formSchema),
+    mode: "onBlur", // Show errors only when user leaves field
     defaultValues: {
       name: "",
       username: "",
@@ -53,6 +61,36 @@ const SignUp = () => {
       confirmPassword: "",
     },
   });
+
+  // Watch all values to trigger revalidation when conditions are met
+  const watchedValues = form.watch();
+  const errors = form.formState.errors;
+
+  // Debounced revalidation to clear errors when user types valid value
+  useEffect(() => {
+    // Only revalidate if there are errors to potentially clear
+    const hasErrors = Object.keys(errors).length > 0;
+    if (!hasErrors) return;
+
+    // Clear previous timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // Debounce: wait 500ms after user stops typing to revalidate
+    debounceTimerRef.current = setTimeout(() => {
+      // Revalidate fields that have errors
+      Object.keys(errors).forEach((fieldName) => {
+        form.trigger(fieldName);
+      });
+    }, 500);
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [watchedValues, errors, form]);
 
   async function onSubmit(values) {
     try {

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -22,20 +22,52 @@ import { Mail, ArrowLeft, CheckCircle } from "lucide-react";
 import { Button } from "../../components/ui/button";
 
 const formSchema = z.object({
-  email: z.string().email("Please enter a valid email address"),
+  email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
 });
 
 const ResendEmail = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [sentEmail, setSentEmail] = useState("");
+  const debounceTimerRef = useRef(null);
 
   const form = useForm({
     resolver: zodResolver(formSchema),
+    mode: "onBlur", // Show errors when user leaves field
     defaultValues: {
       email: "",
     },
   });
+
+  // Watch all values to trigger revalidation when conditions are met
+  const watchedValues = form.watch();
+  const errors = form.formState.errors;
+
+  // Debounced revalidation to clear errors when user types valid value
+  useEffect(() => {
+    // Only revalidate if there are errors to potentially clear
+    const hasErrors = Object.keys(errors).length > 0;
+    if (!hasErrors) return;
+
+    // Clear previous timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // Debounce: wait 500ms after user stops typing to revalidate
+    debounceTimerRef.current = setTimeout(() => {
+      // Revalidate fields that have errors
+      Object.keys(errors).forEach((fieldName) => {
+        form.trigger(fieldName);
+      });
+    }, 500);
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [watchedValues, errors, form]);
 
   async function onSubmit(values) {
     try {

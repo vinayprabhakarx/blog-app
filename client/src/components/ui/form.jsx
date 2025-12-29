@@ -31,13 +31,12 @@ function FormItem({ className, ...props }) {
 }
 
 function FormLabel({ className, ...props }) {
-  const { error, formItemId } = useFormField();
+  const { formItemId } = useFormField();
 
   return (
     <Label
       data-slot="form-label"
-      data-error={!!error}
-      className={cn("data-[error=true]:text-destructive", className)}
+      className={className}
       htmlFor={formItemId}
       {...props}
     />

@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -25,18 +25,54 @@ const Login = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { loading } = useSelector((state) => state.auth);
+  const debounceTimerRef = useRef(null);
+
   const formSchema = z.object({
-    email: z.string().email(),
-    password: z.string().min(8, "Password must be at least 8 characters long"),
+    email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
+    password: z
+      .string()
+      .min(1, "Password is required")
+      .min(6, "Password must be at least 6 characters long"),
   });
 
   const form = useForm({
     resolver: zodResolver(formSchema),
+    mode: "onBlur", // Show errors when user leaves field
     defaultValues: {
       email: "",
       password: "",
     },
   });
+
+  // Watch all values to trigger revalidation when conditions are met
+  const watchedValues = form.watch();
+  const errors = form.formState.errors;
+
+  // Debounced revalidation to clear errors when user types valid value
+  useEffect(() => {
+    // Only revalidate if there are errors to potentially clear
+    const hasErrors = Object.keys(errors).length > 0;
+    if (!hasErrors) return;
+
+    // Clear previous timer
+    if (debounceTimerRef.current) {
+      clearTimeout(debounceTimerRef.current);
+    }
+
+    // Debounce: wait 500ms after user stops typing to revalidate
+    debounceTimerRef.current = setTimeout(() => {
+      // Revalidate fields that have errors
+      Object.keys(errors).forEach((fieldName) => {
+        form.trigger(fieldName);
+      });
+    }, 500);
+
+    return () => {
+      if (debounceTimerRef.current) {
+        clearTimeout(debounceTimerRef.current);
+      }
+    };
+  }, [watchedValues, errors, form]);
 
   // Clear any stale tokens on mount to prevent redirect loops
   useEffect(() => {
