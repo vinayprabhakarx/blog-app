@@ -60,13 +60,20 @@ api.interceptors.response.use(
     if (error.response && error.response.status === 401) {
       const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
       const isAuthPage = currentPath === "/login" || currentPath === "/signup";
+      const isVerifyPage = currentPath.startsWith("/verify-email") || currentPath.startsWith("/resend-email");
       const isAuthEndpoint = 
         error.config?.url?.includes("/auth/login") || 
-        error.config?.url?.includes("/auth/register");
+        error.config?.url?.includes("/auth/register") ||
+        error.config?.url?.includes("/auth/verify-email");
 
       // If we are already on the login page, just clear the token to be safe
       if (isAuthPage) {
         localStorage.removeItem("token");
+        return Promise.reject(error);
+      }
+
+      // If on verify-email or resend-email page, don't redirect - let the page handle the error
+      if (isVerifyPage) {
         return Promise.reject(error);
       }
 
