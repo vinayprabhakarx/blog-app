@@ -19,6 +19,13 @@ const createHtmlMessage = (message) =>
     )
     .join("");
 
+// Helper to get capitalized first name from full name
+const getCapitalizedFirstName = (fullName) => {
+  if (!fullName || typeof fullName !== 'string') return "there";
+  const firstName = fullName.trim().split(" ")[0];
+  return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+};
+
 // Template for email sent to site owner
 export const buildContactSubmissionEmail = ({
   userName,
@@ -102,10 +109,7 @@ Reply to this person: ${email}
 This message was submitted via the contact form on ${displayUrl}
   `;
 
-  // Extract and capitalize first name for subject
-  const firstName = userName.trim().split(" ")[0];
-  const capitalizedFirstName =
-    firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+  const capitalizedFirstName = getCapitalizedFirstName(userName);
 
   return {
     subject: `New Contact Submission from ${capitalizedFirstName}: ${subject}`,
@@ -124,10 +128,7 @@ export const buildContactConfirmationEmail = (
   const websiteUrl = process.env.SENDER_WEBSITE || "https://vinayprabhakar.dev";
   const displayUrl = websiteUrl.replace(/^https?:\/\//, "");
 
-  // Extract first name and capitalize
-  const firstName = userName.trim().split(" ")[0];
-  const capitalizedFirstName =
-    firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+  const capitalizedFirstName = getCapitalizedFirstName(userName);
 
   // Only include message if provided
   const messageSection = originalMessage
