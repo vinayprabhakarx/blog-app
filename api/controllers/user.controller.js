@@ -21,17 +21,8 @@ import { buildVerifyNewEmail } from "../templates/email/verificationTemplates.js
 // Build verification link for email
 const buildEmailVerificationLink = (token) => {
   const baseUrl =
-    process.env.CLIENT_URL || process.env.APP_URL || "http://localhost:5173";
-  const apiBase =
-    process.env.API_URL || process.env.SERVER_URL || "http://localhost:3000";
-  return {
-    linkForEmail: `${apiBase}/api/auth/verify-email?token=${encodeURIComponent(
-      token
-    )}`,
-    clientTokenLink: `${baseUrl}/verify-email?token=${encodeURIComponent(
-      token
-    )}`,
-  };
+    process.env.CLIENT_URL || "http://localhost:5173";
+  return `${baseUrl}/verify-email?token=${encodeURIComponent(token)}`;
 };
 
 // @route   GET /api/users/public-profile/:username
@@ -266,10 +257,10 @@ export const updateUser = async (req, res, next) => {
         process.env.JWT_SECRET,
         { expiresIn: "24h" }
       );
-      const { linkForEmail } = buildEmailVerificationLink(verifyToken);
+      const verifyLink = buildEmailVerificationLink(verifyToken);
       const { subject, html, text } = buildVerifyNewEmail(
         updatedUser.personal_info?.name,
-        linkForEmail
+        verifyLink
       );
       await sendEmail({
         to: updatedUser.personal_info.email,
