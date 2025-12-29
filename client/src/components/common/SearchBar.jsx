@@ -1,16 +1,22 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
 import { Input } from "../ui/input";
-import { Search, X, Loader2 } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Search, X, Loader2, Clock } from "lucide-react";
+import { useNavigate, useLocation } from "react-router-dom";
 import blogService from "../../features/blog/blogsService";
 
-const SearchBar = React.memo(() => {
+// Custom event for closing mobile search from SearchBar
+const CLOSE_MOBILE_SEARCH_EVENT = "closeMobileSearch";
+
+const SearchBar = React.memo(({ onResultClick } = {}) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
   const [isSearching, setIsSearching] = useState(false);
   const [showResults, setShowResults] = useState(false);
   const [selectedIndex, setSelectedIndex] = useState(-1);
+  const [recentSearches, setRecentSearches] = useState([]);
+  const [showRecent, setShowRecent] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   // Refs for optimization
   const debounceTimeoutRef = useRef(null);
@@ -33,7 +39,58 @@ const SearchBar = React.memo(() => {
     CACHE_EXPIRY: 5 * 60 * 1000,
     STALE_TIME: 30 * 1000,
     REQUEST_TIMEOUT: 5000,
+    MAX_RECENT_SEARCHES: 5,
   }), []);
+
+  // Load recent searches from localStorage
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem("recentSearches");
+      if (saved) {
+        setRecentSearches(JSON.parse(saved));
+      }
+    } catch (e) {
+      // Ignore localStorage errors
+    }
+  }, []);
+
+  // Clear search bar when route changes (e.g., clicking logo)
+  useEffect(() => {
+    setSearchQuery("");
+    setSearchResults([]);
+    setShowResults(false);
+    setShowRecent(false);
+    setIsSearching(false);
+    setSelectedIndex(-1);
+  }, [location.key]);
+
+  // Save search to recent searches
+  const saveToRecentSearches = useCallback((query) => {
+    const trimmed = query.trim();
+    if (trimmed.length < CONFIG.MIN_SEARCH_LENGTH) return;
+    
+    setRecentSearches((prev) => {
+      const filtered = prev.filter((s) => s.toLowerCase() !== trimmed.toLowerCase());
+      const updated = [trimmed, ...filtered].slice(0, CONFIG.MAX_RECENT_SEARCHES);
+      try {
+        localStorage.setItem("recentSearches", JSON.stringify(updated));
+      } catch (e) {
+        // Ignore localStorage errors
+      }
+      return updated;
+    });
+  }, [CONFIG.MIN_SEARCH_LENGTH, CONFIG.MAX_RECENT_SEARCHES]);
+
+  // Clear recent searches
+  const clearRecentSearches = useCallback(() => {
+    setRecentSearches([]);
+    try {
+      localStorage.removeItem("recentSearches");
+    } catch (e) {
+      // Ignore localStorage errors
+    }
+    setShowRecent(false);
+  }, []);
 
   // Cleanup function
   const cleanup = useCallback(() => {
@@ -154,6 +211,7 @@ const SearchBar = React.memo(() => {
       if (!backgroundRefresh) {
         setSearchResults(results);
         setShowResults(true);
+        setShowRecent(false);
       }
     } catch (error) {
       // Handle timeout or other errors silently
@@ -188,6 +246,7 @@ const SearchBar = React.memo(() => {
     if (cached) {
       setSearchResults(cached.data);
       setShowResults(true);
+      setShowRecent(false);
       setIsSearching(false);
 
       // Background refresh if stale
@@ -200,8 +259,9 @@ const SearchBar = React.memo(() => {
     // Show loading state immediately
     setIsSearching(true);
     setShowResults(true);
+    setShowRecent(false);
 
-    // Debounced Redux dispatch
+    // Debounced API call
     debounceTimeoutRef.current = setTimeout(() => {
       performSearch(trimmedQuery);
     }, CONFIG.DEBOUNCE_DELAY);
@@ -215,8 +275,50 @@ const SearchBar = React.memo(() => {
     handleSearch(value);
   }, [handleSearch]);
 
+  // Close mobile search helper
+  const closeMobileSearch = useCallback(() => {
+    window.dispatchEvent(new CustomEvent(CLOSE_MOBILE_SEARCH_EVENT));
+    if (onResultClick) onResultClick();
+  }, [onResultClick]);
+
   // Keyboard navigation
   const handleKeyDown = useCallback((e) => {
+    // Handle recent searches navigation
+    if (showRecent && recentSearches.length > 0 && !showResults) {
+      switch (e.key) {
+        case "ArrowDown":
+          e.preventDefault();
+          setSelectedIndex((prev) => 
+            prev < recentSearches.length - 1 ? prev + 1 : prev
+          );
+          return;
+        case "ArrowUp":
+          e.preventDefault();
+          setSelectedIndex((prev) => (prev > 0 ? prev - 1 : -1));
+          return;
+        case "Enter":
+          e.preventDefault();
+          if (selectedIndex >= 0 && recentSearches[selectedIndex]) {
+            setSearchQuery(recentSearches[selectedIndex]);
+            handleSearch(recentSearches[selectedIndex]);
+          } else if (searchQuery.trim().length >= CONFIG.MIN_SEARCH_LENGTH) {
+            saveToRecentSearches(searchQuery);
+            cleanup();
+            setIsSearching(false);
+            setShowResults(false);
+            setShowRecent(false);
+            closeMobileSearch();
+            navigate(`/?search=${encodeURIComponent(searchQuery.trim())}`);
+          }
+          return;
+        case "Escape":
+          setShowRecent(false);
+          setSelectedIndex(-1);
+          inputRef.current?.blur();
+          return;
+      }
+    }
+
     if (!showResults || searchResults.length === 0) return;
 
     switch (e.key) {
@@ -235,28 +337,42 @@ const SearchBar = React.memo(() => {
         if (selectedIndex >= 0 && searchResults[selectedIndex]) {
           handleResultClick(searchResults[selectedIndex]);
         } else if (searchQuery.trim().length >= CONFIG.MIN_SEARCH_LENGTH) {
+          saveToRecentSearches(searchQuery);
           cleanup();
+          setIsSearching(false);
           setShowResults(false);
+          closeMobileSearch();
           navigate(`/?search=${encodeURIComponent(searchQuery.trim())}`);
         }
         break;
       case "Escape":
         setShowResults(false);
+        setShowRecent(false);
         setSelectedIndex(-1);
         inputRef.current?.blur();
         break;
     }
-  }, [showResults, searchResults, selectedIndex, searchQuery, CONFIG.MIN_SEARCH_LENGTH, cleanup, navigate]);
+  }, [showResults, showRecent, searchResults, recentSearches, selectedIndex, searchQuery, CONFIG.MIN_SEARCH_LENGTH, cleanup, navigate, handleSearch, saveToRecentSearches, closeMobileSearch]);
 
   // Result click handler
   const handleResultClick = useCallback((blog) => {
+    saveToRecentSearches(searchQuery);
     cleanup();
     navigate(`/blog/${blog.slug}`);
     setSearchQuery("");
     setShowResults(false);
+    setShowRecent(false);
     setSearchResults([]);
     setSelectedIndex(-1);
-  }, [navigate, cleanup]);
+    closeMobileSearch();
+  }, [navigate, cleanup, searchQuery, saveToRecentSearches, closeMobileSearch]);
+
+  // Recent search click handler
+  const handleRecentClick = useCallback((query) => {
+    setSearchQuery(query);
+    handleSearch(query);
+    setShowRecent(false);
+  }, [handleSearch]);
 
   // Clear search
   const handleClearSearch = useCallback(() => {
@@ -264,6 +380,7 @@ const SearchBar = React.memo(() => {
     setSearchQuery("");
     setSearchResults([]);
     setShowResults(false);
+    setShowRecent(false);
     setSelectedIndex(-1);
     inputRef.current?.focus();
   }, [cleanup]);
@@ -273,24 +390,58 @@ const SearchBar = React.memo(() => {
     e.preventDefault();
     const trimmedQuery = searchQuery.trim();
     if (trimmedQuery.length >= CONFIG.MIN_SEARCH_LENGTH) {
+      saveToRecentSearches(trimmedQuery);
       cleanup();
+      setIsSearching(false);
       setShowResults(false);
+      setShowRecent(false);
+      closeMobileSearch();
       navigate(`/?search=${encodeURIComponent(trimmedQuery)}`);
     }
-  }, [searchQuery, CONFIG.MIN_SEARCH_LENGTH, navigate, cleanup]);
+  }, [searchQuery, CONFIG.MIN_SEARCH_LENGTH, navigate, cleanup, saveToRecentSearches, closeMobileSearch]);
 
-  // Focus handler
+  // Focus handler - show recent searches if empty
   const handleInputFocus = useCallback(() => {
     if (searchQuery.trim() && searchResults.length > 0) {
       setShowResults(true);
+    } else if (!searchQuery.trim() && recentSearches.length > 0) {
+      setShowRecent(true);
+      setSelectedIndex(-1);
     }
-  }, [searchQuery, searchResults.length]);
+  }, [searchQuery, searchResults.length, recentSearches.length]);
+
+  // Global keyboard shortcut (/ or Ctrl+K to focus search)
+  useEffect(() => {
+    const handleGlobalKeyDown = (e) => {
+      // Ignore if typing in an input, textarea, or contenteditable
+      const target = e.target;
+      if (target.tagName === "INPUT" || target.tagName === "TEXTAREA" || target.isContentEditable) {
+        return;
+      }
+
+      // "/" key to focus search
+      if (e.key === "/") {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+
+      // Ctrl+K or Cmd+K to focus search
+      if ((e.ctrlKey || e.metaKey) && e.key === "k") {
+        e.preventDefault();
+        inputRef.current?.focus();
+      }
+    };
+
+    document.addEventListener("keydown", handleGlobalKeyDown);
+    return () => document.removeEventListener("keydown", handleGlobalKeyDown);
+  }, []);
 
   // Click outside handler
   useEffect(() => {
     const handleClickOutside = (event) => {
       if (!event.target.closest("[data-search-container]")) {
         setShowResults(false);
+        setShowRecent(false);
         setSelectedIndex(-1);
       }
     };
@@ -309,6 +460,22 @@ const SearchBar = React.memo(() => {
     }
   }, [selectedIndex]);
 
+  // Expose focus method for external use
+  const focusInput = useCallback(() => {
+    inputRef.current?.focus();
+  }, []);
+
+  // Auto-focus only when opened as mobile search (onResultClick prop is passed)
+  useEffect(() => {
+    if (onResultClick) {
+      // Short delay to ensure DOM is ready
+      const timer = setTimeout(() => {
+        inputRef.current?.focus();
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [onResultClick]);
+
   return (
     <div className="relative w-full" data-search-container>
       <form onSubmit={handleFormSubmit} className="relative">
@@ -320,7 +487,7 @@ const SearchBar = React.memo(() => {
           )}
           <Input
             ref={inputRef}
-            placeholder="Search blogs..."
+            placeholder={onResultClick ? "Search blogs..." : "Press / or Ctrl+K to search"}
             value={searchQuery}
             onChange={handleInputChange}
             onFocus={handleInputFocus}
@@ -341,11 +508,45 @@ const SearchBar = React.memo(() => {
         </div>
       </form>
 
+      {/* Recent Searches Dropdown */}
+      {showRecent && recentSearches.length > 0 && !searchQuery.trim() && (
+        <div 
+          ref={resultsRef}
+          className="fixed md:absolute top-16 md:top-full left-0 right-0 md:mt-2 bg-background border-b md:border border-border md:rounded-md shadow-lg z-50 max-h-80 overflow-y-auto"
+        >
+          <div className="flex items-center justify-between px-3 py-2 border-b">
+            <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Recent Searches
+            </span>
+            <button
+              onClick={clearRecentSearches}
+              className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Clear
+            </button>
+          </div>
+          {recentSearches.map((query, index) => (
+            <button
+              key={query}
+              onClick={() => handleRecentClick(query)}
+              className={`w-full px-3 py-2.5 text-left transition-colors cursor-pointer border-b border-border/50 last:border-b-0 flex items-center gap-2 ${
+                index === selectedIndex
+                  ? "bg-accent"
+                  : "hover:bg-accent/50"
+              }`}
+            >
+              <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <span className="text-sm line-clamp-1">{query}</span>
+            </button>
+          ))}
+        </div>
+      )}
+
       {/* Search Results Dropdown */}
       {showResults && searchQuery.trim().length >= CONFIG.MIN_SEARCH_LENGTH && (
         <div 
           ref={resultsRef}
-          className="absolute top-full left-0 right-0 mt-2 bg-background border border-border rounded-md shadow-lg z-50 max-h-80 overflow-y-auto"
+          className="fixed md:absolute top-16 md:top-full left-0 right-0 md:mt-2 bg-background border-b md:border border-border md:rounded-md shadow-lg z-50 max-h-80 overflow-y-auto"
         >
           {isSearching && searchResults.length === 0 ? (
             <div className="p-4 text-center text-muted-foreground">
@@ -365,16 +566,15 @@ const SearchBar = React.memo(() => {
                 <button
                   key={blog._id}
                   onClick={() => handleResultClick(blog)}
-                  className={`w-full px-3 py-2 text-left transition-colors cursor-pointer border-none bg-transparent ${
+                  className={`w-full px-3 py-2.5 text-left transition-colors cursor-pointer border-b border-border/50 last:border-b-0 ${
                     index === selectedIndex
                       ? "bg-accent"
                       : "hover:bg-accent/50"
                   }`}
                 >
-                  <h4 className="font-medium text-sm line-clamp-1">
-                    {blog.title}
-                  </h4>
-                  <div className="flex items-center gap-2 mt-1">
+                  <span className="text-sm line-clamp-2 md:line-clamp-1">{blog.title}</span>
+                  {/* Show category and date only on desktop */}
+                  <div className="hidden md:flex items-center gap-2 mt-1">
                     <span className="text-xs text-muted-foreground">
                       {blog.category?.name}
                     </span>
@@ -396,3 +596,6 @@ const SearchBar = React.memo(() => {
 SearchBar.displayName = "SearchBar";
 
 export default SearchBar;
+
+// Export the close event name for Topbar to use
+export { CLOSE_MOBILE_SEARCH_EVENT };
