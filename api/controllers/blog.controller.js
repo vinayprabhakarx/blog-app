@@ -123,13 +123,29 @@ export const getAllBlogs = async (req, res, next) => {
   }
 
   if (search) {
+    // Find authors matching search term (by name or username)
     const authors = await User.find({
-      "personal_info.name": { $regex: search, $options: "i" },
+      $or: [
+        { "personal_info.name": { $regex: search, $options: "i" } },
+        { "personal_info.username": { $regex: search, $options: "i" } },
+      ],
     }).select("_id");
     const authorIds = authors.map((author) => author._id);
+
+    // Find categories matching search term
+    const Category = (await import("../models/category.model.js")).default;
+    const categories = await Category.find({
+      name: { $regex: search, $options: "i" },
+    }).select("_id");
+    const categoryIds = categories.map((cat) => cat._id);
+
+    // Search across all fields: title, tags, excerpt, author, category
     query.$or = [
       { title: { $regex: search, $options: "i" } },
-      { author: { $in: authorIds } },
+      { tags: { $regex: search, $options: "i" } },
+      { excerpt: { $regex: search, $options: "i" } },
+      ...(authorIds.length > 0 ? [{ author: { $in: authorIds } }] : []),
+      ...(categoryIds.length > 0 ? [{ category: { $in: categoryIds } }] : []),
     ];
   }
 
@@ -163,12 +179,23 @@ export const getAllBlogs = async (req, res, next) => {
   }
 
   // 4. Fetch the "Other" blogs
-  const standardBlogs = await Blog.find(query)
-    .populate("author", "personal_info.name personal_info.username personal_info.profile_img")
+  let blogQuery = Blog.find(query)
     .populate("category", "name slug")
-    .sort({ createdAt: -1 }) // Sort strictly by date, ignoring isFeatured
-    .skip(Math.max(0, skip)) // Protect against negative skip
-    .limit(limitNum)
+    .sort({ createdAt: -1 })
+    .skip(Math.max(0, skip))
+    .limit(limitNum);
+
+  // Optimize for search: exclude heavy fields and author image
+  if (search) {
+    blogQuery = blogQuery
+      .populate("author", "personal_info.name personal_info.username")
+      .select("-banner -content");
+  } else {
+    blogQuery = blogQuery
+      .populate("author", "personal_info.name personal_info.username personal_info.profile_img");
+  }
+
+  const standardBlogs = await blogQuery
     .lean()
     .catch((err) => {
       throw databaseError("fetching all blogs", err);
