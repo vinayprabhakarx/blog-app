@@ -104,132 +104,29 @@ const generateUniqueUsername = async (email) => {
   return username;
 };
 
-// Helper function to create consistent HTML responses for verification
-const createVerificationHtmlResponse = (status, clientBase) => {
-  const configs = {
-    success: {
-      title: "Email Verified Successfully",
-      icon: "✅",
-      color: "#10b981",
-      message:
-        "Your email has been verified. You will be redirected automatically...",
-      link: { url: `${clientBase}/login`, text: "Continue to Login" },
-      refreshTime: 3,
-    },
-    already: {
-      title: "Email Already Verified",
-      icon: "✅",
-      color: "#10b981",
-      message:
-        "Your email address has already been verified. You can now log in to your account.",
-      link: { url: `${clientBase}/login`, text: "Go to Login Page" },
-      refreshTime: 3,
-    },
-    expired: {
-      title: "Verification Link Expired",
-      icon: "⏰",
-      color: "#f59e0b",
-      message:
-        "Your verification link has expired. Please request a new one from the login page.",
-      link: { url: `${clientBase}/login`, text: "Go to Login Page" },
-      refreshTime: 5,
-    },
-    invalid: {
-      title: "Invalid Verification Link",
-      icon: "❌",
-      color: "#ef4444",
-      message: "This verification link is invalid or has already been used.",
-      link: { url: `${clientBase}/login`, text: "Go to Login Page" },
-      refreshTime: 5,
-    },
-    userNotFound: {
-      title: "User Not Found",
-      icon: "❌",
-      color: "#ef4444",
-      message:
-        "The user associated with this verification link could not be found.",
-      link: { url: `${clientBase}/register`, text: "Create New Account" },
-      refreshTime: 5,
-    },
-    error: {
-      title: "Verification Error",
-      icon: "⚠️",
-      color: "#ef4444",
-      message:
-        "An error occurred during verification. Please try again or contact support.",
-      link: { url: `${clientBase}/login`, text: "Go to Login Page" },
-      refreshTime: 5,
-    },
-  };
 
-  const config = configs[status] || configs.error;
-  // Ensure clientBase has proper protocol and no double domains
-  const cleanClientBase = clientBase.startsWith("http")
-    ? clientBase
-    : `https://${clientBase}`;
-  const redirectUrl = `${cleanClientBase}/verify-email?status=${status}`;
-
-  return `
-    <!DOCTYPE html>
-    <html>
-    <head>
-      <title>${config.title}</title>
-      <meta http-equiv="refresh" content="${config.refreshTime};url=${redirectUrl}">
-      <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    </head>
-    <body style="font-family: Arial, sans-serif; text-align: center; padding: 50px; background-color: #f9fafb; margin: 0;">
-      <div style="max-width: 500px; margin: 0 auto; background: white; padding: 40px; border-radius: 8px; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
-        <h1 style="color: ${config.color}; margin-bottom: 20px;">${config.icon} ${config.title}</h1>
-        <p style="color: #6b7280; margin-bottom: 30px; line-height: 1.5;">${config.message}</p>
-        <a href="${config.link.url}" style="display: inline-block; background-color: #3b82f6; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: 500;">${config.link.text}</a>
-        <p style="color: #9ca3af; font-size: 14px; margin-top: 20px;">You will be redirected automatically in ${config.refreshTime} seconds...</p>
-      </div>
-    </body>
-    </html>
-  `;
-};
-
-// Build verification link for email
+// Build verification link for email (direct to client)
 const buildEmailVerificationLink = (token) => {
-  const baseUrl =
-    process.env.CLIENT_URL ||
-    process.env.APP_URL ||
-    "https://blog.vinayprabhakar.dev";
-  // Link goes to backend GET endpoint for one-click verification, then can redirect to client
-  const apiBase =
-    process.env.API_URL ||
-    process.env.SERVER_URL ||
-    "https://blog.vinayprabhakar.dev";
-
-  // Remove trailing /api if present to avoid duplication
-  const cleanApiBase = apiBase.replace(/\/api$/, "");
-
-  // Debug logging for production
-  if (process.env.NODE_ENV === "production") {
-    console.log("=== EMAIL VERIFICATION LINK DEBUG ===");
-    console.log("CLIENT_URL env:", process.env.CLIENT_URL);
-    console.log("API_URL env:", process.env.API_URL);
-    console.log("baseUrl:", baseUrl);
-    console.log("apiBase:", apiBase);
-    console.log("cleanApiBase:", cleanApiBase);
+  const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+  
+  // Clean the client URL
+  let cleanClientUrl = clientUrl.replace(/\/$/, "");
+  if (!cleanClientUrl.startsWith("http://") && !cleanClientUrl.startsWith("https://")) {
+    cleanClientUrl = process.env.NODE_ENV === "production" 
+      ? `https://${cleanClientUrl}` 
+      : `http://${cleanClientUrl}`;
   }
 
-  const finalLinkForEmail = `https://${cleanApiBase.replace(
-    /^https?:\/\//,
-    ""
-  )}/api/auth/verify-email?token=${encodeURIComponent(token)}`;
+  const linkForEmail = `${cleanClientUrl}/verify-email?token=${encodeURIComponent(token)}`;
 
-  if (process.env.NODE_ENV === "production") {
-    console.log("Final linkForEmail:", finalLinkForEmail);
-    console.log("=====================================");
+  // Debug logging in development
+  if (process.env.NODE_ENV === "development") {
+    console.log("=== EMAIL VERIFICATION LINK ===");
+    console.log("Link:", linkForEmail);
+    console.log("===============================");
   }
 
-  return {
-    linkForEmail: finalLinkForEmail,
-    clientTokenLink: `${baseUrl}/verify-email?token=${encodeURIComponent(
-      token
-    )}`,
-  };
+  return { linkForEmail };
 };
 
 // @route   POST /api/auth/register
@@ -390,7 +287,10 @@ export const verifyEmail = async (req, res, next) => {
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (e) {
-      return next(authError("Invalid or expired verification token"));
+      if (e.name === "TokenExpiredError") {
+        return next(authError("Verification token has expired"));
+      }
+      return next(authError("Invalid verification token"));
     }
 
     if (decoded.purpose !== "verify_email" || !decoded.id) {
@@ -420,114 +320,62 @@ export const verifyEmail = async (req, res, next) => {
 };
 
 // @route   GET /api/auth/verify-email
-// @desc    Verify email via link click (query token) then redirect
+// @desc    Verify email via link click (query token) then redirect to client
 // @access  Public
 export const verifyEmailLink = async (req, res, next) => {
+  // Helper to get clean client URL
+  const getClientUrl = () => {
+    const clientBase = process.env.CLIENT_URL || "http://localhost:5173";
+    let cleanUrl = clientBase.replace(/\/api.*$/, "").replace(/\/$/, "");
+    if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
+      cleanUrl = `https://${cleanUrl}`;
+    }
+    return cleanUrl;
+  };
+
+  const clientUrl = getClientUrl();
+
   try {
     const { token } = req.query;
-    const clientBase =
-      process.env.CLIENT_URL || "https://blog.vinayprabhakar.dev";
 
-    // Clean clientBase to ensure no double domains in redirects and add https if missing
-    let cleanClientBase = clientBase.replace(/\/api.*$/, "").replace(/\/$/, "");
-    if (
-      !cleanClientBase.startsWith("http://") &&
-      !cleanClientBase.startsWith("https://")
-    ) {
-      cleanClientBase = `https://${cleanClientBase}`;
-    }
-
+    // No token provided
     if (!token) {
-      return res.redirect(
-        302,
-        `${cleanClientBase}/verify-email?status=invalid`
-      );
+      return res.redirect(302, `${clientUrl}/verify-email?status=invalid`);
     }
 
+    // Verify JWT token
     let decoded;
     try {
       decoded = jwt.verify(token, process.env.JWT_SECRET);
     } catch (e) {
-      const isExpired = e?.name === "TokenExpiredError";
-      const status = isExpired ? "expired" : "invalid";
-      const redirectUrl = `${cleanClientBase}/verify-email?status=${status}`;
-
-      try {
-        return res.redirect(302, redirectUrl);
-      } catch (redirectError) {
-        const status = isExpired ? "expired" : "invalid";
-        return res
-          .status(200)
-          .send(createVerificationHtmlResponse(status, cleanClientBase));
-      }
+      const status = e?.name === "TokenExpiredError" ? "expired" : "invalid";
+      return res.redirect(302, `${clientUrl}/verify-email?status=${status}`);
     }
 
+    // Check token purpose
     if (decoded.purpose !== "verify_email" || !decoded.id) {
-      const redirectUrl = `${cleanClientBase}/verify-email?status=invalid`;
-      try {
-        return res.redirect(302, redirectUrl);
-      } catch (redirectError) {
-        return res
-          .status(200)
-          .send(createVerificationHtmlResponse("invalid", cleanClientBase));
-      }
+      return res.redirect(302, `${clientUrl}/verify-email?status=invalid`);
     }
 
+    // Find user
     const user = await User.findById(decoded.id);
     if (!user) {
-      const redirectUrl = `${cleanClientBase}/verify-email?status=invalid`;
-      try {
-        return res.redirect(302, redirectUrl);
-      } catch (redirectError) {
-        return res
-          .status(200)
-          .send(
-            createVerificationHtmlResponse("userNotFound", cleanClientBase)
-          );
-      }
+      return res.redirect(302, `${clientUrl}/verify-email?status=invalid`);
     }
 
+    // Already verified
     if (user.emailVerified) {
-      const redirectUrl = `${cleanClientBase}/verify-email?status=already`;
-      try {
-        return res.redirect(302, redirectUrl);
-      } catch (redirectError) {
-        return res
-          .status(200)
-          .send(createVerificationHtmlResponse("already", cleanClientBase));
-      }
+      return res.redirect(302, `${clientUrl}/verify-email?status=already`);
     }
 
+    // Verify email
     user.emailVerified = true;
     await user.save();
 
-    const redirectUrl = `${cleanClientBase}/verify-email?status=success`;
-
-    // Try redirect first, with fallback HTML if redirect fails
-    try {
-      return res.redirect(302, redirectUrl);
-    } catch (redirectError) {
-      return res
-        .status(200)
-        .send(createVerificationHtmlResponse("success", cleanClientBase));
-    }
+    return res.redirect(302, `${clientUrl}/verify-email?status=success`);
   } catch (error) {
-    const clientBase =
-      process.env.CLIENT_URL || "https://blog.vinayprabhakar.dev";
-    let cleanClientBase = clientBase.replace(/\/api.*$/, "").replace(/\/$/, "");
-    if (
-      !cleanClientBase.startsWith("http://") &&
-      !cleanClientBase.startsWith("https://")
-    ) {
-      cleanClientBase = `https://${cleanClientBase}`;
-    }
-    try {
-      return res.redirect(302, `${cleanClientBase}/verify-email?status=error`);
-    } catch (finalRedirectError) {
-      return res
-        .status(200)
-        .send(createVerificationHtmlResponse("error", cleanClientBase));
-    }
+    console.error("Email verification error:", error);
+    return res.redirect(302, `${clientUrl}/verify-email?status=error`);
   }
 };
 
