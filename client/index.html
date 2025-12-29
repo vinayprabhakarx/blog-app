@@ -18,6 +18,36 @@
     gtag('config', 'G-1CHFVDX0FV');
   </script>
 
+  <!-- Prevent FOUC (Flash of Unstyled Content) by initializing theme immediately -->
+  <script>
+    (function () {
+      try {
+        const savedTheme = localStorage.getItem("theme");
+        const savedMode = localStorage.getItem("themeMode");
+        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
+        
+        let theme = "light";
+        
+        if (savedTheme) {
+          theme = savedTheme;
+        } else if (savedMode === "time") {
+          const hour = new Date().getHours();
+          theme = (hour >= 19 || hour < 6) ? "dark" : "light";
+        } else {
+           theme = prefersDark ? "dark" : "light";
+        }
+
+        if (theme === "dark") {
+          document.documentElement.classList.add("dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+        }
+      } catch (e) {
+        console.error("Theme init error:", e);
+      }
+    })();
+  </script>
+
 </head>
 
 <body>

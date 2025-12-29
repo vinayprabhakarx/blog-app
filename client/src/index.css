@@ -132,6 +132,7 @@ body {
 
 /* --- Dark Theme --- */
 .dark {
+  color-scheme: dark;
   --background: #1e1e1e;
   --foreground: #d4d4d4;
   --card: #252526;
@@ -177,7 +178,9 @@ body {
 .theme-transition *,
 .theme-transition *::before,
 .theme-transition *::after {
-  transition: all 0.3s ease-in-out !important;
+  transition-property: background-color, border-color, color, fill, stroke, box-shadow;
+  transition-duration: 0.3s !important;
+  transition-timing-function: ease-in-out !important;
   transition-delay: 0s !important;
 }
 
