@@ -55,6 +55,7 @@ const SearchBar = React.memo(({ onResultClick } = {}) => {
   }, []);
 
   // Clear search bar when route changes (e.g., clicking logo)
+  // Clear search bar when route changes
   useEffect(() => {
     setSearchQuery("");
     setSearchResults([]);
@@ -62,7 +63,7 @@ const SearchBar = React.memo(({ onResultClick } = {}) => {
     setShowRecent(false);
     setIsSearching(false);
     setSelectedIndex(-1);
-  }, [location.key]);
+  }, [location]);
 
   // Save search to recent searches
   const saveToRecentSearches = useCallback((query) => {
@@ -400,12 +401,14 @@ const SearchBar = React.memo(({ onResultClick } = {}) => {
     }
   }, [searchQuery, CONFIG.MIN_SEARCH_LENGTH, navigate, cleanup, saveToRecentSearches, closeMobileSearch]);
 
-  // Focus handler - show recent searches if empty
+  // Focus handler - show recent searches if available and no results shown
   const handleInputFocus = useCallback(() => {
     if (searchQuery.trim() && searchResults.length > 0) {
       setShowResults(true);
-    } else if (!searchQuery.trim() && recentSearches.length > 0) {
+      setShowRecent(false); // Ensure only one is shown
+    } else if (recentSearches.length > 0) {
       setShowRecent(true);
+      setShowResults(false);
       setSelectedIndex(-1);
     }
   }, [searchQuery, searchResults.length, recentSearches.length]);
@@ -491,6 +494,7 @@ const SearchBar = React.memo(({ onResultClick } = {}) => {
             value={searchQuery}
             onChange={handleInputChange}
             onFocus={handleInputFocus}
+            onClick={handleInputFocus}
             onKeyDown={handleKeyDown}
             className="h-9 pl-10 pr-10 rounded-full bg-muted border border-border focus:border-primary focus:outline-none focus:ring-0"
             autoComplete="off"
@@ -509,7 +513,7 @@ const SearchBar = React.memo(({ onResultClick } = {}) => {
       </form>
 
       {/* Recent Searches Dropdown */}
-      {showRecent && recentSearches.length > 0 && !searchQuery.trim() && (
+      {showRecent && recentSearches.length > 0 && (
         <div 
           ref={resultsRef}
           className="fixed md:absolute top-16 md:top-full left-0 right-0 md:mt-2 bg-background border-b md:border border-border md:rounded-md shadow-lg z-50 max-h-80 overflow-y-auto"
