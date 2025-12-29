@@ -21,20 +21,31 @@ const AuthInitializer = ({ children }) => {
     // Only run once on mount
     if (initializing) {
       const currentPath = window.location.pathname;
-      const publicRoutes = [
+      // Auth pages that should clear tokens (login/signup flow)
+      const authRoutes = [
         "/login",
         "/signup",
         "/forgot-password",
         "/reset-password",
-        "/verify-email",
       ];
-      const isPublicRoute = publicRoutes.some((route) =>
+      // Pages that bypass token logic entirely
+      const bypassRoutes = ["/verify-email", "/resend-email"];
+      
+      const isAuthRoute = authRoutes.some((route) =>
         currentPath.startsWith(route)
       );
+      const isBypassRoute = bypassRoutes.some((route) =>
+        currentPath.startsWith(route)
+      );
+      // Bypass routes - just complete initialization, don't touch auth state
+      if (isBypassRoute) {
+        dispatch(initializationComplete());
+        return;
+      }
 
       // CRITICAL: If on auth pages AND we have a token, clear it immediately
       // This prevents redirect loops from stale/invalid tokens
-      if (isPublicRoute && token) {
+      if (isAuthRoute && token) {
         console.log("AuthInitializer: Clearing stale token on auth page");
         localStorage.removeItem("token");
         dispatch({ type: "auth/logout" });
@@ -43,7 +54,7 @@ const AuthInitializer = ({ children }) => {
       }
 
       // If on auth pages without token, just complete initialization
-      if (isPublicRoute) {
+      if (isAuthRoute) {
         dispatch(initializationComplete());
         return;
       }
