@@ -1,4 +1,10 @@
-import React, { useEffect, useMemo, useState, useCallback } from "react";
+import React, {
+  useEffect,
+  useMemo,
+  useState,
+  useCallback,
+  useRef,
+} from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "../../hooks/useAuth";
 import { useCategories } from "../../hooks/useRedux";
@@ -38,12 +44,34 @@ export const SidebarBody = (props) => {
 export const DesktopSidebar = React.memo(
   ({ className, children, ...props }) => {
     const { open, setOpen, animate } = useSidebar();
+    const containerRef = useRef(null);
 
     const handleMouseEnter = useCallback(() => setOpen(true), [setOpen]);
     const handleMouseLeave = useCallback(() => setOpen(false), [setOpen]);
 
+    // Close sidebar on outside click for tablet and smaller (<= 1024px)
+    useEffect(() => {
+      if (!open) return;
+
+      const isTabletOrBelow = () =>
+        window.matchMedia("(max-width: 1024px)").matches;
+
+      const handleDocumentClick = (e) => {
+        if (!containerRef.current) return;
+        if (!isTabletOrBelow()) return; // Only handle for tablet / smaller
+        if (!containerRef.current.contains(e.target)) {
+          setOpen(false);
+        }
+      };
+
+      document.addEventListener("mousedown", handleDocumentClick);
+      return () =>
+        document.removeEventListener("mousedown", handleDocumentClick);
+    }, [open, setOpen]);
+
     return (
       <Motion.div
+        ref={containerRef}
         className={cn(
           "fixed left-0 z-50 px-4 py-4 hidden md:flex md:flex-col bg-background border-r border-border shrink-0 overflow-hidden",
           className
@@ -74,8 +102,27 @@ DesktopSidebar.displayName = "DesktopSidebar";
 
 export const MobileSidebar = React.memo(({ className, children, ...props }) => {
   const { open, setOpen } = useSidebar();
+  const containerRef = useRef(null);
 
   const handleOverlayClick = useCallback(() => setOpen(false), [setOpen]);
+
+  // Close on clicks outside the sidebar on small devices
+  useEffect(() => {
+    if (!open) return;
+
+    const isSmallScreen = () => window.matchMedia("(max-width: 767px)").matches;
+
+    const handleDocumentClick = (e) => {
+      if (!containerRef.current) return;
+      if (!isSmallScreen()) return; // Only for small screens
+      if (!containerRef.current.contains(e.target)) {
+        setOpen(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleDocumentClick);
+    return () => document.removeEventListener("mousedown", handleDocumentClick);
+  }, [open, setOpen]);
 
   return (
     <>
@@ -88,6 +135,7 @@ export const MobileSidebar = React.memo(({ className, children, ...props }) => {
       )}
       {/* Sidebar */}
       <Motion.div
+        ref={containerRef}
         className={cn(
           "fixed left-0 top-16 bottom-0 z-40 px-4 py-4 flex flex-col bg-background border-r border-border w-[250px] md:hidden",
           className
