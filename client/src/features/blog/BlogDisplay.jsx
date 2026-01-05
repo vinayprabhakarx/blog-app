@@ -3,10 +3,11 @@ import React, { useEffect, useCallback, useRef, useState } from "react";
 import MdRenderCardWrapper from "./MdRenderCardWrapper";
 
 // Chunk size in characters for each render
-const CHUNK_SIZE = 4000;
+// Increased chunk size to 8000 for fewer loads on large posts
+const CHUNK_SIZE = 8000;
 // Only apply chunking for blogs larger than this (in characters)
-// ~20,000 chars = ~5,000 words = ~25 min read
-const LARGE_BLOG_THRESHOLD = 20000;
+// ~24,000 chars = ~6,000 words = ~30 min read
+const LARGE_BLOG_THRESHOLD = 24000;
 
 /**
  * Converts a heading text to a slug ID (matching @uiw/react-md-editor behavior).
@@ -45,15 +46,17 @@ const findHeadingPosition = (content, targetSlug) => {
 const BlogDisplay = ({ blog }) => {
   const content = blog?.content || "";
   const isLargeBlog = content.length > LARGE_BLOG_THRESHOLD;
-  
+
   // For small blogs, show everything; for large blogs, chunk it
   const totalChunks = isLargeBlog ? Math.ceil(content.length / CHUNK_SIZE) : 1;
-  const [visibleChunks, setVisibleChunks] = useState(isLargeBlog ? 1 : totalChunks);
-  
-  const displayedContent = isLargeBlog 
+  const [visibleChunks, setVisibleChunks] = useState(
+    isLargeBlog ? 1 : totalChunks
+  );
+
+  const displayedContent = isLargeBlog
     ? content.slice(0, visibleChunks * CHUNK_SIZE)
     : content;
-    
+
   const containerRef = useRef(null);
   const pendingScrollRef = useRef(null);
   const articleRef = useRef(null);
@@ -65,14 +68,14 @@ const BlogDisplay = ({ blog }) => {
     const handlePause = () => {
       isPausedRef.current = true;
     };
-    
+
     const handleResume = () => {
       isPausedRef.current = false;
     };
-    
+
     window.addEventListener("blog-chunk-pause", handlePause);
     window.addEventListener("blog-chunk-resume", handleResume);
-    
+
     return () => {
       window.removeEventListener("blog-chunk-pause", handlePause);
       window.removeEventListener("blog-chunk-resume", handleResume);
@@ -83,24 +86,25 @@ const BlogDisplay = ({ blog }) => {
   // Pauses when user navigates to comments
   useEffect(() => {
     if (!isLargeBlog || visibleChunks >= totalChunks) return;
-    
+
     const handleScroll = () => {
       // Don't load more chunks if paused
       if (isPausedRef.current) return;
-      
+
       const scrollY = window.scrollY || window.pageYOffset;
       const viewportHeight = window.innerHeight;
-      
+
       // Get article bottom position
-      const articleBottom = articleRef.current?.getBoundingClientRect()?.bottom ?? 0;
+      const articleBottom =
+        articleRef.current?.getBoundingClientRect()?.bottom ?? 0;
       const articleBottomFromTop = scrollY + articleBottom;
-      
+
       // Pre-load when user is within 800px of article end (not page end)
       if (scrollY + viewportHeight + 800 >= articleBottomFromTop) {
         setVisibleChunks((prev) => Math.min(prev + 1, totalChunks));
       }
     };
-    
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isLargeBlog, visibleChunks, totalChunks]);
@@ -108,20 +112,20 @@ const BlogDisplay = ({ blog }) => {
   // Resume chunk loading ONLY when user scrolls UP and comments are not visible
   useEffect(() => {
     if (!isLargeBlog || visibleChunks >= totalChunks) return;
-    
+
     const handleScroll = () => {
       const currentScrollY = window.scrollY || window.pageYOffset;
       const isScrollingUp = currentScrollY < lastScrollYRef.current;
       lastScrollYRef.current = currentScrollY;
-      
+
       // Only check for resume if currently paused AND scrolling UP
       if (!isPausedRef.current || !isScrollingUp) return;
-      
+
       // Check if comment section exists
       const commentSection = document.getElementById("comment-section");
       if (commentSection) {
         const commentRect = commentSection.getBoundingClientRect();
-        
+
         // Resume only when comment section is completely BELOW the viewport
         // (user scrolled up and comments are no longer visible at all)
         if (commentRect.top > window.innerHeight) {
@@ -132,14 +136,18 @@ const BlogDisplay = ({ blog }) => {
         isPausedRef.current = false;
       }
     };
-    
+
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
   }, [isLargeBlog, visibleChunks, totalChunks]);
 
   useEffect(() => {
     // Reset when blog changes
-    setVisibleChunks(content.length > LARGE_BLOG_THRESHOLD ? 1 : Math.ceil(content.length / CHUNK_SIZE) || 1);
+    setVisibleChunks(
+      content.length > LARGE_BLOG_THRESHOLD
+        ? 1
+        : Math.ceil(content.length / CHUNK_SIZE) || 1
+    );
     isPausedRef.current = false;
   }, [blog?._id, content.length]);
 
