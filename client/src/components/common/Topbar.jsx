@@ -93,13 +93,13 @@ const Topbar = React.memo(() => {
   }, []);
 
   return (
-    <div className="flex justify-between items-center h-16 fixed w-full z-[100] bg-background/95 backdrop-blur-sm text-foreground pl-4 pr-3 sm:pl-4 sm:pr-4 md:pl-4 md:pr-6 border-b border-border/20 shadow-sm no-print">
+    <div className="flex justify-between items-center h-16 fixed w-full z-100 bg-background/95 backdrop-blur-sm text-foreground pl-4 pr-3 sm:pl-4 sm:pr-4 md:pl-4 md:pr-6 border-b border-border/20 shadow-sm no-print">
       {/* Mobile search mode - replaces entire navbar content like YouTube */}
       {showMobileSearch ? (
         <div className="flex items-center gap-2 w-full md:hidden pr-2">
           <button
             onClick={closeMobileSearch}
-            className="p-1.5 rounded-md hover:bg-accent/50 transition-colors flex-shrink-0"
+            className="p-1.5 rounded-md hover:bg-accent/50 transition-colors shrink-0"
             aria-label="Close search"
           >
             <ArrowLeft className="h-5 w-5" />
