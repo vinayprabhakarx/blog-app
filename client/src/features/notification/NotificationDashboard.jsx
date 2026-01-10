@@ -133,7 +133,7 @@ const NotificationDashboard = () => {
   }
 
   return (
-    <div className="max-w-5xl mx-auto p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
+    <section className="max-w-5xl mx-auto p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8" aria-label="Notifications">
       {/* Notification Center */}
       <div className="space-y-6 sm:space-y-8">
         {/* Header */}
@@ -324,7 +324,7 @@ const NotificationDashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
-    </div>
+    </section>
   );
 };
 

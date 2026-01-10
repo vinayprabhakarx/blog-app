@@ -87,7 +87,7 @@ const ForgotPassword = () => {
   };
 
   return (
-    <div className="flex justify-center items-start pt-32 w-screen min-h-screen bg-background">
+    <section className="flex justify-center items-start pt-32 w-screen min-h-screen bg-background">
       <Card className="w-[400px] p-5 bg-background text-foreground">
         <h1 className="text-2xl font-bold text-center mb-6">
           Forgot your password?
@@ -140,7 +140,7 @@ const ForgotPassword = () => {
           </form>
         </Form>
       </Card>
-    </div>
+    </section>
   );
 };
 

@@ -238,9 +238,9 @@ const BlogDisplay = ({ blog }) => {
         color: "var(--foreground)",
       }}
     >
-      <article
+      <div
         ref={articleRef}
-        id="article"
+        id="blog-content"
         className="w-full px-2 sm:px-4 md:px-0"
         style={{
           /* 
@@ -264,7 +264,7 @@ const BlogDisplay = ({ blog }) => {
             color: "var(--muted-foreground)",
           }}
         ></footer>
-      </article>
+      </div>
     </div>
   );
 };

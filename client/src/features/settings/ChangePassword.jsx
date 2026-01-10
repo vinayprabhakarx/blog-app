@@ -101,7 +101,7 @@ const ChangePassword = () => {
   }
 
   return (
-    <div className="min-h-screen w-full px-4 py-6 sm:px-6 sm:py-8">
+    <section className="min-h-screen w-full px-4 py-6 sm:px-6 sm:py-8">
       <div className="max-w-md mx-auto">
         {/* Header */}
         <div className="mb-6 sm:mb-8">
@@ -219,7 +219,7 @@ const ChangePassword = () => {
           </Form>
         )}
       </div>
-    </div>
+    </section>
   );
 };
 

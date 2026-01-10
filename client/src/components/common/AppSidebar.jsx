@@ -70,7 +70,7 @@ export const DesktopSidebar = React.memo(
     }, [open, setOpen]);
 
     return (
-      <Motion.div
+      <Motion.aside
         ref={containerRef}
         className={cn(
           "fixed left-0 z-50 px-4 py-4 hidden md:flex md:flex-col bg-background border-r border-border shrink-0 overflow-hidden",
@@ -93,7 +93,7 @@ export const DesktopSidebar = React.memo(
         {...props}
       >
         {children}
-      </Motion.div>
+      </Motion.aside>
     );
   }
 );
@@ -134,7 +134,7 @@ export const MobileSidebar = React.memo(({ className, children, ...props }) => {
         />
       )}
       {/* Sidebar */}
-      <Motion.div
+      <Motion.aside
         ref={containerRef}
         className={cn(
           "fixed left-0 top-16 bottom-0 z-40 px-4 py-4 flex flex-col bg-background border-r border-border w-[250px] md:hidden",
@@ -151,7 +151,7 @@ export const MobileSidebar = React.memo(({ className, children, ...props }) => {
         {...props}
       >
         {children}
-      </Motion.div>
+      </Motion.aside>
     </>
   );
 });

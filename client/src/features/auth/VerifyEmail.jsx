@@ -53,7 +53,7 @@ const VerifyEmail = () => {
   // Loading state
   if (status === "loading") {
     return (
-      <div className="flex justify-center items-center min-h-screen w-full bg-background px-4">
+      <section className="flex justify-center items-center min-h-screen w-full bg-background px-4">
         <Card className="w-[440px] max-w-full p-8 bg-background text-foreground border shadow-lg">
           <div className="text-center space-y-6">
             <div className="flex justify-center">
@@ -70,14 +70,14 @@ const VerifyEmail = () => {
             </div>
           </div>
         </Card>
-      </div>
+      </section>
     );
   }
 
   // Success state
   if (status === "success") {
     return (
-      <div className="flex justify-center items-center min-h-screen w-full bg-background px-4">
+      <section className="flex justify-center items-center min-h-screen w-full bg-background px-4">
         <Card className="w-[440px] max-w-full p-8 bg-background text-foreground border shadow-lg">
           <div className="text-center space-y-6">
             <div className="flex justify-center">
@@ -97,14 +97,14 @@ const VerifyEmail = () => {
             </Link>
           </div>
         </Card>
-      </div>
+      </section>
     );
   }
 
   // Already verified state
   if (status === "already") {
     return (
-      <div className="flex justify-center items-center min-h-screen w-full bg-background px-4">
+      <section className="flex justify-center items-center min-h-screen w-full bg-background px-4">
         <Card className="w-[440px] max-w-full p-8 bg-background text-foreground border shadow-lg">
           <div className="text-center space-y-6">
             <div className="flex justify-center">
@@ -124,14 +124,14 @@ const VerifyEmail = () => {
             </Link>
           </div>
         </Card>
-      </div>
+      </section>
     );
   }
 
   // Expired state
   if (status === "expired") {
     return (
-      <div className="flex justify-center items-center min-h-screen w-full bg-background px-4">
+      <section className="flex justify-center items-center min-h-screen w-full bg-background px-4">
         <Card className="w-[440px] max-w-full p-8 bg-background text-foreground border shadow-lg">
           <div className="text-center space-y-6">
             <div className="flex justify-center">
@@ -163,13 +163,13 @@ const VerifyEmail = () => {
             </div>
           </div>
         </Card>
-      </div>
+      </section>
     );
   }
 
   // Invalid or error state (default)
   return (
-    <div className="flex justify-center items-center min-h-screen w-full bg-background px-4">
+    <section className="flex justify-center items-center min-h-screen w-full bg-background px-4">
       <Card className="w-[440px] max-w-full p-8 bg-background text-foreground border shadow-lg">
         <div className="text-center space-y-6">
           <div className="flex justify-center">
@@ -203,7 +203,7 @@ const VerifyEmail = () => {
           </div>
         </div>
       </Card>
-    </div>
+    </section>
   );
 };
 

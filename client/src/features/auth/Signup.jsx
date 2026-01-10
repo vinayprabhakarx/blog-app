@@ -110,7 +110,7 @@ const SignUp = () => {
   }
 
   return (
-    <div className="flex justify-center items-center min-h-screen w-screen bg-background py-8">
+    <section className="flex justify-center items-center min-h-screen w-screen bg-background py-8">
       <Card className="w-[400px] p-5 bg-background text-foreground">
         <h1 className="text-2xl font-bold text-center mb-5">
           Create Your Account
@@ -243,7 +243,7 @@ const SignUp = () => {
           </form>
         </Form>
       </Card>
-    </div>
+    </section>
   );
 };
 

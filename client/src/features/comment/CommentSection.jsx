@@ -58,7 +58,7 @@ const CommentSection = ({
   // No loading spinners - comments appear instantly
 
   return (
-    <div className={cn("w-full space-y-4", className)}>
+    <section className={cn("w-full space-y-4", className)} aria-label="Comments">
       {/* Header */}
       <div className="border-b border-border/50 pb-4">
         <h3 className="text-xl font-semibold text-foreground">
@@ -166,7 +166,7 @@ const CommentSection = ({
           </div>
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

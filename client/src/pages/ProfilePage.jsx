@@ -318,7 +318,7 @@ const ProfilePage = React.memo(() => {
           </div>
 
           {/* About Section */}
-          <div className="border-t pt-6 sm:pt-8">
+          <section className="border-t pt-6 sm:pt-8" aria-label="About User">
             <div className="flex items-center mb-4 sm:mb-6">
               <h2 className="text-base sm:text-lg sm:text-xl font-semibold">About</h2>
               <div className="ml-3 sm:ml-4 h-0.5 bg-primary w-6 sm:w-8"></div>
@@ -338,7 +338,7 @@ const ProfilePage = React.memo(() => {
                 </p>
               )}
             </div>
-          </div>
+          </section>
         </div>
 
         {/* Tablet Layout - Medium screens */}
@@ -485,7 +485,7 @@ const ProfilePage = React.memo(() => {
           </div>
 
           {/* About Section */}
-          <div className="border-t pt-8">
+          <section className="border-t pt-8" aria-label="About User">
             <div className="flex items-center mb-6">
               <h2 className="text-xl font-semibold">About</h2>
               <div className="ml-4 h-0.5 bg-primary w-8"></div>
@@ -503,7 +503,7 @@ const ProfilePage = React.memo(() => {
                 </p>
               )}
             </div>
-          </div>
+          </section>
         </div>
 
         {/* Desktop Layout - Large screens */}
@@ -665,7 +665,7 @@ const ProfilePage = React.memo(() => {
             </div>
 
             {/* About Section - Full Width */}
-            <div className="border-t pt-8">
+            <section className="border-t pt-8" aria-label="About User">
               <div className="flex items-center mb-6">
                 <h2 className="text-xl font-semibold">About</h2>
                 <div className="ml-4 h-0.5 bg-primary w-8"></div>
@@ -683,7 +683,7 @@ const ProfilePage = React.memo(() => {
                   </p>
                 )}
               </div>
-            </div>
+            </section>
           </div>
         </div>
       </div>

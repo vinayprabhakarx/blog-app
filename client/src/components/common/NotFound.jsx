@@ -29,7 +29,7 @@ const NotFound = ({
   };
 
   return (
-    <div className="flex justify-center items-center py-20 px-6 bg-background">
+    <section className="flex justify-center items-center py-20 px-6 bg-background" aria-label="Not Found Error">
       <div className="text-center max-w-2xl w-full space-y-8">
         {/* Error Code */}
         <div>
@@ -78,7 +78,7 @@ const NotFound = ({
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 };
 

@@ -129,7 +129,7 @@ const CategoriesView = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <section className="p-6 space-y-6" aria-label="Categories">
       {/* Header with Stats */}
       <div className="text-center mb-8">
         <div className="flex items-center justify-center gap-3 mb-2">
@@ -282,7 +282,7 @@ const CategoriesView = () => {
           Showing all {categoryStats.total} categories
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

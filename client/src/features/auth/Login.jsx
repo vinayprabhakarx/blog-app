@@ -107,7 +107,7 @@ const Login = () => {
   }
 
   return (
-    <div className="flex justify-center items-center h-screen w-screen bg-background">
+    <section className="flex justify-center items-center h-screen w-screen bg-background">
       <Card className="w-[400px] p-5 bg-background text-foreground">
         <h1 className="text-2xl font-bold text-center mb-5">
           Login into Account
@@ -200,7 +200,7 @@ const Login = () => {
           </form>
         </Form>
       </Card>
-    </div>
+    </section>
   );
 };
 

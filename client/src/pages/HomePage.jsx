@@ -246,7 +246,7 @@ const HomePage = React.memo(() => {
       </section>
 
       {/* Main Content */}
-      <main className="container mx-auto px-6 py-8">
+      <div className="container mx-auto px-6 py-8">
         {/* Search Results Header */}
         {isSearchMode && (
           <section className="mb-6">
@@ -349,7 +349,7 @@ const HomePage = React.memo(() => {
             />
           </div>
         )}
-      </main>
+      </div>
     </div>
   );
 });

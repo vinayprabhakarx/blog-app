@@ -501,7 +501,7 @@ const MdRenderCard = React.memo(({ content = "", onDeleteImage }) => {
   );
 
   return (
-    <div className="w-full overflow-hidden">
+    <section className="w-full overflow-hidden">
       <style>{markdownStyles}</style>
       <div data-color-mode={themeDataMode} className="w-full">
         <div style={overflowStyle}>
@@ -529,7 +529,7 @@ const MdRenderCard = React.memo(({ content = "", onDeleteImage }) => {
           />
         </div>
       </div>
-    </div>
+    </section>
   );
 });
 

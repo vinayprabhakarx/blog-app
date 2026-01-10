@@ -79,7 +79,7 @@ const FeaturedBlogCard = React.memo(({ blog, className, ...props }) => {
   if (!blog) return null;
 
   return (
-    <div
+    <article
       className={cn("group w-full mb-8", className)}
       {...props}
     >
@@ -175,7 +175,7 @@ const FeaturedBlogCard = React.memo(({ blog, className, ...props }) => {
       
       {/* Separator */}
       <div className="w-full h-px bg-border my-12 opacity-50" />
-    </div>
+    </article>
   );
 });
 

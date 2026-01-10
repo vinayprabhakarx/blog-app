@@ -326,7 +326,7 @@ const UserManagement = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <section className="p-6 space-y-6" aria-label="User Management">
       <div className="text-center">
         <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
           User Management
@@ -867,7 +867,7 @@ const UserManagement = () => {
           </CardContent>
         </Card>
       )}
-    </div>
+    </section>
   );
 };
 

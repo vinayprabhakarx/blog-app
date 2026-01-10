@@ -120,7 +120,7 @@ const CategoryManagement = () => {
   }
 
   return (
-    <div className="p-6 space-y-6">
+    <section className="p-6 space-y-6">
       {/* Header with Stats */}
       <div className="text-center">
         <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
@@ -328,7 +328,7 @@ const CategoryManagement = () => {
           Showing all {categoryStats.total} categories
         </div>
       )}
-    </div>
+    </section>
   );
 };
 

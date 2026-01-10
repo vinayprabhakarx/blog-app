@@ -102,7 +102,7 @@ const BlogCard = React.memo(
     }, []);
 
     return (
-      <div
+      <article
         className={cn("group transition-all duration-300", className)}
         {...props}
       >
@@ -231,7 +231,7 @@ const BlogCard = React.memo(
 
         {/* Bright separation line below each blog card */}
         <div className="mt-4 h-0.5 bg-border/70 w-full rounded-full"></div>
-      </div>
+      </article>
     );
   }
 );

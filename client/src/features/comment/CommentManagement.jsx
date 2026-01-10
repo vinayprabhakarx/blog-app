@@ -248,7 +248,7 @@ const CommentManagement = () => {
   }
 
   return (
-    <div className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
+    <section className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
       {/* Header */}
       <div className="text-center space-y-3">
         <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
@@ -488,7 +488,7 @@ const CommentManagement = () => {
           )}
         </TabsContent>
       </Tabs>
-    </div>
+    </section>
   );
 };
 
@@ -527,7 +527,7 @@ const RowCard = ({ comment, selected, onToggle, onRefresh }) => {
   };
 
   return (
-    <div
+    <article
       className={cn(
         "group transition-all duration-200 rounded-xl border bg-card border-border/40 hover:bg-muted/30"
       )}
@@ -622,7 +622,7 @@ const RowCard = ({ comment, selected, onToggle, onRefresh }) => {
           />
         </div>
       )}
-    </div>
+    </article>
   );
 };
 

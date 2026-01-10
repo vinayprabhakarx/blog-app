@@ -4,17 +4,17 @@ const Footer = () => {
   const currentYear = new Date().getFullYear();
 
   return (
-    <div className="w-full text-sm text-center bg-background py-4 text-foreground no-print border-t border-border">
+    <footer className="w-full text-sm text-center bg-background py-4 text-foreground no-print border-t border-border">
       &copy; {currentYear} | Designed & Developed By:{" "}
       <a
         href="https://vinayprabhakar.dev"
         target="_blank"
         rel="noopener noreferrer"
-        className="font-bold hover:text-primary"
+        className="hover:text-primary"
       >
-        @VinayPrabhakarX
+        <strong>@VinayPrabhakarX</strong>
       </a>
-    </div>
+    </footer>
   );
 };
 

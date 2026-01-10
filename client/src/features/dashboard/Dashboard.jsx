@@ -227,7 +227,7 @@ const Dashboard = () => {
   const stats = getStats();
 
   return (
-    <div className="min-h-screen bg-background">
+    <section className="min-h-screen bg-background">
       {/* Header */}
       <div className="text-center mb-8 p-6">
         <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
@@ -404,7 +404,7 @@ const Dashboard = () => {
           </div>
         )}
       </div>
-    </div>
+    </section>
   );
 };
 

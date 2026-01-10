@@ -259,7 +259,7 @@ const Comment = React.memo(
     }, []);
 
     return (
-      <div className={cn("group relative", getIndentClass(level))}>
+      <article className={cn("group relative", getIndentClass(level))}>
         {/* Vertical line for replies - Instagram style */}
         {level > 0 && (
           <div className="absolute left-[-12px] sm:left-[-16px] md:left-[-20px] top-0 bottom-0 w-px bg-border/40" />
@@ -597,7 +597,7 @@ const Comment = React.memo(
           }
           hasReported={hasReported}
         />
-      </div>
+      </article>
     );
   }
 );

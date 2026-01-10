@@ -177,7 +177,7 @@ const Analytics = () => {
   }
 
   return (
-    <div className="min-h-screen bg-background p-6">
+    <section className="min-h-screen bg-background p-6">
       <div className="max-w-7xl mx-auto space-y-8">
         {/* Header */}
         <div className="text-center mb-8">
@@ -187,7 +187,7 @@ const Analytics = () => {
         </div>
 
         {/* Main Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6" aria-label="Main Statistics">
           <StatCard
             icon={Eye}
             title="Total Views"
@@ -206,10 +206,10 @@ const Analytics = () => {
             value={analytics.totalUsers}
             color="purple"
           />
-        </div>
+        </section>
 
         {/* Additional Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <section className="grid grid-cols-1 md:grid-cols-3 gap-6" aria-label="Additional Statistics">
           <StatCard
             icon={FileText}
             title="Total Blogs"
@@ -228,10 +228,10 @@ const Analytics = () => {
             value={analytics.recentRegistrations}
             color="indigo"
           />
-        </div>
+        </section>
 
         {/* Content Performance */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+        <section className="grid grid-cols-1 lg:grid-cols-2 gap-8" aria-label="Content Performance">
           {/* Top Performing Blogs */}
           <Card>
             <CardHeader>
@@ -340,7 +340,7 @@ const Analytics = () => {
               </div>
             </CardContent>
           </Card>
-        </div>
+        </section>
 
         {/* User Demographics */}
         <Card>
@@ -404,7 +404,7 @@ const Analytics = () => {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </section>
   );
 };
 

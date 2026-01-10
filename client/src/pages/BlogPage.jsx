@@ -232,17 +232,19 @@ const BlogPage = () => {
             </li>
           </ol>
         </nav>
-        <BlogHeader blog={currentBlog} onCommentClick={handleCommentClick} />
+        <article className="w-full">
+          <BlogHeader blog={currentBlog} onCommentClick={handleCommentClick} />
         
-        {/* Main Blog Content - Centered by BlogDisplay internal styles */}
-        {/* 
-            LAYOUT EXPLANATION:
-            The BlogDisplay component inside handles its own centering (max-width: 800px, margin: 0 auto).
-            We avoid wrapping it in flex/grid here to prevent interfering with that centering logic.
-        */}
-        <div className="relative">
-           <BlogDisplay blog={currentBlog} />
-        </div>
+          {/* Main Blog Content - Centered by BlogDisplay internal styles */}
+          {/* 
+              LAYOUT EXPLANATION:
+              The BlogDisplay component inside handles its own centering (max-width: 800px, margin: 0 auto).
+              We avoid wrapping it in flex/grid here to prevent interfering with that centering logic.
+          */}
+          <div className="relative">
+            <BlogDisplay blog={currentBlog} />
+          </div>
+        </article>
 
         {/* Comment Toggle Button - Now directly after blog content */}
         <div className="px-1 sm:px-2 md:px-4 pb-4">

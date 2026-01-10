@@ -54,7 +54,7 @@ const Pagination = ({
   };
 
   return (
-    <div className="flex items-center justify-center mt-16 mb-8">
+    <nav className="flex items-center justify-center mt-16 mb-8" aria-label="Pagination">
       <div className="flex items-center gap-0.5 sm:gap-1">
         {/* Left Arrow - Only show if not on first page */}
         {validCurrentPage > 1 && (
@@ -93,7 +93,7 @@ const Pagination = ({
           </button>
         )}
       </div>
-    </div>
+    </nav>
   );
 };
 
