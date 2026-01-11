@@ -45,7 +45,7 @@ export const buildContactSubmissionEmail = ({
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 40px auto; background: #ffffff; border: 1px solid #e0e0e0;">
   <!-- Header -->
   <div style="background-color: #000000; padding: 16px 32px; text-align: center;">
-    <h2 style="color: #ffffff; margin: 0; font-size: 14px; font-weight: 400; letter-spacing: 1px;">NEW CONTACT SUBMISSION</h2>
+    <h2 style="color: #ffffff; margin: 0; font-size: 14px; font-weight: 400; letter-spacing: 1px;">CONTACT SUBMISSION</h2>
   </div>
   
   <!-- Body -->
@@ -97,7 +97,7 @@ export const buildContactSubmissionEmail = ({
 </div>`;
 
   const text = `
-NEW CONTACT FORM SUBMISSION
+CONTACT FORM SUBMISSION
 
 Contact Information:
 Name: ${formattedName}
@@ -113,8 +113,8 @@ Reply to this person: ${email}
 This message was submitted via the contact form on ${displayUrl}
   `;
 
-  return {
-    subject: `New Contact Submission from ${formattedName}: ${subject}`,
+  return {  
+    subject: `Contact Submission from ${formattedName}: ${subject}`,
     html,
     text,
   };
