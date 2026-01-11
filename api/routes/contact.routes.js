@@ -20,7 +20,7 @@ const contactValidation = [
     .withMessage("Please provide a valid email address")
     .isLength({ max: 150 })
     .withMessage("Email address is too long")
-    .normalizeEmail(),
+    .normalizeEmail({ gmail_remove_dots: false }),
 
   body("subject")
     .trim()

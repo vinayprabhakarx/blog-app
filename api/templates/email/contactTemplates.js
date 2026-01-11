@@ -19,11 +19,14 @@ const createHtmlMessage = (message) =>
     )
     .join("");
 
-// Helper to get capitalized first name from full name
-const getCapitalizedFirstName = (fullName) => {
-  if (!fullName || typeof fullName !== 'string') return "there";
-  const firstName = fullName.trim().split(" ")[0];
-  return firstName.charAt(0).toUpperCase() + firstName.slice(1).toLowerCase();
+// Helper to title case full name
+const toTitleCase = (fullName) => {
+  if (!fullName || typeof fullName !== 'string') return "There";
+  return fullName
+    .toLowerCase()
+    .split(' ')
+    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+    .join(' ');
 };
 
 // Template for email sent to site owner
@@ -36,11 +39,12 @@ export const buildContactSubmissionEmail = ({
   const htmlMessage = createHtmlMessage(message);
   const websiteUrl = process.env.SENDER_WEBSITE || "https://vinayprabhakar.dev";
   const displayUrl = websiteUrl.replace(/^https?:\/\//, "");
+  const formattedName = toTitleCase(userName);
 
   const html = `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 40px auto; background: #ffffff; border: 1px solid #e0e0e0;">
   <!-- Header -->
-  <div style="background-color: #000000; padding: 16px 32px;">
+  <div style="background-color: #000000; padding: 16px 32px; text-align: center;">
     <h2 style="color: #ffffff; margin: 0; font-size: 14px; font-weight: 400; letter-spacing: 1px;">NEW CONTACT SUBMISSION</h2>
   </div>
   
@@ -51,7 +55,7 @@ export const buildContactSubmissionEmail = ({
         <tr>
           <td style="padding: 8px 0; font-size: 14px; color: #666666; width: 100px;">Name</td>
           <td style="padding: 8px 0; font-size: 14px; color: #000000; font-weight: 500;">${sanitizeForEmail(
-            userName
+            formattedName
           )}</td>
         </tr>
         <tr>
@@ -60,9 +64,9 @@ export const buildContactSubmissionEmail = ({
         </tr>
         <tr>
           <td style="padding: 8px 0; font-size: 14px; color: #666666; border-top: 1px solid #f0f0f0;">Subject</td>
-          <td style="padding: 8px 0; font-size: 14px; color: #000000; font-weight: 500; border-top: 1px solid #f0f0f0;">${sanitizeForEmail(
+          <td style="padding: 8px 0; font-size: 14px; color: #000000; font-weight: 500; border-top: 1px solid #f0f0f0;"><span style="margin-left: 15px; display: inline-block;">${sanitizeForEmail(
             subject
-          )}</td>
+          )}</span></td>
         </tr>
         <tr>
           <td style="padding: 8px 0; font-size: 14px; color: #666666; border-top: 1px solid #f0f0f0;">Date</td>
@@ -79,7 +83,7 @@ export const buildContactSubmissionEmail = ({
     </div>
     
     <p style="font-size: 13px; color: #999999; margin: 32px 0 0 0; line-height: 1.6;">
-      Reply directly to this email to respond to ${sanitizeForEmail(userName)}.
+      Reply directly to this email to respond to ${sanitizeForEmail(formattedName)}.
     </p>
   </div>
   
@@ -96,9 +100,9 @@ export const buildContactSubmissionEmail = ({
 NEW CONTACT FORM SUBMISSION
 
 Contact Information:
-Name: ${userName}
+Name: ${formattedName}
 Email: ${email}
-Subject: ${subject}
+Subject:   ${subject}
 Date: ${new Date().toLocaleString()}
 
 Message:
@@ -109,10 +113,8 @@ Reply to this person: ${email}
 This message was submitted via the contact form on ${displayUrl}
   `;
 
-  const capitalizedFirstName = getCapitalizedFirstName(userName);
-
   return {
-    subject: `New Contact Submission from ${capitalizedFirstName}: ${subject}`,
+    subject: `New Contact Submission from ${formattedName}: ${subject}`,
     html,
     text,
   };
@@ -128,7 +130,8 @@ export const buildContactConfirmationEmail = (
   const websiteUrl = process.env.SENDER_WEBSITE || "https://vinayprabhakar.dev";
   const displayUrl = websiteUrl.replace(/^https?:\/\//, "");
 
-  const capitalizedFirstName = getCapitalizedFirstName(userName);
+  const formattedName = toTitleCase(userName);
+  const firstName = formattedName.split(' ')[0];
 
   // Only include message if provided
   const messageSection = originalMessage
@@ -144,13 +147,13 @@ export const buildContactConfirmationEmail = (
   const html = `
 <div style="font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; max-width: 600px; margin: 40px auto; background: #ffffff; border: 1px solid #e0e0e0;">
   <!-- Header -->
-  <div style="background-color: #000000; padding: 16px 32px;">
+  <div style="background-color: #000000; padding: 16px 32px; text-align: center;">
     <h2 style="color: #ffffff; margin: 0; font-size: 14px; font-weight: 400; letter-spacing: 1px;">MESSAGE CONFIRMATION</h2>
   </div>
   
   <!-- Body -->
   <div style="padding: 40px 32px;">
-    <p style="font-size: 16px; color: #000000; margin: 0 0 24px 0;">Hi ${capitalizedFirstName},</p>
+    <p style="font-size: 16px; color: #000000; margin: 0 0 24px 0;">Hi ${firstName},</p>
     
     <p style="font-size: 15px; color: #333333; line-height: 1.6; margin: 0 0 32px 0;">
       Thank you for reaching out. I have received your message and will respond within 2–3 business days.
@@ -175,7 +178,7 @@ export const buildContactConfirmationEmail = (
   const text = `
 Thank you for your message
 
-Hi ${capitalizedFirstName},
+Hi ${firstName},
 
 Thank you for reaching out. I have received your message and will respond within 2–3 business days.
 ${originalMessage ? `\nYour Message:\n${originalMessage}\n` : ""}

@@ -28,6 +28,7 @@ export const sendContactMessage = async (req, res, next) => {
     const startTime = Date.now();
     const { userName, email, subject, message } = req.body;
 
+
     // Build email content using templates
     const submissionEmail = buildContactSubmissionEmail({
       userName,
