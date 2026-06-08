@@ -108,6 +108,22 @@ const ProfilePage = React.memo(() => {
     fetchProfile();
   }, [username, user, isPublicProfile, isOwnProfile]);
 
+  // Set dynamic page title for SEO based on user profile name/username
+  useEffect(() => {
+    if (profile) {
+      const name = profile.personal_info?.name || profile.name || "";
+      const uname = profile.personal_info?.username || profile.username || "";
+      if (name) {
+        document.title = `${name} (@${uname}) | VinayPrabhakarX-Blog`;
+      } else if (uname) {
+        document.title = `@${uname} | VinayPrabhakarX-Blog`;
+      }
+    }
+    return () => {
+      document.title = "VinayPrabhakarX-Blog";
+    };
+  }, [profile]);
+
   // Show loading spinner while profile is being fetched
   if (loading) {
     return (

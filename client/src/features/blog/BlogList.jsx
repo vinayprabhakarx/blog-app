@@ -291,6 +291,22 @@ const BlogList = () => {
     }
   }, [slug, selectedCategory]);
 
+  // Set dynamic page title for SEO on lists/categories/user blogs
+  useEffect(() => {
+    if (isMyBlogsPage) {
+      document.title = "My Blogs | VinayPrabhakarX-Blog";
+    } else if (isUserBlogsPage && username) {
+      document.title = `${username}'s Blogs | VinayPrabhakarX-Blog`;
+    } else if (isViewingCategory && currentCategory) {
+      document.title = `${currentCategory.name} Category | VinayPrabhakarX-Blog`;
+    } else {
+      document.title = "All Blogs | VinayPrabhakarX-Blog";
+    }
+    return () => {
+      document.title = "VinayPrabhakarX-Blog";
+    };
+  }, [isMyBlogsPage, isUserBlogsPage, isViewingCategory, currentCategory, username]);
+
   const handleClearFilters = useCallback(() => {
     setSelectedCategory("all");
     setSortBy("createdAt");

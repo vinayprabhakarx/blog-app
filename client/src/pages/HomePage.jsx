@@ -93,7 +93,10 @@ const HomePage = React.memo(() => {
         .catch((error) => console.error("Failed to fetch categories:", error));
     }
   }, [dispatch, hasFetchedCategories]);
-
+  // Set dynamic page title for SEO
+  useEffect(() => {
+    document.title = "VinayPrabhakarX-Blog | Deep Dives on Tech, Algorithms & Science";
+  }, []);
   useEffect(() => {
     let isMounted = true;
 

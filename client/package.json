@@ -6,7 +6,7 @@
   "author": "vinayprabhakarx",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && npm run obfuscate",
+    "build": "vite build && node scripts/generate-sitemap.js && npm run obfuscate",
     "build:analyze": "vite build --mode analyze",
     "lint": "eslint .",
     "preview": "vite preview",

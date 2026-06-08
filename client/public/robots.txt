@@ -1,0 +1,36 @@
+# Robots.txt configured for blog-app SEO optimization
+# Directory: client/public/robots.txt
+
+User-agent: *
+
+# Public paths that should be crawled
+Allow: /$
+Allow: /blogs
+Allow: /blog/
+Allow: /category/
+Allow: /browse-categories
+
+# Block crawl search engines from private areas
+Disallow: /dashboard
+Disallow: /notifications
+Disallow: /profile
+Disallow: /edit-profile
+Disallow: /change-password
+Disallow: /my-blogs
+Disallow: /blogs/create
+Disallow: /blogs/edit/
+Disallow: /write-blog
+Disallow: /edit-blog/
+Disallow: /editor/
+Disallow: /comments
+Disallow: /users
+Disallow: /analytics
+Disallow: /login
+Disallow: /register
+Disallow: /forgot-password
+Disallow: /reset-password
+Disallow: /verify-email
+
+# Host and Sitemap locations
+Host: https://blog.vinayprabhakar.dev
+Sitemap: https://blog.vinayprabhakar.dev/sitemap.xml

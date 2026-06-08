@@ -115,6 +115,16 @@ const BlogPage = () => {
     mainDispatch,
   ]);
 
+  // Set dynamic page title for SEO based on blog title
+  useEffect(() => {
+    if (blogData.title) {
+      document.title = `${blogData.title} | VinayPrabhakarX-Blog`;
+    }
+    return () => {
+      document.title = "VinayPrabhakarX-Blog";
+    };
+  }, [blogData.title]);
+
   // Callback functions
   const toggleComments = useCallback((e) => {
     if (e) {

@@ -13,6 +13,7 @@ import categoryRoutes from "./routes/category.route.js";
 import blogLikeRoutes from "./routes/blogLike.route.js";
 import notificationRoutes from "./routes/notification.route.js";
 import contactRoutes from "./routes/contact.routes.js";
+import sitemapRoutes from "./routes/sitemap.route.js";
 
 // Load environment variables
 dotenv.config();
@@ -96,6 +97,8 @@ app.use("/api/comments", commentRoutes);
 app.use("/api/likes", blogLikeRoutes);
 app.use("/api/notifications", notificationRoutes);
 app.use("/api/send-email", contactRoutes);
+app.use("/sitemap.xml", sitemapRoutes);
+app.use("/api/sitemap.xml", sitemapRoutes);
 
 
 // Global Error Handler
