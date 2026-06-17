@@ -28,7 +28,7 @@ const BlogCard = React.memo(
     // Memoize computed values
     const blogSlug = useMemo(() => blog?.slug, [blog?.slug]);
     const blogTitle = useMemo(() => blog?.title, [blog?.title]);
-    const blogBanner = useMemo(() => blog?.banner, [blog?.banner]);
+
     const blogCreatedAt = useMemo(() => blog?.createdAt, [blog?.createdAt]);
     const blogContent = useMemo(() => blog?.content, [blog?.content]);
     const blogExcerpt = useMemo(() => blog?.excerpt, [blog?.excerpt]);
@@ -76,78 +76,17 @@ const BlogCard = React.memo(
       return { name, slug };
     }, [blog?.category, blog?.categories, blog?.Category]);
     const excerptText = useMemo(() => {
-      const maxLength = variant === "compact" ? 100 : 250;
+      const maxLength = variant === "compact" ? 100 : 160;
       return truncateText(blogExcerpt || blogContent, maxLength);
     }, [truncateText, blogExcerpt, blogContent, variant]);
 
-    // Memoize image source
-    const imageSrc = useMemo(() => {
-      if (!blogBanner) return null;
-      return blogBanner.startsWith("http") ? blogBanner : `/api${blogBanner}`;
-    }, [blogBanner]);
 
-    // Memoize image variants
-    const imageVariants = useMemo(
-      () => ({
-        default: "aspect-video",
-        compact: "aspect-video",
-        featured: "aspect-video",
-      }),
-      []
-    );
-
-    // Memoize image error handler
-    const handleImageError = useCallback((e) => {
-      e.target.style.display = "none";
-    }, []);
 
     return (
       <article
-        className={cn("group transition-all duration-300", className)}
+        className={cn("group transition-all duration-300 h-full flex flex-col", className)}
         {...props}
       >
-        {/* Featured Image */}
-        {blogBanner && imageSrc && (
-          <Link to={`/blog/${blogSlug}`} className="block">
-            <div
-              className={cn(
-                "relative overflow-hidden bg-muted rounded-lg border border-border/50 mb-3 sm:mb-4 cursor-pointer",
-                imageVariants[variant]
-              )}
-            >
-              <img
-                src={imageSrc}
-                alt={blogTitle}
-                className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-105"
-                loading="lazy"
-                decoding="async"
-                onError={handleImageError}
-                crossOrigin="anonymous"
-              />
-
-              {/* Hover overlay - Only on non-touch devices */}
-              <div className="absolute inset-0 bg-background/10 opacity-0 group-hover:opacity-100 transition-opacity duration-200 hidden sm:block" />
-
-              {/* Click indicator - subtle arrow icon */}
-              <div className="absolute top-3 right-3 bg-background/80 backdrop-blur-sm rounded-full p-1.5 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
-                <svg
-                  className="w-3 h-3 text-foreground"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                  />
-                </svg>
-              </div>
-            </div>
-          </Link>
-        )}
-
         {/* Category pill - visible on all breakpoints */}
         {categoryInfo?.name && (
           <div className="mb-2">
@@ -164,7 +103,7 @@ const BlogCard = React.memo(
         {/* Content */}
         <div
           className={cn(
-            "space-y-2 sm:space-y-3",
+            "space-y-2 sm:space-y-3 flex-1 flex flex-col",
             variant === "compact" && "space-y-2"
           )}
         >
@@ -172,12 +111,12 @@ const BlogCard = React.memo(
           <Link to={`/blog/${blogSlug}`} className="block">
             <h3
               className={cn(
-                "font-bold text-foreground line-clamp-2 group-hover:text-primary transition-colors duration-200 cursor-pointer",
+                "font-bold text-foreground line-clamp-2 group-hover:text-primary transition-colors duration-200 cursor-pointer min-h-[3.5rem]",
                 // Responsive text sizes
                 variant === "featured"
                   ? "text-lg sm:text-xl md:text-2xl lg:text-3xl"
                   : "text-lg sm:text-xl lg:text-2xl",
-                variant === "compact" && "text-base sm:text-lg lg:text-xl"
+                variant === "compact" && "text-base sm:text-lg lg:text-xl min-h-0"
               )}
             >
               {blogTitle}
@@ -221,7 +160,7 @@ const BlogCard = React.memo(
           {/* Excerpt */}
           <p
             className={cn(
-              "text-muted-foreground line-clamp-3 sm:line-clamp-4 lg:line-clamp-5 text-lg leading-relaxed",
+              "text-muted-foreground line-clamp-3 text-base leading-relaxed",
               variant === "compact" && "line-clamp-2 text-sm"
             )}
           >
