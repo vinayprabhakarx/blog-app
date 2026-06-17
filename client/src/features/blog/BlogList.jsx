@@ -5,7 +5,7 @@ import React, {
   useCallback,
   useRef,
 } from "react";
-import { Link, useParams, useNavigate, useLocation } from "react-router-dom";
+import { Link, useParams, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
 import { Card, CardContent } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
@@ -84,17 +84,33 @@ const BlogList = () => {
     dispatch: categoriesDispatch,
   } = useCategories();
 
-  const [selectedCategory, setSelectedCategory] = useState(
-    slug || filters.category || "all"
-  );
-  const [sortBy, setSortBy] = useState(filters.sortBy || "createdAt");
-  const [sortOrder, setSortOrder] = useState(filters.sortOrder || "desc");
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const [draftFilter, setDraftFilter] = useState("all");
-  const [selectedAuthor, setSelectedAuthor] = useState("all");
+  // URL State (Source of Truth)
+  const urlPage = parseInt(searchParams.get("page"), 10) || 1;
+  const urlCategory = searchParams.get("category") || slug || "all";
+  const urlSortBy = searchParams.get("sort_by") || "createdAt";
+  const urlSortOrder = searchParams.get("sort_order") || "desc";
+  const urlDraftFilter = searchParams.get("draft") || "all";
+  const urlAuthor = searchParams.get("author") || "all";
 
-  const [currentPage, setCurrentPage] = useState(1);
-  const blogsPerPage = 10;
+  // Local State (for UI unapplied filters)
+  const [selectedCategory, setSelectedCategory] = useState(urlCategory);
+  const [sortBy, setSortBy] = useState(urlSortBy);
+  const [sortOrder, setSortOrder] = useState(urlSortOrder);
+  const [draftFilter, setDraftFilter] = useState(urlDraftFilter);
+  const [selectedAuthor, setSelectedAuthor] = useState(urlAuthor);
+
+  const blogsPerPage = 9;
+
+  // Sync local state when URL changes
+  useEffect(() => {
+    setSelectedCategory(urlCategory);
+    setSortBy(urlSortBy);
+    setSortOrder(urlSortOrder);
+    setDraftFilter(urlDraftFilter);
+    setSelectedAuthor(urlAuthor);
+  }, [urlCategory, urlSortBy, urlSortOrder, urlDraftFilter, urlAuthor]);
 
   const currentCategory = slug
     ? categories.find((cat) => cat.slug === slug)
@@ -109,28 +125,27 @@ const BlogList = () => {
 
   useEffect(() => {
     const params = {
-      page: currentPage,
+      page: urlPage,
       limit: blogsPerPage,
     };
 
-    if (selectedCategory && selectedCategory !== "all") {
+    if (urlCategory && urlCategory !== "all") {
       const categoryData = categories.find(
-        (cat) => cat.slug === selectedCategory
+        (cat) => cat.slug === urlCategory
       );
       if (categoryData) {
         params.category = categoryData._id;
       }
     }
 
-    params.sortBy = sortBy;
-    params.sortOrder = sortOrder;
+    params.sortBy = urlSortBy;
+    params.sortOrder = urlSortOrder;
 
     const fetchData = async () => {
       try {
         if (isMyBlogsPage) {
           await blogDispatch(fetchMyBlogs(params));
         } else if (isUserBlogsPage && username) {
-          // Fetch blogs by specific author username
           await blogDispatch(fetchBlogsByAuthor({ username, params }));
         } else {
           await blogDispatch(fetchAllBlogs(params));
@@ -146,27 +161,16 @@ const BlogList = () => {
     fetchData();
   }, [
     blogDispatch,
-    currentPage,
-    selectedCategory,
-    sortBy,
-    sortOrder,
+    urlPage,
+    urlCategory,
+    urlSortBy,
+    urlSortOrder,
     categories,
     blogsPerPage,
     isMyBlogsPage,
     isUserBlogsPage,
-    isGeneralBlogsPage,
     username,
   ]);
-
-  const [isInitialized, setIsInitialized] = useState(false);
-
-  useEffect(() => {
-    if (isInitialized) {
-      setCurrentPage(1);
-    } else {
-      setIsInitialized(true);
-    }
-  }, [selectedCategory, sortBy, sortOrder, isInitialized]);
 
   const formatReadTime = (content) => {
     const wordsPerMinute = 200;
@@ -218,14 +222,14 @@ const BlogList = () => {
     if (isMyBlogsPage) {
       return currentBlogs.filter((blog) => {
         let passesDraftFilter = true;
-        if (draftFilter === "published") passesDraftFilter = !blog.draft;
-        if (draftFilter === "drafts") passesDraftFilter = blog.draft;
+        if (urlDraftFilter === "published") passesDraftFilter = !blog.draft;
+        if (urlDraftFilter === "drafts") passesDraftFilter = blog.draft;
 
         return passesDraftFilter;
       });
     } else {
       return currentBlogs.filter((blog) => {
-        if (selectedAuthor && selectedAuthor !== "all") {
+        if (urlAuthor && urlAuthor !== "all") {
           try {
             const blogAuthor =
               blog.author?.personal_info?.username ||
@@ -235,7 +239,7 @@ const BlogList = () => {
               blog.author?.name ||
               blog.author;
             return (
-              typeof blogAuthor === "string" && blogAuthor === selectedAuthor
+              typeof blogAuthor === "string" && blogAuthor === urlAuthor
             );
           } catch (error) {
             console.warn(
@@ -249,13 +253,13 @@ const BlogList = () => {
         return true;
       });
     }
-  }, [currentBlogs, isMyBlogsPage, draftFilter, selectedAuthor]);
+  }, [currentBlogs, isMyBlogsPage, urlDraftFilter, urlAuthor]);
 
   const sortedAndFilteredBlogs = useMemo(() => {
     return [...filteredBlogs].sort((a, b) => {
       let aValue, bValue;
 
-      switch (sortBy) {
+      switch (urlSortBy) {
         case "title":
           aValue = a.title?.toLowerCase() || "";
           bValue = b.title?.toLowerCase() || "";
@@ -271,13 +275,13 @@ const BlogList = () => {
           break;
       }
 
-      if (sortOrder === "asc") {
+      if (urlSortOrder === "asc") {
         return aValue < bValue ? -1 : aValue > bValue ? 1 : 0;
       } else {
         return aValue > bValue ? -1 : aValue < bValue ? 1 : 0;
       }
     });
-  }, [filteredBlogs, sortBy, sortOrder]);
+  }, [filteredBlogs, urlSortBy, urlSortOrder]);
 
   const displayTotalBlogs = useMemo(() => {
     return isMyBlogsPage ? sortedAndFilteredBlogs.length : totalBlogs;
@@ -285,12 +289,7 @@ const BlogList = () => {
 
   const paginatedBlogs = sortedAndFilteredBlogs;
 
-  useEffect(() => {
-    if (slug && slug !== selectedCategory) {
-      setSelectedCategory(slug);
-      setCurrentPage(1);
-    }
-  }, [slug, selectedCategory]);
+
 
   // Set dynamic page title for SEO on lists/categories/user blogs
   useEffect(() => {
@@ -308,14 +307,34 @@ const BlogList = () => {
     };
   }, [isMyBlogsPage, isUserBlogsPage, isViewingCategory, currentCategory, username]);
 
+  const handleApplyFilters = useCallback(() => {
+    const newParams = new URLSearchParams(searchParams);
+    
+    newParams.set("page", 1); // Reset page on filter apply
+    
+    if (selectedCategory !== "all") newParams.set("category", selectedCategory);
+    else newParams.delete("category");
+    
+    if (sortBy !== "createdAt") newParams.set("sort_by", sortBy);
+    else newParams.delete("sort_by");
+
+    if (sortOrder !== "desc") newParams.set("sort_order", sortOrder);
+    else newParams.delete("sort_order");
+
+    if (draftFilter !== "all") newParams.set("draft", draftFilter);
+    else newParams.delete("draft");
+
+    if (selectedAuthor !== "all") newParams.set("author", selectedAuthor);
+    else newParams.delete("author");
+
+    setSearchParams(newParams);
+  }, [searchParams, setSearchParams, selectedCategory, sortBy, sortOrder, draftFilter, selectedAuthor]);
+
   const handleClearFilters = useCallback(() => {
-    setSelectedCategory("all");
-    setSortBy("createdAt");
-    setSortOrder("desc");
-    setCurrentPage(1);
-    setDraftFilter("all");
-    setSelectedAuthor("all");
-  }, []);
+    const newParams = new URLSearchParams();
+    if (slug) newParams.set("category", slug); // preserve category if on category page
+    setSearchParams(newParams);
+  }, [setSearchParams, slug]);
 
   const handleDeleteBlog = useCallback(
     async (blogId, blogTitle) => {
@@ -329,21 +348,21 @@ const BlogList = () => {
           showToast("success", "Blog deleted successfully!");
 
           const params = {
-            page: currentPage,
+            page: urlPage,
             limit: blogsPerPage,
           };
 
-          if (selectedCategory && selectedCategory !== "all") {
+          if (urlCategory && urlCategory !== "all") {
             const categoryData = categories.find(
-              (cat) => cat.slug === selectedCategory
+              (cat) => cat.slug === urlCategory
             );
             if (categoryData) {
               params.category = categoryData._id;
             }
           }
 
-          params.sortBy = sortBy;
-          params.sortOrder = sortOrder;
+          params.sortBy = urlSortBy;
+          params.sortOrder = urlSortOrder;
 
           blogDispatch(fetchAllBlogs(params));
         } catch (error) {
@@ -357,10 +376,10 @@ const BlogList = () => {
     },
     [
       blogDispatch,
-      currentPage,
-      selectedCategory,
-      sortBy,
-      sortOrder,
+      urlPage,
+      urlCategory,
+      urlSortBy,
+      urlSortOrder,
       categories,
       blogsPerPage,
     ]
@@ -435,7 +454,7 @@ const BlogList = () => {
             <span>{displayTotalBlogs} blogs</span>
             <span>•</span>
             <span>
-              {currentPage} of {Math.ceil(displayTotalBlogs / blogsPerPage)}{" "}
+              {urlPage} of {Math.ceil(displayTotalBlogs / blogsPerPage)}{" "}
               pages
             </span>
             {isMyBlogsPage && (
@@ -456,7 +475,7 @@ const BlogList = () => {
         {isViewingCategory && (
           <div className="flex items-center gap-3">
             <Button
-              onClick={() => navigate("/categories")}
+              onClick={() => navigate("/category")}
               variant="ghost"
               size="sm"
               className="flex items-center gap-2"
@@ -600,6 +619,13 @@ const BlogList = () => {
         </div>
 
         <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-2 sm:gap-3">
+          <Button
+            onClick={handleApplyFilters}
+            size="sm"
+            className="text-sm h-10 sm:h-9 w-full sm:w-auto"
+          >
+            Apply Filters
+          </Button>
           <Button
             variant="outline"
             size="sm"
@@ -786,8 +812,12 @@ const BlogList = () => {
 
       <Pagination
         totalPages={Math.ceil(displayTotalBlogs / blogsPerPage)}
-        currentPage={currentPage}
-        setCurrentPage={setCurrentPage}
+        currentPage={urlPage}
+        setCurrentPage={(page) => {
+          const newParams = new URLSearchParams(searchParams);
+          newParams.set("page", page);
+          setSearchParams(newParams);
+        }}
         totalBlogs={displayTotalBlogs}
         paginationThreshold={9}
       />

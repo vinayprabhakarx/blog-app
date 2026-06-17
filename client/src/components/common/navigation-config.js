@@ -26,7 +26,7 @@ export const NAVIGATION_CONFIG = {
   },
   categories: {
     title: "Categories",
-    path: "/categories",
+    path: "/category",
     icon: IconTags,
     activeIcon: IconTags,
     roles: ["user", "author", "admin"],
@@ -136,8 +136,8 @@ export const isRouteActive = (path, pathname) => {
     return pathname === "/blogs" || pathname.startsWith("/blogs/");
   }
 
-  if (path === "/categories") {
-    return pathname === "/categories" || pathname.startsWith("/categories/");
+  if (path === "/category") {
+    return pathname === "/category" || pathname.startsWith("/category/");
   }
 
   return pathname.startsWith(path);

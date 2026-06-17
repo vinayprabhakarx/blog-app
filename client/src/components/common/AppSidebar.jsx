@@ -177,11 +177,11 @@ export const SidebarLink = React.memo(({ link, className, ...props }) => {
           !location.pathname.startsWith("/blogs/edit"))
       );
     }
-    // Special handling for /categories
-    if (link.href === "/categories") {
+    // Special handling for /category
+    if (link.href === "/category") {
       return (
-        location.pathname === "/categories" ||
-        location.pathname.startsWith("/categories/")
+        location.pathname === "/category" ||
+        location.pathname.startsWith("/category/")
       );
     }
     return false;

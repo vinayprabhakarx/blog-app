@@ -144,7 +144,7 @@ const Dashboard = () => {
           title: "Manage Categories",
           description: "Add or edit blog categories",
           icon: FolderOpen,
-          path: "/categories",
+          path: "/category",
           variant: "outline",
         }
       );

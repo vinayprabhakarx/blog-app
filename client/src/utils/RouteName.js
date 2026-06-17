@@ -8,7 +8,7 @@ export const RouteForgotPassword = "/forgot-password";
 export const RouteResetPassword = "/reset-password";
 
 // Public Category & Blog routes (for users)
-export const RouteCategories = "/categories";
+export const RouteCategories = "/category";
 export const RouteCategoryView = (slug) => `/category/${slug}`;
 export const RouteBlogs = "/blogs";
 export const RouteBlogView = (slug) => `/blog/${slug}`;

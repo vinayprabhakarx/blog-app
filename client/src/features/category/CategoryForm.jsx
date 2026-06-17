@@ -136,7 +136,7 @@ const CategoryForm = () => {
 
         if (!isEditMode) {
           // Redirect to category display page after creation
-          navigate("/categories");
+          navigate("/category");
           return;
         }
       } else {

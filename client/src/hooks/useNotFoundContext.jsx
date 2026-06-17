@@ -23,7 +23,7 @@ export const useNotFoundContext = () => {
       isAdminRoute: path.startsWith('/admin'),
       isAuthorRoute: path.startsWith('/author'),
       isBlogRoute: path.includes('/blog') || segments.includes('blog'),
-      isCategoryRoute: path.includes('/category') || path.includes('/categories'),
+      isCategoryRoute: path.includes('/category'),
       isUserRoute: path.includes('/profile') || path.includes('/user'),
       isSettingsRoute: path.includes('/settings'),
       isDashboardRoute: path.includes('/dashboard'),
@@ -65,7 +65,7 @@ export const useNotFoundContext = () => {
             });
           });
         } else {
-          suggestions.push({ path: '/categories', text: 'Browse Categories', icon: Search });
+          suggestions.push({ path: '/category', text: 'Browse Categories', icon: Search });
         }
       }
 
@@ -140,7 +140,7 @@ export const useNotFoundContext = () => {
           primaryAction: { path: '/admin', text: 'Admin Dashboard', icon: Shield },
           suggestions: [
             { path: '/admin/blogs', text: 'Manage Blogs', icon: BookOpen },
-            { path: '/admin/categories', text: 'Manage Categories', icon: Settings },
+            { path: '/admin/category', text: 'Manage Categories', icon: Settings },
             { path: '/admin/users', text: 'Manage Users', icon: Users },
             { path: '/admin/analytics', text: 'Analytics', icon: BarChart },
           ],
@@ -180,7 +180,7 @@ export const useNotFoundContext = () => {
           suggestions: [
             { path: '/author/my-blogs', text: 'My Blogs', icon: BookOpen },
             { path: '/author/blog/create', text: 'Create New Blog', icon: BookOpen },
-            { path: '/author/categories', text: 'Manage Categories', icon: Settings },
+            { path: '/author/category', text: 'Manage Categories', icon: Settings },
           ],
           errorType: 'author_not_found'
         };
@@ -213,7 +213,7 @@ export const useNotFoundContext = () => {
             ? `The category "${decodeURIComponent(categorySlug)}" doesn't exist.`
             : 'The category you\'re looking for doesn\'t exist.',
           errorIcon: <Folder className="w-12 h-12" />,
-          primaryAction: { path: '/categories', text: 'Browse Categories', icon: Search },
+          primaryAction: { path: '/category', text: 'Browse Categories', icon: Search },
           suggestions: [
             { path: '/', text: 'All Articles', icon: BookOpen },
             ...categories.slice(0, 4).map(cat => ({

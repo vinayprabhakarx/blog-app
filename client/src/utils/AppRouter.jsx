@@ -103,7 +103,7 @@ const AppRouter = () => {
               path="browse-categories"
               element={<PublicCategoriesView />}
             />
-            <Route path="categories" element={<ConditionalCategories />} />
+            <Route path="category" element={<ConditionalCategories />} />
             <Route path=":username" element={<ProfilePage />} />
             <Route path=":username/blogs" element={<BlogList />} />
 
