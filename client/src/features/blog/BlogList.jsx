@@ -312,8 +312,8 @@ const BlogList = () => {
     
     newParams.set("page", 1); // Reset page on filter apply
     
-    if (selectedCategory !== "all") newParams.set("category", selectedCategory);
-    else newParams.delete("category");
+    // We will handle category in the route path for public blogs
+    newParams.delete("category");
     
     if (sortBy !== "createdAt") newParams.set("sort_by", sortBy);
     else newParams.delete("sort_by");
@@ -327,14 +327,34 @@ const BlogList = () => {
     if (selectedAuthor !== "all") newParams.set("author", selectedAuthor);
     else newParams.delete("author");
 
-    setSearchParams(newParams);
-  }, [searchParams, setSearchParams, selectedCategory, sortBy, sortOrder, draftFilter, selectedAuthor]);
+    let pathname = location.pathname;
+
+    if (isMyBlogsPage || isUserBlogsPage) {
+      if (selectedCategory !== "all") {
+        newParams.set("category", selectedCategory);
+      }
+    } else {
+      if (selectedCategory === "all") {
+        pathname = "/blogs";
+      } else {
+        pathname = `/category/${selectedCategory}`;
+      }
+    }
+
+    navigate({ pathname, search: newParams.toString() });
+  }, [searchParams, navigate, location.pathname, selectedCategory, sortBy, sortOrder, draftFilter, selectedAuthor, isMyBlogsPage, isUserBlogsPage]);
 
   const handleClearFilters = useCallback(() => {
     const newParams = new URLSearchParams();
-    if (slug) newParams.set("category", slug); // preserve category if on category page
-    setSearchParams(newParams);
-  }, [setSearchParams, slug]);
+    
+    let pathname = location.pathname;
+    
+    if (!isMyBlogsPage && !isUserBlogsPage && slug) {
+      pathname = "/blogs";
+    }
+
+    navigate({ pathname, search: newParams.toString() });
+  }, [navigate, location.pathname, isMyBlogsPage, isUserBlogsPage, slug]);
 
   const handleDeleteBlog = useCallback(
     async (blogId, blogTitle) => {
