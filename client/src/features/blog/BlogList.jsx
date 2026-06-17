@@ -27,6 +27,7 @@ import {
 } from "./blogSlice";
 import { fetchAllCategories } from "../category/categoriesSlice";
 import LoadingSpinner from "../../components/common/LoadingSpinner";
+import BlogCard from "./BlogCard";
 import Pagination from "../../components/common/Pagination";
 import {
   Eye,
@@ -630,34 +631,12 @@ const BlogList = () => {
             )}
           </CardContent>
         </Card>
-      ) : (
+      ) : isMyBlogsPage ? (
         <div className="grid gap-4 sm:gap-6">
           {paginatedBlogs.map((blog) => (
             <Card key={blog._id} className="hover:shadow-md transition-shadow">
               <CardContent className="p-4 sm:p-6">
-                <div
-                  className={`flex flex-col lg:flex-row ${
-                    blog.banner ? "lg:gap-6" : "lg:gap-0"
-                  }`}
-                >
-                  {blog.banner && (
-                    <div className="w-full lg:w-48 h-48 lg:h-32 flex-shrink-0 mb-4 lg:mb-0">
-                      <img
-                        src={
-                          blog.banner.startsWith("http")
-                            ? blog.banner
-                            : `/api${blog.banner}`
-                        }
-                        alt={blog.title}
-                        className="w-full h-full object-cover rounded-lg"
-                        onError={(e) => {
-                          e.target.style.display = "none";
-                        }}
-                        crossOrigin="anonymous"
-                      />
-                    </div>
-                  )}
-
+                <div className="flex flex-col lg:flex-row lg:gap-0">
                   <div className="flex-1">
                     <div className="flex flex-col lg:flex-row lg:justify-between lg:items-start gap-4">
                       <div className="flex-1">
@@ -733,28 +712,26 @@ const BlogList = () => {
                               Featured
                             </Badge>
                           )}
-                          {isMyBlogsPage && (
-                            <Badge
-                              variant={blog.draft ? "destructive" : "default"}
-                              className="text-xs"
-                            >
-                              {blog.draft ? (
-                                <>
-                                  <FilePenLine className="w-3 h-3 mr-1" />
-                                  Draft
-                                </>
-                              ) : (
-                                <>
-                                  <FileCheck className="w-3 h-3 mr-1" />
-                                  Published
-                                </>
-                              )}
-                            </Badge>
-                          )}
+                          <Badge
+                            variant={blog.draft ? "destructive" : "default"}
+                            className="text-xs"
+                          >
+                            {blog.draft ? (
+                              <>
+                                <FilePenLine className="w-3 h-3 mr-1" />
+                                Draft
+                              </>
+                            ) : (
+                              <>
+                                <FileCheck className="w-3 h-3 mr-1" />
+                                Published
+                              </>
+                            )}
+                          </Badge>
                         </div>
 
-                        <p className="text-muted-foreground mb-4 text-lg line-clamp-3 sm:line-clamp-4 lg:line-clamp-5 leading-relaxed">
-                          {truncateContent(blog.excerpt || blog.content || "")}
+                        <p className="text-muted-foreground mb-4 text-base line-clamp-3 leading-relaxed">
+                          {truncateContent(blog.excerpt || blog.content || "", 160)}
                         </p>
                       </div>
 
@@ -796,6 +773,14 @@ const BlogList = () => {
               </CardContent>
             </Card>
           ))}
+        </div>
+      ) : (
+        <div className="container mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-8 gap-y-12">
+            {paginatedBlogs.map((blog) => (
+              <BlogCard key={blog._id} blog={blog} />
+            ))}
+          </div>
         </div>
       )}
 

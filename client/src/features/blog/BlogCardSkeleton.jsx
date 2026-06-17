@@ -3,17 +3,7 @@ import { cn } from "@/lib/utils";
 
 const BlogCardSkeleton = ({ className }) => {
   return (
-    <div className={cn("group", className)}>
-      {/* Image skeleton */}
-      <div
-        className={cn(
-          "relative overflow-hidden bg-muted rounded-lg border border-border/50 mb-3 sm:mb-4 animate-pulse",
-          "aspect-video"
-        )}
-      >
-        <div className="h-full w-full bg-muted-foreground/10" />
-      </div>
-
+    <div className={cn("group flex flex-col h-full", className)}>
       {/* Category skeleton */}
       <div className="mb-2">
         <div className="h-3 w-20 bg-muted-foreground/10 rounded animate-pulse" />
