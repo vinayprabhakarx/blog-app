@@ -1,23 +1,23 @@
-import React, { useEffect, useState } from "react";
-import { Card, CardContent } from "../../components/ui/card";
-import { Input } from "../../components/ui/input";
+import React, { useEffect, useState, useCallback, useRef } from "react";
+import { Card, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 import slugify from "slugify";
-import { showToast } from "../../utils/showToast";
+import { showToast } from "@/utils/showToast";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
+} from "@/components/ui/select";
 import BlogEditor from "./BlogEditor";
 import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import { createBlog, updateBlog } from "./blogSlice";
-import { fetchAllCategories } from "../category/categoriesSlice";
-import { useCategories } from "../../hooks/useRedux";
-import LoadingButton from "../../components/common/LoadingButton";
-import ImageCropper from "../../components/common/ImageCropper";
+import { fetchAllCategories } from "@/features/category/categoriesSlice";
+import { useCategories } from "@/hooks/useRedux";
+import LoadingButton from "@/components/common/LoadingButton";
+import ImageCropper from "@/components/common/ImageCropper";
 import { IoCameraOutline } from "react-icons/io5";
 
 const BlogForm = ({ existingBlog }) => {
@@ -35,7 +35,14 @@ const BlogForm = ({ existingBlog }) => {
 
   const isEditing = Boolean(existingBlog);
 
-  const [formData, setFormData] = useState({
+  // --- Auto-save constants ---
+  const STORAGE_KEY = "blog-form-draft";
+  const EXPIRY_HOURS = 12;
+  const AUTO_SAVE_DELAY = 1000; // 1 second debounce
+  const autoSaveTimerRef = useRef(null);
+  const isRestoringRef = useRef(false); // Prevent auto-save during restore
+
+  const defaultFormData = {
     category: "",
     title: "",
     slug: "",
@@ -44,7 +51,9 @@ const BlogForm = ({ existingBlog }) => {
     tags: "",
     draft: false,
     isFeatured: false,
-  });
+  };
+
+  const [formData, setFormData] = useState(defaultFormData);
 
   const [formErrors, setFormErrors] = useState({});
 
@@ -55,11 +64,32 @@ const BlogForm = ({ existingBlog }) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [isCropping, setIsCropping] = useState(false);
   const [imageRemoved, setImageRemoved] = useState(false); // Track if user removed existing banner
-  
-
 
   // Reset Key to force component remounting
   const [resetKey, setResetKey] = useState(0);
+
+  // --- Auto-save helpers ---
+  const clearSavedFormData = useCallback(() => {
+    localStorage.removeItem(STORAGE_KEY);
+  }, []);
+
+  const saveFormData = useCallback((data) => {
+    if (isEditing) return;
+    const hasContent = data.title || data.content || data.excerpt || data.tags || data.category;
+    if (!hasContent) {
+      clearSavedFormData();
+      return;
+    }
+    const payload = {
+      formData: data,
+      timestamp: Date.now(),
+    };
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(payload));
+    } catch {
+      // Ignore storage errors
+    }
+  }, [isEditing, clearSavedFormData]);
 
   useEffect(() => {
     if (existingBlog) {
@@ -83,32 +113,57 @@ const BlogForm = ({ existingBlog }) => {
       if (existingBlog.banner) {
         setPreview(existingBlog.banner);
       }
-
-
     } else {
-      // For new blogs, try to restore from localStorage
-      const savedContent = localStorage.getItem("blog-draft-content");
-      const savedTimestamp = localStorage.getItem(
-        "blog-draft-content-timestamp"
-      );
+      // For new blogs, try to restore all form fields from localStorage
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (saved) {
+          const { formData: savedData, timestamp } = JSON.parse(saved);
+          const hoursSinceLastSave =
+            (Date.now() - timestamp) / (1000 * 60 * 60);
 
-      if (savedContent && savedTimestamp) {
-        const hoursSinceLastSave =
-          (Date.now() - parseInt(savedTimestamp)) / (1000 * 60 * 60);
-
-        // Only restore if saved within last 24 hours
-        if (hoursSinceLastSave < 24) {
-          // Automatically restore without confirmation
-          setFormData((prev) => ({ ...prev, content: savedContent }));
-          showToast("success", "Draft content restored!");
-        } else {
-          // Auto-clear old drafts
-          localStorage.removeItem("blog-draft-content");
-          localStorage.removeItem("blog-draft-content-timestamp");
+          if (hoursSinceLastSave < EXPIRY_HOURS) {
+            isRestoringRef.current = true;
+            setFormData(savedData);
+            showToast("success", "Draft form restored!");
+            // Allow auto-save again after restore settles
+            setTimeout(() => { isRestoringRef.current = false; }, 500);
+          } else {
+            // Auto-clear expired drafts
+            clearSavedFormData();
+          }
         }
+      } catch {
+        clearSavedFormData();
+      }
+
+      // Also migrate old content-only draft if it exists
+      const oldContent = localStorage.getItem("blog-draft-content");
+      if (oldContent) {
+        localStorage.removeItem("blog-draft-content");
+        localStorage.removeItem("blog-draft-content-timestamp");
       }
     }
-  }, [existingBlog]);
+  }, [existingBlog, clearSavedFormData]);
+
+  // Auto-save form data on change (debounced)
+  useEffect(() => {
+    if (isEditing || isRestoringRef.current) return;
+
+    if (autoSaveTimerRef.current) {
+      clearTimeout(autoSaveTimerRef.current);
+    }
+
+    autoSaveTimerRef.current = setTimeout(() => {
+      saveFormData(formData);
+    }, AUTO_SAVE_DELAY);
+
+    return () => {
+      if (autoSaveTimerRef.current) {
+        clearTimeout(autoSaveTimerRef.current);
+      }
+    };
+  }, [formData, isEditing, saveFormData]);
 
   useEffect(() => {
     if (categoryData.length === 0 && !loadingCategories) {
@@ -235,19 +290,8 @@ const BlogForm = ({ existingBlog }) => {
 
       // Success handling - cleanup states (only for new blogs)
       if (!isEditing) {
-        setFormData({
-          category: "",
-          title: "",
-          slug: "",
-          content: "",
-          excerpt: "",
-          tags: "",
-          draft: false,
-          isFeatured: false,
-        });
-        // Clear auto-saved content after successful submission
-        localStorage.removeItem("blog-draft-content");
-        localStorage.removeItem("blog-draft-content-timestamp");
+        setFormData(defaultFormData);
+        clearSavedFormData();
         setResetKey((prev) => prev + 1); // Force remount of editors to clear internal state/timers
       }
       setFormErrors({});
@@ -655,24 +699,14 @@ const BlogForm = ({ existingBlog }) => {
                 <button
                   type="button"
                   onClick={() => {
-                      setFormData({
-                        category: "",
-                        title: "",
-                        slug: "",
-                        content: "",
-                        excerpt: "",
-                        tags: "",
-                        draft: false,
-                      });
-
+                      setFormData(defaultFormData);
                       setResetKey((prev) => prev + 1); // Force remount of editors
                       setFormErrors({});
                       setFile(null);
                       setCroppedFile(null);
                       setPreview(null);
                       setSelectedImage(null);
-                      localStorage.removeItem("blog-draft-content");
-                      localStorage.removeItem("blog-draft-content-timestamp");
+                      clearSavedFormData();
                       showToast("success", "Form cleared successfully!");
                   }}
                   className="text-sm text-destructive hover:underline cursor-pointer"

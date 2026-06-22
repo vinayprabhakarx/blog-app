@@ -35,9 +35,9 @@ import VirtualizedMdPreview from "./VirtualizedMdPreview";
 // ... inside component ...
 
 
-import { useTheme } from "../../utils/ThemeContext";
-import ImageCropper from "../../components/common/ImageCropper";
-import { showToast } from "../../utils/showToast";
+import { useTheme } from "@/utils/ThemeContext";
+import ImageCropper from "@/components/common/ImageCropper";
+import { showToast } from "@/utils/showToast";
 const ToolButton = React.memo(({ onClick, title, children }) => (
   <button
     type="button"
@@ -59,7 +59,6 @@ const BlogEditor = ({
   height = 500,
   placeholder = "Write your blog content using Markdown...",
   className = "",
-  autoSaveKey = "blog-draft-content", // Unique key for localStorage
 }) => {
   const { theme } = useTheme();
   const [viewMode, setViewMode] = useState("split");
@@ -68,27 +67,6 @@ const BlogEditor = ({
   const [selectedImageForCrop, setSelectedImageForCrop] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
   const textareaRef = useRef(null);
-  const autoSaveTimerRef = useRef(null);
-
-  // Auto-save content to localStorage with debouncing
-  useEffect(() => {
-    if (autoSaveTimerRef.current) {
-      clearTimeout(autoSaveTimerRef.current);
-    }
-
-    autoSaveTimerRef.current = setTimeout(() => {
-      if (value && value.trim()) {
-        localStorage.setItem(autoSaveKey, value);
-        localStorage.setItem(`${autoSaveKey}-timestamp`, Date.now().toString());
-      }
-    }, 1000); // Save after 1 second of inactivity
-
-    return () => {
-      if (autoSaveTimerRef.current) {
-        clearTimeout(autoSaveTimerRef.current);
-      }
-    };
-  }, [value, autoSaveKey]);
 
   const handleChange = useCallback(
     (e) => {
