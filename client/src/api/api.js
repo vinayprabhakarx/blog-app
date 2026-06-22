@@ -25,7 +25,7 @@ api.interceptors.request.use(
     ];
 
     // Check if this is a public GET request
-    const isPublicGetRequest =
+    const _isPublicGetRequest =
       config.method === "get" &&
       publicGetRoutes.some((route) => {
         if (route === "/blogs?") {
@@ -38,8 +38,8 @@ api.interceptors.request.use(
         return config.url.startsWith(route);
       });
 
-    // Add token for all requests except public GET requests
-    if (token && !isPublicGetRequest) {
+    // Always attach token if available so backend can identify admins on public endpoints.
+    if (token) {
       config.headers["Authorization"] = `Bearer ${token}`;
     }
 

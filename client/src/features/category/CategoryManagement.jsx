@@ -1,16 +1,16 @@
 import React, { useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button } from "../../components/ui/button";
-import { Card, CardContent, CardHeader } from "../../components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   RouteAddCategory,
   RouteEditCategory,
   RouteCategoryView,
-} from "../../utils/RouteName";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
-import { showToast } from "../../utils/showToast";
-import { useAuth } from "../../hooks/useAuth";
+} from "@/utils/RouteName";
+import { EmptyState, LoadingState } from "@/components/common/StateDisplays";
+import { showToast } from "@/utils/showToast";
+import { useAuth } from "@/hooks/useAuth";
 import {
   fetchAllCategories,
   deleteCategory,
@@ -18,7 +18,17 @@ import {
   selectCategoriesLoading,
   selectOperationLoading,
 } from "./categoriesSlice";
-import { Tag, Star, Edit, Trash2, Plus } from "lucide-react";
+import {
+  FolderOpen,
+  Plus,
+  Search,
+  Edit,
+  Trash2,
+  RefreshCw,
+  Tag,
+  Star,
+} from "lucide-react";
+import { PageStats } from "@/components/common/PageStats";
 
 const CategoryManagement = () => {
   const dispatch = useDispatch();
@@ -85,12 +95,8 @@ const CategoryManagement = () => {
     [dispatch]
   );
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <LoadingSpinner />
-      </div>
-    );
+  if (loading && (!categories || categories.length === 0)) {
+    return <LoadingState message="Loading categories..." />;
   }
 
   if (!categories || categories.length === 0) {
@@ -101,20 +107,18 @@ const CategoryManagement = () => {
             Category Management
           </h1>
         </div>
-        <div className="text-center py-8">
-          <Tag className="h-16 w-16 mx-auto mb-4 text-muted-foreground/60" />
-          <h2 className="text-xl font-semibold mb-2 text-muted-foreground">
-            No Categories Yet
-          </h2>
-          <p className="text-muted-foreground max-w-md mx-auto mb-4">
-            Create your first category to start organizing your content.
-          </p>
-          <Button asChild variant="outline">
-            <Link to={RouteAddCategory(userRole)}>
-              Create your first category
-            </Link>
-          </Button>
-        </div>
+        <EmptyState 
+          icon={Tag} 
+          title="No Categories Yet" 
+          description="Create your first category to start organizing your content."
+          action={
+            <Button asChild variant="outline">
+              <Link to={RouteAddCategory(userRole)}>
+                Create your first category
+              </Link>
+            </Button>
+          }
+        />
       </div>
     );
   }
@@ -126,17 +130,17 @@ const CategoryManagement = () => {
         <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
           Category Management
         </h1>
-        <div className="flex justify-center gap-4 text-sm text-muted-foreground">
-          <span>{categoryStats.total} categories</span>
-          <span>•</span>
-          <span>{categoryStats.totalArticles} articles</span>
-          {categoryStats.featured > 0 && (
-            <>
-              <span>•</span>
-              <span>{categoryStats.featured} featured</span>
-            </>
-          )}
-        </div>
+        <PageStats
+          stats={[
+            { value: categoryStats.total, label: "categories" },
+            { value: categoryStats.totalArticles, label: "articles" },
+            {
+              value: categoryStats.featured,
+              label: "featured",
+              hidden: categoryStats.featured === 0,
+            },
+          ]}
+        />
       </div>
 
       {/* Add Category Button */}
@@ -179,8 +183,7 @@ const CategoryManagement = () => {
                     >
                       {/* Category Name */}
                       <td className="py-4 px-4">
-                        <div className="flex items-center gap-3">
-                          <Tag className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+                        <div className="flex items-center">
                           <Link
                             to={RouteCategoryView(category.slug)}
                             className="font-medium group-hover:text-primary transition-colors hover:underline"
@@ -260,11 +263,10 @@ const CategoryManagement = () => {
               <div className="space-y-3">
                 {/* Category Header */}
                 <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Tag className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                  <div className="flex items-center">
                     <Link
                       to={RouteCategoryView(category.slug)}
-                      className="font-medium text-lg hover:text-primary transition-colors hover:underline"
+                      className="font-medium text-lg hover:underline"
                       title={`View all posts in ${category.name}`}
                     >
                       {category.name}
@@ -286,34 +288,33 @@ const CategoryManagement = () => {
                     </span>
                   </div>
                   {category.featured && (
-                    <span className="text-amber-600 font-medium">Featured</span>
+                    <span className="font-medium">Featured</span>
                   )}
                 </div>
 
                 {/* Actions */}
-                <div className="flex justify-center gap-5 pt-2 border-t">
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    asChild
-                    className="px-2 py-1 h-7 min-w-[60px] flex items-center justify-center gap-1 text-xs transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
-                    title="Edit category"
-                  >
-                    <Link to={RouteEditCategory(category._id, userRole)}>
-                      <Edit className="h-3 w-3" />
-                      <span>Edit</span>
-                    </Link>
-                  </Button>
+                <div className="flex justify-center gap-2 pt-4 border-t">
+                  <Link to={RouteEditCategory(category._id, userRole)} className="flex-1">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full flex items-center justify-center gap-2 h-10 sm:h-9"
+                      title="Edit category"
+                    >
+                      <Edit className="w-6 h-6 sm:w-4 sm:h-4" />
+                      <span className="hidden sm:inline">Edit</span>
+                    </Button>
+                  </Link>
                   <Button
                     onClick={() => handleDelete(category._id, category.name)}
                     variant="outline"
                     size="sm"
                     disabled={operationLoading.delete}
-                    className="px-2 py-0.5 h-7 min-w-[60px] flex items-center justify-center gap-1 text-xs transition-colors duration-200 hover:text-destructive hover:border-destructive"
+                    className="flex-1 flex items-center justify-center gap-2 h-10 sm:h-9"
                     title="Delete category"
                   >
-                    <Trash2 className="h-3 w-3" />
-                    <span>Delete</span>
+                    <Trash2 className="w-6 h-6 sm:w-4 sm:h-4" />
+                    <span className="hidden sm:inline">Delete</span>
                   </Button>
                 </div>
               </div>
@@ -322,12 +323,7 @@ const CategoryManagement = () => {
         ))}
       </div>
 
-      {/* Footer Stats */}
-      {categories.length > 5 && (
-        <div className="text-center text-sm text-muted-foreground">
-          Showing all {categoryStats.total} categories
-        </div>
-      )}
+
     </section>
   );
 };

@@ -7,52 +7,56 @@ import React, {
 } from "react";
 import { Link, useParams, useNavigate, useLocation, useSearchParams } from "react-router-dom";
 import { useSelector } from "react-redux";
-import { Card, CardContent } from "../../components/ui/card";
-import { Button } from "../../components/ui/button";
-import { Badge } from "../../components/ui/badge";
+import { Card, CardContent } from "@/components/ui/card";
+import { FilterCard } from "@/components/common/FilterCard";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
-import { useAuth } from "../../hooks/useAuth";
-import { useBlog, useCategories } from "../../hooks/useRedux";
+} from "@/components/ui/select";
+import { useAuth } from "@/hooks/useAuth";
+import { useBlog, useCategories } from "@/hooks/useRedux";
 import {
   fetchAllBlogs,
   fetchMyBlogs,
   fetchBlogsByAuthor,
   deleteBlog,
 } from "./blogSlice";
-import { fetchAllCategories } from "../category/categoriesSlice";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { fetchAllCategories } from "@/features/category/categoriesSlice";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import { EmptyState, ErrorState, LoadingState } from "@/components/common/StateDisplays";
 import BlogCard from "./BlogCard";
-import Pagination from "../../components/common/Pagination";
+import Pagination from "@/components/common/Pagination";
 import {
-  Eye,
-  Calendar,
-  User,
-  Tag,
-  Clock,
   FileText,
-  ArrowLeft,
+  User,
+  Calendar,
+  Clock,
+  Eye,
   Edit,
   Trash2,
-  FileCheck,
-  FilePenLine,
   Plus,
+  Filter,
+  ArrowLeft,
+  FilePenLine,
+  FileCheck,
   Star,
 } from "lucide-react";
-import { formatDate } from "../../utils/formatDate";
-import { showToast } from "../../utils/showToast";
+import { PageStats } from "@/components/common/PageStats";
+import { formatDate } from "@/utils/formatDate";
+import { showToast } from "@/utils/showToast";
 
-const BlogList = () => {
+const BlogManagement = () => {
   const { slug, username } = useParams();
   const navigate = useNavigate();
   const location = useLocation();
   const [isInitialLoad, setIsInitialLoad] = useState(true);
   const isInitialFetch = useRef(true);
+  const [showFilters, setShowFilters] = useState(false);
 
   const { user, isAuthenticated } = useAuth();
 
@@ -75,7 +79,6 @@ const BlogList = () => {
     authorBlogs,
     authorBlogsLoading,
     authorBlogsError,
-    filters,
     dispatch: blogDispatch,
   } = useBlog();
   const {
@@ -255,6 +258,11 @@ const BlogList = () => {
     }
   }, [currentBlogs, isMyBlogsPage, urlDraftFilter, urlAuthor]);
 
+  const hasActiveFilters = 
+    urlCategory !== "all" || 
+    urlDraftFilter !== "all" || 
+    urlAuthor !== "all";
+
   const sortedAndFilteredBlogs = useMemo(() => {
     return [...filteredBlogs].sort((a, b) => {
       let aValue, bValue;
@@ -426,33 +434,59 @@ const BlogList = () => {
   const isAuthor = user?.role === "author";
 
   if (shouldShowInitialLoading) {
-    return (
-      <div className="flex justify-center items-center min-h-[400px]">
-        <LoadingSpinner size="lg" />
-      </div>
-    );
+    return <LoadingState message="Loading blogs..." />;
   }
 
   if (currentError) {
     return (
-      <div className="text-center text-destructive p-8">
-        <FileText className="h-16 w-16 mx-auto mb-4 opacity-50" />
-        <p>Error loading blogs: {currentError}</p>
-        <Button
-          onClick={() => {
-            if (isMyBlogsPage) {
-              blogDispatch(fetchMyBlogs());
-            } else if (isUserBlogsPage && username) {
-              blogDispatch(fetchBlogsByAuthor({ username, params: {} }));
-            } else {
-              blogDispatch(fetchAllBlogs());
-            }
-          }}
-          className="mt-4"
-          variant="outline"
-        >
-          Try Again
-        </Button>
+      <ErrorState
+        title="Failed to Load Blogs"
+        message={currentError}
+        onRetry={() => {
+          if (isMyBlogsPage) {
+            blogDispatch(fetchMyBlogs());
+          } else if (isUserBlogsPage && username) {
+            blogDispatch(fetchBlogsByAuthor({ username, params: {} }));
+          } else {
+            blogDispatch(fetchAllBlogs());
+          }
+        }}
+      />
+    );
+  }
+
+  if (!shouldShowInitialLoading && currentBlogs.length === 0 && !hasActiveFilters) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="flex items-center justify-between mb-6">
+          <h1 className="text-2xl font-bold flex items-center gap-2">
+            <FileText className="w-6 h-6 text-primary" />
+            {isMyBlogsPage
+              ? "My Blogs"
+              : isUserBlogsPage
+              ? `${username}'s Blogs`
+              : "Blog Management"}
+          </h1>
+        </div>
+        <Card>
+          <CardContent className="p-0">
+            <EmptyState
+              icon={FileText}
+              title="No blogs available"
+              description="There are no blogs to display at the moment. Create your first blog!"
+              action={
+                (isMyBlogsPage || (isAdmin && isGeneralBlogsPage)) && (
+                  <Button asChild>
+                    <Link to="/write-blog">
+                      <Plus className="w-4 h-4 mr-2" />
+                      Write Blog
+                    </Link>
+                  </Button>
+                )
+              }
+            />
+          </CardContent>
+        </Card>
       </div>
     );
   }
@@ -470,26 +504,26 @@ const BlogList = () => {
               ? "Blog Management"
               : "All Blogs"}
           </h1>
-          <div className="flex justify-center gap-4 text-sm text-muted-foreground">
-            <span>{displayTotalBlogs} blogs</span>
-            <span>•</span>
-            <span>
-              {urlPage} of {Math.ceil(displayTotalBlogs / blogsPerPage)}{" "}
-              pages
-            </span>
-            {isMyBlogsPage && (
-              <>
-                <span>•</span>
-                <span>
-                  {draftFilter === "drafts"
+          <PageStats
+            stats={[
+              { value: displayTotalBlogs, label: "blogs" },
+              {
+                value: `${urlPage} of ${Math.ceil(
+                  displayTotalBlogs / blogsPerPage
+                )}`,
+                label: "pages",
+              },
+              {
+                label:
+                  draftFilter === "drafts"
                     ? "Drafts"
                     : draftFilter === "published"
                     ? "Published"
-                    : "All Types"}
-                </span>
-              </>
-            )}
-          </div>
+                    : "All Types",
+                hidden: !isMyBlogsPage,
+              },
+            ]}
+          />
         </div>
 
         {isViewingCategory && (
@@ -514,19 +548,32 @@ const BlogList = () => {
         )}
       </div>
 
-      {(isAdmin || isAuthor) && (
-        <div className="flex justify-center">
-          <Button asChild className="flex items-center gap-2">
-            <Link to="/blogs/create">
-              <Plus className="h-4 w-4" />
-              Create Blog
-            </Link>
+      <div className="flex justify-center gap-3">
+        {(isAdmin || isAuthor) && (
+          <Button
+            onClick={() => navigate("/blogs/create")}
+            className="flex items-center justify-center gap-2 h-10 w-10 sm:w-auto p-0 sm:px-4"
+          >
+            <Plus className="w-7 h-7 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Create Blog</span>
           </Button>
-        </div>
-      )}
+        )}
+        <Button
+          variant="outline"
+          onClick={() => setShowFilters(!showFilters)}
+          className="flex items-center justify-center gap-2 h-10 w-10 sm:w-auto p-0 sm:px-4"
+        >
+          <Filter className="w-7 h-7 sm:w-4 sm:h-4" />
+          <span className="hidden sm:inline">Filters</span>
+        </Button>
+      </div>
 
-      <div className="space-y-3 sm:space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-2 sm:gap-3 lg:gap-4">
+      <FilterCard
+        isOpen={showFilters}
+        onClear={handleClearFilters}
+        onApply={handleApplyFilters}
+        className=""
+      >
           <div className="col-span-1">
             <Select
               value={selectedCategory}
@@ -546,7 +593,7 @@ const BlogList = () => {
             </Select>
           </div>
 
-          {isMyBlogsPage && (
+          {(isMyBlogsPage || (isAdmin && isGeneralBlogsPage)) && (
             <Select value={draftFilter} onValueChange={setDraftFilter}>
               <SelectTrigger className="w-full h-10 sm:h-9 text-sm">
                 <SelectValue placeholder="All Blogs" />
@@ -636,48 +683,20 @@ const BlogList = () => {
               <SelectItem value="asc">Oldest First</SelectItem>
             </SelectContent>
           </Select>
-        </div>
+      </FilterCard>
 
-        <div className="flex flex-col sm:flex-row justify-end items-stretch sm:items-center gap-2 sm:gap-3">
-          <Button
-            onClick={handleApplyFilters}
-            size="sm"
-            className="text-sm h-10 sm:h-9 w-full sm:w-auto"
-          >
-            Apply Filters
-          </Button>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={handleClearFilters}
-            className="text-sm h-10 sm:h-9 w-full sm:w-auto"
-          >
-            Clear Filters
-          </Button>
-        </div>
-      </div>
-
-      {currentBlogs.length === 0 ? (
-        <Card>
-          <CardContent className="p-6 sm:p-8 text-center">
-            <FileText className="h-12 w-12 sm:h-16 sm:w-16 text-muted-foreground mx-auto mb-4 opacity-50" />
-            <div className="text-muted-foreground text-sm sm:text-base">
-              {filters.search || filters.category !== "all"
-                ? "No blogs found matching your criteria."
-                : "No blogs available yet."}
-            </div>
-            {(filters.search || filters.category !== "all") && (
-              <Button
-                onClick={handleClearFilters}
-                className="mt-4"
-                variant="outline"
-              >
-                Clear Filters
-              </Button>
-            )}
-          </CardContent>
-        </Card>
-      ) : isMyBlogsPage ? (
+      {sortedAndFilteredBlogs.length === 0 ? (
+        <EmptyState
+          icon={FileText}
+          title="No matching blogs found"
+          description="We couldn't find any blogs that match your current filters. Try adjusting your search criteria."
+          action={
+            <Button onClick={handleClearFilters} variant="outline">
+              Clear Filters
+            </Button>
+          }
+        />
+      ) : (isMyBlogsPage || (isAdmin && isGeneralBlogsPage)) ? (
         <div className="grid gap-4 sm:gap-6">
           {paginatedBlogs.map((blog) => (
             <Card key={blog._id} className="hover:shadow-md transition-shadow">
@@ -845,4 +864,4 @@ const BlogList = () => {
   );
 };
 
-export default BlogList;
+export default BlogManagement;

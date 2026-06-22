@@ -2,42 +2,57 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Bell,
+  Heart,
+  MessageCircle,
   MessageSquare,
-  RefreshCw,
-  Trash2,
+  AlertCircle,
   CheckCircle,
+  Check,
+  CheckSquare,
+  Trash2,
+  Trash,
+  Filter,
+  RefreshCw,
+  Info,
 } from "lucide-react";
+import { PageStats } from "@/components/common/PageStats";
 import {
   Avatar,
   AvatarImage,
   AvatarFallback,
-} from "../../components/ui/avatar";
-import { Button } from "../../components/ui/button";
+} from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { EmptyState, ErrorState, LoadingState } from "@/components/common/StateDisplays";
+import { FilterCard } from "@/components/common/FilterCard";
+import { Card } from "@/components/ui/card";
 import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../../components/ui/tabs";
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import {
   fetchNotifications,
   markNotificationRead,
   clearAllNotifications,
 } from "./notificationsSlice";
-import { useNotifications } from "../../hooks/useNotifications";
-import { cn } from "../../lib/utils";
+import { useNotifications } from "@/hooks/useNotifications";
+import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
-import CommentForm from "../comment/CommentForm";
+import CommentForm from "@/features/comment/CommentForm";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 
-const NotificationDashboard = () => {
+const NotificationCenter = () => {
   const dispatch = useDispatch();
   const { notifications, loading, error } = useSelector(
     (state) => state.notifications
   );
   const { refreshNotifications } = useNotifications();
 
-  const [activeTab, setActiveTab] = useState("all");
+  const [filterStatus, setFilterStatus] = useState("all");
+  const [pendingFilterStatus, setPendingFilterStatus] = useState("all");
+  const [showFilters, setShowFilters] = useState(false);
   const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
@@ -47,17 +62,17 @@ const NotificationDashboard = () => {
   // Enhanced filtering and sorting
   const filteredNotifications = notifications
     .filter((notification) => {
-      // Filter by tab
-      if (activeTab === "unread" && notification.is_read) return false;
-      if (activeTab === "reports" && notification.type !== "comment_report")
+      // Filter by type
+      if (filterStatus === "unread" && notification.is_read) return false;
+      if (filterStatus === "reports" && notification.type !== "comment_report")
         return false;
       if (
-        activeTab === "comments" &&
+        filterStatus === "comments" &&
         !["blog_comment", "comment_reply"].includes(notification.type)
       )
         return false;
       if (
-        activeTab === "likes" &&
+        filterStatus === "likes" &&
         !["blog_like", "comment_like"].includes(notification.type)
       )
         return false;
@@ -117,17 +132,16 @@ const NotificationDashboard = () => {
   const stats = getNotificationStats();
 
   if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[400px]">
-        <LoadingSpinner />
-      </div>
-    );
+    return <LoadingState message="Loading notifications..." />;
   }
 
   if (error) {
     return (
-      <div className="text-center text-warning p-4">
-        Error loading notifications: {error}
+      <div className="py-8">
+        <ErrorState 
+          title="Failed to Load Notifications" 
+          message={error} 
+        />
       </div>
     );
   }
@@ -142,171 +156,87 @@ const NotificationDashboard = () => {
             <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
               Notification Center
             </h1>
+            <PageStats
+              stats={[
+                { value: stats.total, label: "total" },
+                { value: stats.unread, label: "unread" },
+              ]}
+            />
           </div>
 
           <div className="flex items-center justify-center gap-3">
             <Button
               variant="outline"
               size="sm"
-              className="h-10 px-4 hover:shadow-md transition-all duration-200"
+              className="h-10 px-0 sm:px-4 w-10 sm:w-auto hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2"
               onClick={handleRefresh}
               disabled={isRefreshing}
             >
               <RefreshCw
-                className={cn("h-4 w-4 mr-2", isRefreshing && "animate-spin")}
+                className={cn("h-7 w-7 sm:h-4 sm:w-4", isRefreshing && "animate-spin")}
               />
-              Refresh
+              <span className="hidden sm:inline">Refresh</span>
             </Button>
+            {notifications.length > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                className="h-10 px-0 sm:px-4 w-10 sm:w-auto hover:shadow-md transition-all duration-200 text-destructive hover:text-destructive border-destructive/20 hover:border-destructive/40 flex items-center justify-center gap-2"
+                onClick={() => dispatch(clearAllNotifications())}
+                disabled={loading}
+              >
+                <Trash2 className="h-7 w-7 sm:h-4 sm:w-4" />
+                <span className="hidden sm:inline">Clear All</span>
+              </Button>
+            )}
             <Button
               variant="outline"
               size="sm"
-              className="h-10 px-4 hover:shadow-md transition-all duration-200 text-destructive hover:text-destructive border-destructive/20 hover:border-destructive/40"
-              onClick={() => dispatch(clearAllNotifications())}
-              disabled={loading}
+              onClick={() => setShowFilters(!showFilters)}
+              className="h-10 px-0 sm:px-4 w-10 sm:w-auto hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2"
             >
-              <Trash2 className="h-4 w-4 mr-2" />
-              Clear All
+              <Filter className="w-7 h-7 sm:w-4 sm:h-4" />
+              <span className="hidden sm:inline">Filters</span>
             </Button>
           </div>
         </div>
 
-        {/* Tab Navigation - Modern Design */}
-        <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-          {/* Mobile Design - Stacked Tabs */}
-          <div className="block sm:hidden space-y-2">
-            <div className="grid grid-cols-2 gap-2">
-              <button
-                onClick={() => setActiveTab("all")}
-                className={cn(
-                  "cursor-pointer rounded-md transition-all duration-200 text-xs px-3 py-3 h-auto border",
-                  activeTab === "all"
-                    ? "bg-background border-primary/30"
-                    : "bg-muted/30 border-border/30 hover:bg-muted/50"
-                )}
-              >
-                <div className="text-center">
-                  <div className="font-medium">All</div>
-                  <div className="text-xs text-muted-foreground">
-                    ({stats.total})
-                  </div>
-                </div>
-              </button>
-              <button
-                onClick={() => setActiveTab("unread")}
-                className={cn(
-                  "cursor-pointer rounded-md transition-all duration-200 text-xs px-3 py-3 h-auto border",
-                  activeTab === "unread"
-                    ? "bg-background border-primary/30"
-                    : "bg-muted/30 border-border/30 hover:bg-muted/50"
-                )}
-              >
-                <div className="text-center">
-                  <div className="font-medium">Unread</div>
-                  <div className="text-xs text-muted-foreground">
-                    ({stats.unread})
-                  </div>
-                </div>
-              </button>
-            </div>
-            <div className="grid grid-cols-3 gap-2">
-              <button
-                onClick={() => setActiveTab("reports")}
-                className={cn(
-                  "cursor-pointer rounded-md transition-all duration-200 text-xs px-2 py-3 h-auto border",
-                  activeTab === "reports"
-                    ? "bg-background border-primary/30"
-                    : "bg-muted/30 border-border/30 hover:bg-muted/50"
-                )}
-              >
-                <div className="text-center">
-                  <div className="font-medium">Reports</div>
-                  <div className="text-xs text-muted-foreground">
-                    ({stats.reports})
-                  </div>
-                </div>
-              </button>
-              <button
-                onClick={() => setActiveTab("comments")}
-                className={cn(
-                  "cursor-pointer rounded-md transition-all duration-200 text-xs px-2 py-3 h-auto border",
-                  activeTab === "comments"
-                    ? "bg-background border-primary/30"
-                    : "bg-muted/30 border-border/30 hover:bg-muted/50"
-                )}
-              >
-                <div className="text-center">
-                  <div className="font-medium">Comments</div>
-                  <div className="text-xs text-muted-foreground">
-                    ({stats.comments})
-                  </div>
-                </div>
-              </button>
-              <button
-                onClick={() => setActiveTab("likes")}
-                className={cn(
-                  "cursor-pointer rounded-md transition-all duration-200 text-xs px-2 py-3 h-auto border",
-                  activeTab === "likes"
-                    ? "bg-background border-primary/30"
-                    : "bg-muted/30 border-border/30 hover:bg-muted/50"
-                )}
-              >
-                <div className="text-center">
-                  <div className="font-medium">Likes</div>
-                  <div className="text-xs text-muted-foreground">
-                    ({stats.likes})
-                  </div>
-                </div>
-              </button>
-            </div>
-          </div>
+        {/* Filters */}
+        <FilterCard
+          isOpen={showFilters}
+          onClear={() => {
+            setPendingFilterStatus("all");
+            setFilterStatus("all");
+          }}
+          onApply={() => {
+            setFilterStatus(pendingFilterStatus);
+          }}
+          className="mb-6"
+        >
+                  {/* Type */}
+                  <Select value={pendingFilterStatus} onValueChange={setPendingFilterStatus}>
+                    <SelectTrigger className="w-full h-10 sm:h-9 text-sm cursor-pointer">
+                      <SelectValue placeholder="All Notifications" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Notifications</SelectItem>
+                      <SelectItem value="unread">Unread ({stats.unread})</SelectItem>
+                      <SelectItem value="reports">Reports ({stats.reports})</SelectItem>
+                      <SelectItem value="comments">Comments ({stats.comments})</SelectItem>
+                      <SelectItem value="likes">Likes ({stats.likes})</SelectItem>
+                    </SelectContent>
+                  </Select>
+        </FilterCard>
 
-          {/* Desktop Design - Original Horizontal Layout */}
-          <TabsList className="hidden sm:flex w-full bg-muted/30 p-1 rounded-lg gap-1">
-            <TabsTrigger
-              value="all"
-              className="cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground rounded-md transition-all duration-200 text-sm px-3 py-2"
-            >
-              All ({stats.total})
-            </TabsTrigger>
-            <TabsTrigger
-              value="unread"
-              className="cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground rounded-md transition-all duration-200 text-sm px-3 py-2"
-            >
-              Unread ({stats.unread})
-            </TabsTrigger>
-            <TabsTrigger
-              value="reports"
-              className="cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground rounded-md transition-all duration-200 text-sm px-3 py-2"
-            >
-              Reports ({stats.reports})
-            </TabsTrigger>
-            <TabsTrigger
-              value="comments"
-              className="cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground rounded-md transition-all duration-200 text-sm px-3 py-2"
-            >
-              Comments ({stats.comments})
-            </TabsTrigger>
-            <TabsTrigger
-              value="likes"
-              className="cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground rounded-md transition-all duration-200 text-sm px-3 py-2"
-            >
-              Likes ({stats.likes})
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value={activeTab} className="space-y-0">
+        <div className="space-y-0">
             {filteredNotifications.length === 0 ? (
-              <div className="py-8 sm:py-12 md:py-16 text-center">
-                <div className="w-12 h-12 sm:w-16 sm:h-16 mx-auto mb-3 sm:mb-4 rounded-full bg-muted/50 flex items-center justify-center">
-                  <Bell className="w-6 h-6 sm:w-8 sm:h-8 text-muted-foreground" />
-                </div>
-                <h3 className="text-base sm:text-lg font-semibold text-foreground mb-2">
-                  No notifications yet
-                </h3>
-                <p className="text-xs sm:text-sm text-muted-foreground max-w-xs sm:max-w-sm mx-auto px-4">
-                  When you get notifications, they'll show up here. Check back
-                  later for updates.
-                </p>
+              <div className="py-8">
+                <EmptyState 
+                  variant="compact"
+                  icon={Bell} 
+                  title="No notifications yet" 
+                  description="When you get notifications, they'll show up here. Check back later for updates."
+                />
               </div>
             ) : (
               <div className="bg-background border border-border/20 rounded-xl overflow-hidden">
@@ -321,9 +251,8 @@ const NotificationDashboard = () => {
                 </div>
               </div>
             )}
-          </TabsContent>
-        </Tabs>
-      </div>
+          </div>
+        </div>
     </section>
   );
 };
@@ -450,9 +379,9 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
 
           {/* Footer Info */}
           <div className="text-xs text-muted-foreground mb-3">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1">
-                <span className="text-xs text-muted-foreground cursor-pointer font-medium">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+              <div className="flex items-center gap-1 min-w-0 max-w-full">
+                <span className="text-xs text-muted-foreground cursor-pointer font-medium flex-shrink-0">
                   on
                 </span>
                 {notification.blog_id?.title && (
@@ -460,13 +389,13 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
                     to={`/blog/${
                       notification.blog_id.slug || notification.blog_id._id
                     }`}
-                    className="text-primary hover:text-primary/80 hover:underline font-medium truncate max-w-32 sm:max-w-48 cursor-pointer"
+                    className="text-primary hover:text-primary/80 hover:underline font-medium truncate cursor-pointer"
                   >
                     {notification.blog_id.title}
                   </Link>
                 )}
               </div>
-              <div className="text-xs text-muted-foreground font-medium">
+              <div className="text-xs text-muted-foreground font-medium flex-shrink-0 whitespace-nowrap">
                 {formatTimestamp(new Date(notification.created_at))}
               </div>
             </div>
@@ -540,4 +469,4 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
   );
 };
 
-export default NotificationDashboard;
+export default NotificationCenter;

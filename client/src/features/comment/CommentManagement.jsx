@@ -1,39 +1,41 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from "../../components/ui/tabs";
-import { Button } from "../../components/ui/button";
-import { Checkbox } from "../../components/ui/checkbox";
+import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
+} from "@/components/ui/select";
 import {
   MessageSquare,
-  Flag,
   Search as SearchIcon,
+  Filter,
+  CheckCircle,
+  XCircle,
+  Trash2,
   Trash,
   RefreshCw,
-  X,
+  AlertTriangle,
+  CheckSquare,
 } from "lucide-react";
+import { PageStats } from "@/components/common/PageStats";
+import { Card, CardContent } from "@/components/ui/card";
+import { EmptyState } from "@/components/common/StateDisplays";
+import { FilterCard } from "@/components/common/FilterCard";
 
 import {
   deleteComment,
   fetchAdminComments,
   fetchAuthorComments,
 } from "./commentsSlice";
-import { cn } from "../../lib/utils";
+import { cn } from "@/lib/utils";
 import CommentForm from "./CommentForm";
 import { Link } from "react-router-dom";
-import { showToast } from "../../utils/showToast";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { showToast } from "@/utils/showToast";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 // New, minimal management view aligned with app design
 const CommentManagement = () => {
@@ -44,10 +46,19 @@ const CommentManagement = () => {
   );
 
   // All hooks must be called before any conditional returns
-  const [activeTab, setActiveTab] = useState("all");
+  // Filter applied states (used for actual filtering)
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterStatus, setFilterStatus] = useState("all"); // all | reported
+  const [filterStatus, setFilterStatus] = useState("all"); // all | reported | comments
   const [sortBy, setSortBy] = useState("newest"); // newest | oldest | reports
+  
+  // Pending filter states (bound to UI)
+  const [pendingSearchTerm, setPendingSearchTerm] = useState("");
+  const [pendingFilterStatus, setPendingFilterStatus] = useState("all");
+  const [pendingSortBy, setPendingSortBy] = useState("newest");
+
+  const [showFilters, setShowFilters] = useState(false);
+  const [showBulkActions, setShowBulkActions] = useState(false);
+
   const [selectedComments, setSelectedComments] = useState(new Set());
   const [selectAll, setSelectAll] = useState(false);
 
@@ -130,20 +141,18 @@ const CommentManagement = () => {
   const stats = useMemo(() => {
     const total = allComments.length;
     const reported = allComments.filter((c) => c.hasReports).length;
-    const comments = total;
-    return { total, reported, comments };
+    return { total, reported };
   }, [allComments]);
 
   const filtered = useMemo(() => {
     let filteredComments = allComments;
 
-    // Apply tab filtering
-    if (activeTab === "reports") {
+    // Apply type filtering
+    if (filterStatus === "reported") {
       filteredComments = filteredComments.filter((c) => c.hasReports);
-    } else if (activeTab === "comments") {
+    } else if (filterStatus === "comments") {
       filteredComments = filteredComments.filter((c) => !c.hasReports);
     }
-    // activeTab === "all" means no filtering
 
     // Apply search filtering
     if (searchTerm) {
@@ -155,11 +164,6 @@ const CommentManagement = () => {
           (c.blogTitle || "").toLowerCase().includes(searchLower)
         );
       });
-    }
-
-    // Apply status filtering
-    if (filterStatus === "reported") {
-      filteredComments = filteredComments.filter((c) => c.hasReports);
     }
 
     // Apply sorting
@@ -181,7 +185,7 @@ const CommentManagement = () => {
       }
       return 0;
     });
-  }, [allComments, activeTab, searchTerm, filterStatus, sortBy]);
+  }, [allComments, searchTerm, filterStatus, sortBy]);
 
   const handleSelectAll = () => {
     if (selectAll) {
@@ -200,7 +204,6 @@ const CommentManagement = () => {
       setSelectedComments(new Set());
       setSelectAll(false);
 
-      // Refresh the comments data to get updated counts
       if (user?.role === "admin") {
         await dispatch(
           fetchAdminComments({ page: 1, limit: 50, sort: sortBy })
@@ -223,7 +226,6 @@ const CommentManagement = () => {
     }
   };
 
-  // Ensure only admin and author users can access this component
   if (!["admin", "author"].includes(user?.role)) {
     return (
       <div className="flex items-center justify-center min-h-[400px]">
@@ -247,27 +249,48 @@ const CommentManagement = () => {
     );
   }
 
+  const hasActiveFilters = searchTerm !== "" || filterStatus !== "all" || sortBy !== "newest";
+
+  if (!isLoading && allComments.length === 0 && !hasActiveFilters) {
+    return (
+      <div className="p-6 space-y-6">
+        <div className="text-center">
+          <h1 className="text-2xl font-bold text-foreground mb-6">
+            Comment Management
+          </h1>
+        </div>
+        <Card>
+          <CardContent className="p-0">
+            <EmptyState
+              icon={MessageSquare}
+              title="No comments found"
+              description="There are no comments available to manage at this time."
+            />
+          </CardContent>
+        </Card>
+      </div>
+    );
+  }
+
   return (
     <section className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">
-      {/* Header */}
       <div className="text-center space-y-3">
         <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
           Comment Management
         </h1>
-        <div className="flex justify-center gap-4 text-sm text-muted-foreground">
-          <span>{stats.total} comments</span>
-          <span>•</span>
-          <span>{stats.reported} reported</span>
-        </div>
+        <PageStats
+          stats={[
+            { value: stats.total, label: "comments" },
+            { value: stats.reported, label: "reported" },
+          ]}
+        />
 
-        {/* Action Buttons - Same style as NotificationCenter */}
         <div className="flex items-center justify-center gap-3">
           <Button
             variant="outline"
             size="sm"
-            className="h-10 px-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
+            className="h-10 px-0 sm:px-4 w-10 sm:w-auto shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
             onClick={() => {
-              // Refresh the comments data
               if (user?.role === "admin") {
                 dispatch(
                   fetchAdminComments({ page: 1, limit: 50, sort: sortBy })
@@ -283,175 +306,152 @@ const CommentManagement = () => {
               }
             }}
           >
-            <RefreshCw className="h-4 w-4 mr-2" />
-            Refresh
+            <RefreshCw className="h-7 w-7 sm:h-4 sm:w-4" />
+            <span className="hidden sm:inline">Refresh</span>
           </Button>
           <Button
             variant="outline"
             size="sm"
-            className="h-10 px-4 shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer"
-            onClick={() => {
-              setSearchTerm("");
-              setFilterStatus("all");
-              setSortBy("newest");
-              setActiveTab("all");
-              setSelectedComments(new Set());
-              setSelectAll(false);
-            }}
-            disabled={
-              !searchTerm &&
-              filterStatus === "all" &&
-              sortBy === "newest" &&
-              activeTab === "all"
-            }
+            onClick={() => setShowFilters(!showFilters)}
+            className="h-10 px-0 sm:px-4 w-10 sm:w-auto shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
           >
-            <X className="h-4 w-4 mr-2" />
-            Clear Filters
+            <Filter className="w-7 h-7 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Filters</span>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => setShowBulkActions(!showBulkActions)}
+            disabled={filtered.length === 0}
+            className="h-10 px-0 sm:px-4 w-10 sm:w-auto shadow-sm hover:shadow-md transition-all duration-200 cursor-pointer flex items-center justify-center gap-2"
+          >
+            <CheckSquare className="w-7 h-7 sm:w-4 sm:h-4" />
+            <span className="hidden sm:inline">Bulk Actions</span>
           </Button>
         </div>
       </div>
 
-      {/* Filters */}
-      <div className="space-y-3 sm:space-y-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3 lg:gap-4">
-          {/* Search */}
-          <div className="relative col-span-1 sm:col-span-2 lg:col-span-1">
-            <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
-            <input
-              type="text"
-              placeholder="Search comments"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10 w-full h-10 sm:h-9 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring text-foreground placeholder:text-muted-foreground"
-            />
-          </div>
-
-          {/* Status */}
-          <Select value={filterStatus} onValueChange={setFilterStatus}>
-            <SelectTrigger className="w-full h-10 sm:h-9 text-sm cursor-pointer">
-              <SelectValue placeholder="All Status" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Status</SelectItem>
-              <SelectItem value="reported">Reported</SelectItem>
-            </SelectContent>
-          </Select>
-
-          {/* Sort */}
-          <Select value={sortBy} onValueChange={setSortBy}>
-            <SelectTrigger className="w-full h-10 sm:h-9 text-sm cursor-pointer">
-              <SelectValue placeholder="Sort by" />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="newest">Newest</SelectItem>
-              <SelectItem value="oldest">Oldest</SelectItem>
-              <SelectItem value="reports">Most Reported</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-      </div>
-
-      {/* Tabs & Selection Controls */}
-      <Tabs
-        value={activeTab}
-        onValueChange={setActiveTab}
-        className="w-full mt-8"
+      <FilterCard
+        isOpen={showFilters}
+        onClear={() => {
+          setPendingSearchTerm("");
+          setPendingFilterStatus("all");
+          setPendingSortBy("newest");
+          setSearchTerm("");
+          setFilterStatus("all");
+          setSortBy("newest");
+          setSelectedComments(new Set());
+          setSelectAll(false);
+        }}
+        onApply={() => {
+          setSearchTerm(pendingSearchTerm);
+          setFilterStatus(pendingFilterStatus);
+          setSortBy(pendingSortBy);
+        }}
+        disableApply={
+          !pendingSearchTerm &&
+          pendingFilterStatus === "all" &&
+          pendingSortBy === "newest"
+        }
+        className="mb-6"
       >
-        <div className="flex justify-center mb-6">
-          <TabsList className="w-auto max-w-full bg-muted/30 p-1.5 rounded-xl gap-1 overflow-hidden">
-            <TabsTrigger
-              value="all"
-              className="cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-lg transition-all duration-200 text-xs sm:text-sm px-3 sm:px-4 py-2.5 min-w-0 flex-shrink border-0 shadow-none font-medium"
-            >
-              <span className="hidden sm:inline">All ({stats.total})</span>
-              <span className="sm:hidden">All</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="reports"
-              className="cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-lg transition-all duration-200 text-xs sm:text-sm px-3 sm:px-4 py-2.5 min-w-0 flex-shrink border-0 shadow-none font-medium"
-            >
-              <span className="hidden sm:inline">
-                Reports ({stats.reported})
-              </span>
-              <span className="sm:hidden">Reports</span>
-            </TabsTrigger>
-            <TabsTrigger
-              value="comments"
-              className="cursor-pointer data-[state=active]:bg-background data-[state=active]:text-foreground data-[state=active]:shadow-sm rounded-lg transition-all duration-200 text-xs sm:text-sm px-3 sm:px-4 py-2.5 min-w-0 flex-shrink border-0 shadow-none font-medium"
-            >
-              <span className="hidden sm:inline">
-                Comments ({stats.comments})
-              </span>
-              <span className="sm:hidden">Comments</span>
-            </TabsTrigger>
-          </TabsList>
-        </div>
+                <div className="relative col-span-1 sm:col-span-2 lg:col-span-1">
+                  <SearchIcon className="absolute left-3 top-3 h-4 w-4 text-muted-foreground" />
+                  <input
+                    type="text"
+                    placeholder="Search comments"
+                    value={pendingSearchTerm}
+                    onChange={(e) => setPendingSearchTerm(e.target.value)}
+                    className="pl-10 w-full h-10 sm:h-9 border border-border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-ring focus:border-ring text-foreground placeholder:text-muted-foreground"
+                  />
+                </div>
 
-        {/* Select All + Actions */}
-        <div className="flex justify-center items-center gap-4 mb-4">
-          <div className="flex items-center space-x-2">
-            <Checkbox
-              checked={selectAll}
-              onCheckedChange={handleSelectAll}
-              className="cursor-pointer !w-4 !h-4 !min-w-[16px] !min-h-[16px] !max-w-[16px] !max-h-[16px] !text-base"
-            />
-            <span className="text-sm font-medium cursor-pointer">
-              Select All{" "}
-              {selectedComments.size > 0 && `(${selectedComments.size})`}
-            </span>
-          </div>
+                <Select value={pendingFilterStatus} onValueChange={setPendingFilterStatus}>
+                  <SelectTrigger className="w-full h-10 sm:h-9 text-sm cursor-pointer">
+                    <SelectValue placeholder="All Status" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All Comments</SelectItem>
+                    <SelectItem value="reported">Reported Only</SelectItem>
+                    <SelectItem value="comments">Clean Only</SelectItem>
+                  </SelectContent>
+                </Select>
 
-          {selectedComments.size > 0 && (
-            <>
-              {/* Show delete button for any selected comments */}
-              <Button
-                variant="destructive"
-                size="sm"
-                onClick={() => {
-                  const confirmed = window.confirm(
-                    `Are you sure you want to delete ${
-                      selectedComments.size
-                    } comment${
-                      selectedComments.size !== 1 ? "s" : ""
-                    }? This action cannot be undone.`
-                  );
-                  if (confirmed) {
-                    handleBulkDelete();
-                  }
-                }}
-                className="h-8 px-3 cursor-pointer"
-              >
-                <Trash className="h-4 w-4 mr-2" />
-                Delete Selected ({selectedComments.size})
-              </Button>
-
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => {
-                  setSelectedComments(new Set());
-                  setSelectAll(false);
-                }}
-                className="text-xs text-muted-foreground hover:text-foreground h-8 px-3 cursor-pointer"
-              >
-                Clear Selected ({selectedComments.size})
-              </Button>
-            </>
-          )}
-        </div>
-
-        <TabsContent value={activeTab} className="space-y-3">
-          {filtered.length === 0 ? (
-            <div className="py-12 text-center">
-              <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">
-                <MessageSquare className="w-8 h-8 text-muted-foreground" />
+                <Select value={pendingSortBy} onValueChange={setPendingSortBy}>
+                  <SelectTrigger className="w-full h-10 sm:h-9 text-sm cursor-pointer">
+                    <SelectValue placeholder="Sort by" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="newest">Newest</SelectItem>
+                    <SelectItem value="oldest">Oldest</SelectItem>
+                    <SelectItem value="reports">Most Reported</SelectItem>
+                  </SelectContent>
+                </Select>
+      </FilterCard>
+      <div className="w-full mt-8">
+        {showBulkActions && filtered.length > 0 && (
+          <Card className="mb-6">
+            <CardContent className="p-4 flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+              <div className="flex items-center space-x-2">
+                <Checkbox
+                  checked={selectAll}
+                  onCheckedChange={handleSelectAll}
+                  className="cursor-pointer !w-4 !h-4 !min-w-[16px] !min-h-[16px] !max-w-[16px] !max-h-[16px] !text-base"
+                />
+                <span className="text-sm font-medium cursor-pointer">
+                  Select All{" "}
+                  {selectedComments.size > 0 && `(${selectedComments.size})`}
+                </span>
               </div>
-              <p className="text-lg font-medium text-muted-foreground">
-                No comments found
-              </p>
-              <p className="text-sm text-muted-foreground">
-                Try adjusting your filters or check back later
-              </p>
+
+              {selectedComments.size > 0 && (
+                <div className="flex flex-col sm:flex-row gap-2 w-full sm:w-auto">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => {
+                      setSelectedComments(new Set());
+                      setSelectAll(false);
+                    }}
+                    className="text-xs text-muted-foreground hover:text-foreground h-8 px-3 cursor-pointer w-full sm:w-auto"
+                  >
+                    Clear Selected
+                  </Button>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={() => {
+                      const confirmed = window.confirm(
+                        `Are you sure you want to delete ${
+                          selectedComments.size
+                        } comment${
+                          selectedComments.size !== 1 ? "s" : ""
+                        }? This action cannot be undone.`
+                      );
+                      if (confirmed) {
+                        handleBulkDelete();
+                      }
+                    }}
+                    className="h-8 px-3 cursor-pointer w-full sm:w-auto"
+                  >
+                    <Trash className="h-4 w-4 mr-2" />
+                    Delete ({selectedComments.size})
+                  </Button>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        <div className="space-y-3">
+          {filtered.length === 0 ? (
+            <div className="py-8">
+              <EmptyState 
+                variant="compact"
+                icon={MessageSquare} 
+                title="No comments found" 
+                description="Try adjusting your filters or check back later."
+              />
             </div>
           ) : (
             <div className="space-y-3">
@@ -460,6 +460,7 @@ const CommentManagement = () => {
                   key={c._id}
                   comment={c}
                   selected={selectedComments.has(c._id)}
+                  showCheckbox={showBulkActions}
                   onToggle={() => {
                     const next = new Set(selectedComments);
                     if (next.has(c._id)) next.delete(c._id);
@@ -486,13 +487,13 @@ const CommentManagement = () => {
               ))}
             </div>
           )}
-        </TabsContent>
-      </Tabs>
+        </div>
+      </div>
     </section>
   );
 };
 
-const RowCard = ({ comment, selected, onToggle, onRefresh }) => {
+const RowCard = ({ comment, selected, showCheckbox, onToggle, onRefresh }) => {
   const dispatch = useDispatch();
   const [isReplying, setIsReplying] = useState(false);
 
@@ -533,15 +534,18 @@ const RowCard = ({ comment, selected, onToggle, onRefresh }) => {
       )}
     >
       <div className="flex flex-col sm:flex-row items-start gap-3 p-4">
-        <div className="pt-1 flex-shrink-0">
-          <Checkbox
-            checked={selected}
-            onCheckedChange={onToggle}
-            className="cursor-pointer !w-4 !h-4 !min-w-[16px] !min-h-[16px] !max-w-[16px] !max-h-[16px] !text-base"
-          />
-        </div>
-        <div className="flex-1 min-w-0 w-full">
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mb-2">
+        <div className="flex flex-row items-start gap-3 flex-1 min-w-0 w-full">
+          {showCheckbox && (
+            <div className="pt-1 flex-shrink-0">
+              <Checkbox
+                checked={selected}
+                onCheckedChange={onToggle}
+                className="cursor-pointer !w-4 !h-4 !min-w-[16px] !min-h-[16px] !max-w-[16px] !max-h-[16px] !text-base"
+              />
+            </div>
+          )}
+          <div className="flex-1 min-w-0 w-full">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mb-2">
             <span className="font-semibold text-foreground text-sm sm:text-base">
               {comment.authorName}
             </span>
@@ -556,19 +560,19 @@ const RowCard = ({ comment, selected, onToggle, onRefresh }) => {
             {comment.content}
           </div>
           <div className="text-xs text-muted-foreground mb-3">
-            <div className="flex items-center gap-4">
-              <div className="flex items-center gap-1">
-                <span className="text-xs text-muted-foreground cursor-pointer font-medium">
+            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
+              <div className="flex items-center gap-1 min-w-0 max-w-full">
+                <span className="text-xs text-muted-foreground cursor-pointer font-medium flex-shrink-0">
                   on
                 </span>
                 <Link
                   to={`/blog/${comment.blogSlug || comment.blogId}`}
-                  className="text-primary hover:text-primary/80 hover:underline font-medium truncate max-w-32 sm:max-w-48 cursor-pointer"
+                  className="text-primary hover:text-primary/80 hover:underline font-medium truncate cursor-pointer"
                 >
                   {comment.blogTitle}
                 </Link>
               </div>
-              <div className="text-xs text-muted-foreground font-medium">
+              <div className="text-xs text-muted-foreground font-medium flex-shrink-0 whitespace-nowrap">
                 {new Date(
                   comment.created_at || comment.commentDate
                 ).toLocaleDateString("en-US", {
@@ -580,9 +584,10 @@ const RowCard = ({ comment, selected, onToggle, onRefresh }) => {
             </div>
           </div>
         </div>
+        </div>
 
         {/* Action Buttons */}
-        <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-auto mt-3 sm:mt-0">
+        <div className="flex flex-row sm:flex-col md:flex-row items-center justify-end gap-2 w-full sm:w-auto sm:ml-auto mt-3 sm:mt-0 flex-shrink-0">
           <Button
             variant="ghost"
             size="sm"

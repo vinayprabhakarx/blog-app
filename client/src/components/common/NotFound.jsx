@@ -1,76 +1,50 @@
 import React from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { Button } from "../ui/button";
+import { useNavigate } from "react-router-dom";
+import { Button } from "@/components/ui/button";
 import { ArrowLeft } from "lucide-react";
-import { useNotFoundContext } from "../../hooks/useNotFoundContext.jsx";
+import { useNotFoundContext } from "@/hooks/useNotFoundContext.jsx";
 
 const NotFound = ({
   title,
   message,
   showBackButton = true,
-  backPath,
-  backText,
   customMessage,
   errorCode = "404",
-  customIcon,
 }) => {
   const navigate = useNavigate();
   const { content } = useNotFoundContext();
 
   const finalTitle = title || content.title;
   const finalMessage = customMessage || message || content.message;
-  const finalBackPath = backPath || content.primaryAction.path;
-  const finalBackText = backText || content.primaryAction.text;
-  const PrimaryIcon = content.primaryAction.icon;
-  const contextualContent = {
-    ...content,
-    title: finalTitle,
-    message: finalMessage,
-  };
+
 
   return (
     <section className="flex justify-center items-center py-20 px-6 bg-background" aria-label="Not Found Error">
       <div className="text-center max-w-2xl w-full space-y-8">
         {/* Error Code */}
         <div>
-          <h2 className="text-8xl sm:text-9xl font-bold text-primary/20 select-none">
+          <h2 className="text-4xl sm:text-5xl font-bold text-primary/20 select-none mb-4">
             {errorCode}
           </h2>
         </div>
 
-        {/* Error Icon */}
-        <div className="flex items-center justify-center text-5xl text-muted-foreground">
-          {customIcon || contextualContent.errorIcon}
-        </div>
-
         {/* Error Title */}
-        <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-foreground">
+        <h1 className="text-xl sm:text-2xl font-bold text-foreground">
           {finalTitle}
         </h1>
 
         {/* Error Message */}
-        <p className="text-base sm:text-lg text-muted-foreground leading-relaxed max-w-md mx-auto">
+        <p className="text-sm sm:text-base text-muted-foreground leading-relaxed max-w-md mx-auto mb-8">
           {finalMessage}
         </p>
 
         {/* Action Buttons */}
         {showBackButton && (
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-4">
-            <Link to={finalBackPath}>
-              <Button 
-                size="lg"
-                className="flex items-center gap-2 px-6 py-3 text-base w-full sm:w-auto min-w-[200px]"
-              >
-                <PrimaryIcon className="w-5 h-5" />
-                {finalBackText}
-              </Button>
-            </Link>
-
             <Button
-              variant="outline"
-              size="lg"
+              variant="default"
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 px-6 py-3 text-base w-full sm:w-auto min-w-[200px]"
+              className="flex items-center gap-2 px-6 py-2 text-sm w-full sm:w-auto min-w-[150px]"
             >
               <ArrowLeft className="w-4 h-4" />
               Go Back

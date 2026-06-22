@@ -9,17 +9,19 @@ import {
   selectAllUsersError,
   selectUsersPagination,
 } from "./userSlice";
-import { Card, CardContent } from "../../components/ui/card";
-import { Button } from "../../components/ui/button";
-import { Badge } from "../../components/ui/badge";
-import { Input } from "../../components/ui/input";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Badge } from "@/components/ui/badge";
+import { Input } from "@/components/ui/input";
+import { EmptyState, ErrorState, LoadingState } from "@/components/common/StateDisplays";
+import { FilterCard } from "@/components/common/FilterCard";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
+} from "@/components/ui/select";
 import {
   Table,
   TableBody,
@@ -27,7 +29,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "../../components/ui/table";
+} from "@/components/ui/table";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -38,7 +40,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
   AlertDialogTrigger,
-} from "../../components/ui/alert-dialog";
+} from "@/components/ui/alert-dialog";
 import {
   Dialog,
   DialogContent,
@@ -47,31 +49,38 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from "../../components/ui/dialog";
+} from "@/components/ui/dialog";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "../../components/ui/avatar";
+} from "@/components/ui/avatar";
 import {
   Users,
-  Trash2,
-  Crown,
-  User as UserIcon,
   Search,
   Filter,
-  Download,
-  UserCog,
+  Trash2,
   RefreshCw,
-  Edit,
-  CheckCircle,
+  Mail,
+  Shield,
+  Clock,
+  MoreVertical,
+  UserX,
+  UserCheck,
   AlertTriangle,
+  Download,
+  CheckCircle,
+  Crown,
+  User as UserIcon,
+  UserCog,
+  Edit,
 } from "lucide-react";
-import { showToast } from "../../utils/showToast";
+import { PageStats } from "@/components/common/PageStats";
+import { showToast } from "@/utils/showToast";
 import { formatDistanceToNow } from "date-fns";
 import { Link } from "react-router-dom";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
-import Pagination from "../../components/common/Pagination";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import Pagination from "@/components/common/Pagination";
 
 const UserManagement = () => {
   const dispatch = useDispatch();
@@ -86,6 +95,12 @@ const UserManagement = () => {
   const [roleFilter, setRoleFilter] = useState("all");
   const [statusFilter, setStatusFilter] = useState("all");
   const [sortBy, setSortBy] = useState("newest");
+
+  const [pendingSearchQuery, setPendingSearchQuery] = useState("");
+  const [pendingRoleFilter, setPendingRoleFilter] = useState("all");
+  const [pendingStatusFilter, setPendingStatusFilter] = useState("all");
+  const [pendingSortBy, setPendingSortBy] = useState("newest");
+
   const [currentPage, setCurrentPage] = useState(1);
   const [showFilters, setShowFilters] = useState(false);
 
@@ -196,13 +211,16 @@ const UserManagement = () => {
   };
 
   const handleRefresh = () => {
-    const params = {
-      page: currentPage,
-      limit: 10,
-      search: searchQuery,
-      role: roleFilter !== "all" ? roleFilter : "",
-    };
-    dispatch(fetchAllUsers(params));
+    setPendingSearchQuery("");
+    setPendingRoleFilter("all");
+    setPendingStatusFilter("all");
+    setPendingSortBy("newest");
+    setSearchQuery("");
+    setRoleFilter("all");
+    setStatusFilter("all");
+    setSortBy("newest");
+    setCurrentPage(1);
+    dispatch(fetchAllUsers({ page: 1, limit: 10 }));
   };
 
   const exportUsers = () => {
@@ -292,10 +310,18 @@ const UserManagement = () => {
     return user._id !== currentUser?._id && user.role !== "admin";
   };
 
-  if (loading && users.length === 0) {
+  if (loading && (!users || users.length === 0)) {
+    return <LoadingState message="Loading users..." />;
+  }
+
+  if (error) {
     return (
-      <div className="flex justify-center items-center min-h-screen">
-        <LoadingSpinner />
+      <div className="p-6">
+        <ErrorState 
+          title="Failed to Load Users" 
+          message={error || "Something went wrong while fetching users."}
+          onRetry={handleRefresh}
+        />
       </div>
     );
   }
@@ -309,16 +335,12 @@ const UserManagement = () => {
           </h1>
         </div>
         <Card>
-          <CardContent>
-            <div className="text-center py-8">
-              <Users className="h-16 w-16 mx-auto mb-4 text-muted-foreground/60" />
-              <h2 className="text-xl font-semibold mb-2 text-muted-foreground">
-                No Users Found
-              </h2>
-              <p className="text-muted-foreground max-w-md mx-auto mb-4">
-                No users have registered yet.
-              </p>
-            </div>
+          <CardContent className="p-0">
+            <EmptyState 
+              icon={Users} 
+              title="No Users Found" 
+              description="No users have registered yet."
+            />
           </CardContent>
         </Card>
       </div>
@@ -331,23 +353,22 @@ const UserManagement = () => {
         <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
           User Management
         </h1>
-        <div className="flex justify-center gap-4 text-sm text-muted-foreground">
-          <span>{analytics.total} users</span>
-          <span>•</span>
-          <span>{analytics.verified} verified</span>
-          {analytics.recentSignups > 0 && (
-            <>
-              <span>•</span>
-              <span>{analytics.recentSignups} this week</span>
-            </>
-          )}
-          {analytics.admins > 0 && (
-            <>
-              <span>•</span>
-              <span>{analytics.admins} admins</span>
-            </>
-          )}
-        </div>
+        <PageStats
+          stats={[
+            { value: analytics.total, label: "users" },
+            { value: analytics.verified, label: "verified" },
+            {
+              value: analytics.recentSignups,
+              label: "this week",
+              hidden: analytics.recentSignups === 0,
+            },
+            {
+              value: analytics.admins,
+              label: "admins",
+              hidden: analytics.admins === 0,
+            },
+          ]}
+        />
       </div>
 
       <div className="flex justify-center gap-2">
@@ -356,55 +377,66 @@ const UserManagement = () => {
           size="sm"
           onClick={handleRefresh}
           disabled={loading}
-          className="cursor-pointer disabled:cursor-not-allowed"
+          className="cursor-pointer disabled:cursor-not-allowed flex items-center justify-center gap-2 w-9 sm:w-auto p-0 sm:px-3"
         >
           <RefreshCw
-            className={`w-4 h-4 mr-2 ${loading ? "animate-spin" : ""}`}
+            className={`w-7 h-7 sm:w-4 sm:h-4 ${loading ? "animate-spin" : ""}`}
           />
-          Refresh
+          <span className="hidden sm:inline">Refresh</span>
         </Button>
         <Button
           variant="outline"
           size="sm"
           onClick={exportUsers}
-          className="cursor-pointer"
+          className="cursor-pointer flex items-center justify-center gap-2 w-9 sm:w-auto p-0 sm:px-3"
         >
-          <Download className="w-4 h-4 mr-2" />
-          Export
+          <Download className="w-7 h-7 sm:w-4 sm:h-4" />
+          <span className="hidden sm:inline">Export</span>
         </Button>
         <Button
           variant="outline"
           size="sm"
           onClick={() => setShowFilters(!showFilters)}
-          className="cursor-pointer"
+          className="cursor-pointer flex items-center justify-center gap-2 w-9 sm:w-auto p-0 sm:px-3"
         >
-          <Filter className="w-4 h-4 mr-2" />
-          Filters
+          <Filter className="w-7 h-7 sm:w-4 sm:h-4" />
+          <span className="hidden sm:inline">Filters</span>
         </Button>
       </div>
 
-      {showFilters && (
-        <Card>
-          <CardContent className="p-4">
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-              <div>
-                <label className="text-sm font-medium mb-2 block">Search</label>
+      <FilterCard
+        isOpen={showFilters}
+        onClear={() => {
+          setPendingSearchQuery("");
+          setPendingRoleFilter("all");
+          setPendingStatusFilter("all");
+          setPendingSortBy("newest");
+          setSearchQuery("");
+          setRoleFilter("all");
+          setStatusFilter("all");
+          setSortBy("newest");
+        }}
+        onApply={() => {
+          setSearchQuery(pendingSearchQuery);
+          setRoleFilter(pendingRoleFilter);
+          setStatusFilter(pendingStatusFilter);
+          setSortBy(pendingSortBy);
+        }}
+        className="mb-6"
+      >
                 <div className="relative">
                   <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 w-4 h-4 text-muted-foreground" />
                   <Input
                     placeholder="Search users..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 cursor-text"
+                    value={pendingSearchQuery}
+                    onChange={(e) => setPendingSearchQuery(e.target.value)}
+                    className="pl-10 h-10 sm:h-9 text-sm cursor-text"
                   />
                 </div>
-              </div>
 
-              <div>
-                <label className="text-sm font-medium mb-2 block">Role</label>
-                <Select value={roleFilter} onValueChange={setRoleFilter}>
-                  <SelectTrigger className="cursor-pointer">
-                    <SelectValue />
+                <Select value={pendingRoleFilter} onValueChange={setPendingRoleFilter}>
+                  <SelectTrigger className="w-full h-10 sm:h-9 text-sm cursor-pointer">
+                    <SelectValue placeholder="All Roles" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Roles</SelectItem>
@@ -413,13 +445,10 @@ const UserManagement = () => {
                     <SelectItem value="user">User</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
 
-              <div>
-                <label className="text-sm font-medium mb-2 block">Status</label>
-                <Select value={statusFilter} onValueChange={setStatusFilter}>
-                  <SelectTrigger className="cursor-pointer">
-                    <SelectValue />
+                <Select value={pendingStatusFilter} onValueChange={setPendingStatusFilter}>
+                  <SelectTrigger className="w-full h-10 sm:h-9 text-sm cursor-pointer">
+                    <SelectValue placeholder="All Status" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="all">All Status</SelectItem>
@@ -428,15 +457,10 @@ const UserManagement = () => {
                     <SelectItem value="recent">Recent Signups</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
 
-              <div>
-                <label className="text-sm font-medium mb-2 block">
-                  Sort By
-                </label>
-                <Select value={sortBy} onValueChange={setSortBy}>
-                  <SelectTrigger className="cursor-pointer">
-                    <SelectValue />
+                <Select value={pendingSortBy} onValueChange={setPendingSortBy}>
+                  <SelectTrigger className="w-full h-10 sm:h-9 text-sm cursor-pointer">
+                    <SelectValue placeholder="Sort by" />
                   </SelectTrigger>
                   <SelectContent>
                     <SelectItem value="newest">Newest First</SelectItem>
@@ -446,11 +470,7 @@ const UserManagement = () => {
                     <SelectItem value="role">Role</SelectItem>
                   </SelectContent>
                 </Select>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-      )}
+      </FilterCard>
 
       <div className="hidden lg:block">
         <Card>

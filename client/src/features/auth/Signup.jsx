@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useCallback } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Form,
   FormControl,
@@ -6,19 +6,19 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../components/ui/form";
+} from "@/components/ui/form";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Card } from "../../components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
-import { RouteSignIn } from "../../utils/RouteName";
-import { showToast } from "../../utils/showToast";
+import { RouteSignIn } from "@/utils/RouteName";
+import { showToast } from "@/utils/showToast";
 import GoogleAuth from "./GoogleAuth";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser } from "../auth/authSlice";
-import InputBox from "../../components/common/InputBox";
-import LoadingButton from "../../components/common/LoadingButton";
+import { registerUser } from "@/features/auth/authSlice";
+import InputBox from "@/components/common/InputBox";
+import LoadingButton from "@/components/common/LoadingButton";
 import { FaUser, FaAt, FaEnvelope, FaLock } from "react-icons/fa6";
 
 const SignUp = () => {

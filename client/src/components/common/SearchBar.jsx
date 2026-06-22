@@ -1,8 +1,8 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
-import { Input } from "../ui/input";
+import { Input } from "@/components/ui/input";
 import { Search, X, Loader2, Clock } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
-import blogService from "../../features/blog/blogsService";
+import blogService from "@/features/blog/blogsService";
 
 // Custom event for closing mobile search from SearchBar
 const CLOSE_MOBILE_SEARCH_EVENT = "closeMobileSearch";
@@ -49,7 +49,7 @@ const SearchBar = React.memo(({ onResultClick } = {}) => {
       if (saved) {
         setRecentSearches(JSON.parse(saved));
       }
-    } catch (e) {
+    } catch {
       // Ignore localStorage errors
     }
   }, []);
@@ -75,7 +75,7 @@ const SearchBar = React.memo(({ onResultClick } = {}) => {
       const updated = [trimmed, ...filtered].slice(0, CONFIG.MAX_RECENT_SEARCHES);
       try {
         localStorage.setItem("recentSearches", JSON.stringify(updated));
-      } catch (e) {
+      } catch {
         // Ignore localStorage errors
       }
       return updated;
@@ -87,7 +87,7 @@ const SearchBar = React.memo(({ onResultClick } = {}) => {
     setRecentSearches([]);
     try {
       localStorage.removeItem("recentSearches");
-    } catch (e) {
+    } catch {
       // Ignore localStorage errors
     }
     setShowRecent(false);
@@ -214,7 +214,7 @@ const SearchBar = React.memo(({ onResultClick } = {}) => {
         setShowResults(true);
         setShowRecent(false);
       }
-    } catch (error) {
+    } catch {
       // Handle timeout or other errors silently
       if (!backgroundRefresh) {
         setSearchResults([]);
@@ -281,6 +281,19 @@ const SearchBar = React.memo(({ onResultClick } = {}) => {
     window.dispatchEvent(new CustomEvent(CLOSE_MOBILE_SEARCH_EVENT));
     if (onResultClick) onResultClick();
   }, [onResultClick]);
+
+  // Result click handler
+  const handleResultClick = useCallback((blog) => {
+    saveToRecentSearches(searchQuery);
+    cleanup();
+    navigate(`/blog/${blog.slug}`);
+    setSearchQuery("");
+    setShowResults(false);
+    setShowRecent(false);
+    setSearchResults([]);
+    setSelectedIndex(-1);
+    closeMobileSearch();
+  }, [navigate, cleanup, searchQuery, saveToRecentSearches, closeMobileSearch]);
 
   // Keyboard navigation
   const handleKeyDown = useCallback((e) => {
@@ -353,20 +366,8 @@ const SearchBar = React.memo(({ onResultClick } = {}) => {
         inputRef.current?.blur();
         break;
     }
-  }, [showResults, showRecent, searchResults, recentSearches, selectedIndex, searchQuery, CONFIG.MIN_SEARCH_LENGTH, cleanup, navigate, handleSearch, saveToRecentSearches, closeMobileSearch]);
+  }, [showResults, showRecent, searchResults, recentSearches, selectedIndex, searchQuery, CONFIG.MIN_SEARCH_LENGTH, cleanup, navigate, handleSearch, handleResultClick, saveToRecentSearches, closeMobileSearch]);
 
-  // Result click handler
-  const handleResultClick = useCallback((blog) => {
-    saveToRecentSearches(searchQuery);
-    cleanup();
-    navigate(`/blog/${blog.slug}`);
-    setSearchQuery("");
-    setShowResults(false);
-    setShowRecent(false);
-    setSearchResults([]);
-    setSelectedIndex(-1);
-    closeMobileSearch();
-  }, [navigate, cleanup, searchQuery, saveToRecentSearches, closeMobileSearch]);
 
   // Recent search click handler
   const handleRecentClick = useCallback((query) => {
@@ -464,9 +465,10 @@ const SearchBar = React.memo(({ onResultClick } = {}) => {
   }, [selectedIndex]);
 
   // Expose focus method for external use
-  const focusInput = useCallback(() => {
-    inputRef.current?.focus();
-  }, []);
+  // focusInput is available for external use if needed via ref
+  // const focusInput = useCallback(() => {
+  //   inputRef.current?.focus();
+  // }, []);
 
   // Auto-focus only when opened as mobile search (onResultClick prop is passed)
   useEffect(() => {

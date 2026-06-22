@@ -1,23 +1,26 @@
 import React, { useEffect, useState, useCallback, useMemo } from "react";
 import { useSearchParams } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import BlogCard from "../features/blog/BlogCard";
-import BlogCardSkeleton from "../features/blog/BlogCardSkeleton";
-import FeaturedBlogSkeleton from "../features/blog/FeaturedBlogSkeleton";
-import FeaturedBlogCard from "../features/blog/FeaturedBlogCard";
-import Pagination from "../components/common/Pagination";
+import BlogCard from "@/features/blog/BlogCard";
+import BlogCardSkeleton from "@/features/blog/BlogCardSkeleton";
+import FeaturedBlogSkeleton from "@/features/blog/FeaturedBlogSkeleton";
+import FeaturedBlogCard from "@/features/blog/FeaturedBlogCard";
+import Pagination from "@/components/common/Pagination";
+import { EmptyState } from "@/components/common/StateDisplays";
+import { FileText } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 import {
   fetchAllBlogs,
   searchBlogs,
   selectAllBlogs,
   selectBlogLoading,
-} from "../features/blog/blogSlice";
+} from "@/features/blog/blogSlice";
 import {
   fetchAllCategories,
   selectAllCategories,
   selectFeaturedCategories,
-} from "../features/category/categoriesSlice";
+} from "@/features/category/categoriesSlice";
 
 const HomePage = React.memo(() => {
   const dispatch = useDispatch();
@@ -30,6 +33,7 @@ const HomePage = React.memo(() => {
   const [selectedCategory, setSelectedCategory] = useState(
     searchParams.get("category") || "all"
   );
+  
   const initialPage = parseInt(searchParams.get("page"), 10) || 1;
   const [currentPage, setCurrentPage] = useState(initialPage);
 
@@ -97,6 +101,7 @@ const HomePage = React.memo(() => {
   useEffect(() => {
     document.title = "VinayPrabhakarX-Blog | Deep Dives on Tech, Algorithms & Science";
   }, []);
+  /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {
     let isMounted = true;
 
@@ -152,6 +157,7 @@ const HomePage = React.memo(() => {
     hasFetchedCategories,
     selectedCategory,
   ]);
+  /* eslint-enable react-hooks/exhaustive-deps */
 
   useEffect(() => {
     setCurrentPage(1);
@@ -250,6 +256,7 @@ const HomePage = React.memo(() => {
 
       {/* Main Content */}
       <div className="container mx-auto px-6 py-8">
+
         {/* Search Results Header */}
         {isSearchMode && (
           <section className="mb-6">
@@ -295,7 +302,7 @@ const HomePage = React.memo(() => {
             {blogLoading.allBlogs ? (
               // Show skeleton loaders while loading
               <>
-                {Array.from({ length: postsPerPage - (!isSearchMode && currentPage === 1 ? 1 : 0) }).map((_, index) => (
+                {Array.from({ length: postsPerPage }).map((_, index) => (
                   <BlogCardSkeleton key={`skeleton-${index}`} />
                 ))}
               </>
@@ -313,17 +320,25 @@ const HomePage = React.memo(() => {
 
         {/* No Articles Found */}
         {allBlogs.length === 0 && !blogLoading.allBlogs ? (
-          <div className="text-center py-12">
-            <p className="text-muted-foreground text-lg">
-              {isSearchMode
+          <EmptyState
+            icon={FileText}
+            title={
+              isSearchMode
+                ? "No matching articles"
+                : selectedCategory !== "all"
+                ? "No articles in this category"
+                : "No articles available"
+            }
+            description={
+              isSearchMode
                 ? `No articles found matching "${urlParams.search}". Try different keywords or check the spelling.`
                 : selectedCategory !== "all"
-                ? "No published articles found in this category yet."
-                : "No articles available yet."}
-            </p>
-            {(isSearchMode || selectedCategory !== "all") && (
-              <div className="mt-4">
-                <button
+                ? "No published articles found in this category yet. Check back soon!"
+                : "There are no published articles to display at the moment."
+            }
+            action={
+              (isSearchMode || selectedCategory !== "all") && (
+                <Button
                   onClick={() => {
                     const newSearchParams = new URLSearchParams(searchParams);
                     if (isSearchMode) newSearchParams.delete("search");
@@ -331,13 +346,13 @@ const HomePage = React.memo(() => {
                       newSearchParams.delete("category");
                     setSearchParams(newSearchParams);
                   }}
-                  className="text-sm text-primary hover:text-primary/80 underline transition-colors"
+                  variant="outline"
                 >
                   Browse all articles
-                </button>
-              </div>
-            )}
-          </div>
+                </Button>
+              )
+            }
+          />
         ) : null}
 
         {/* Pagination Component */}
