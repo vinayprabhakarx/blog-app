@@ -165,7 +165,7 @@ const CategoryManagement = () => {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b bg-muted/50">
+                  <tr className="border-b">
                     <th className="text-left py-3 px-4 font-medium text-muted-foreground">
                       Category
                     </th>

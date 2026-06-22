@@ -291,14 +291,14 @@ const UserManagement = () => {
     }
   };
 
-  const getRoleIcon = (role) => {
+  const getRoleIcon = (role, className = "w-4 h-4") => {
     switch (role) {
       case "admin":
-        return <Crown className="w-3 h-3 mr-1" />;
+        return <Crown className={className} />;
       case "author":
-        return <Edit className="w-3 h-3 mr-1" />;
+        return <Edit className={className} />;
       default:
-        return <UserIcon className="w-3 h-3 mr-1" />;
+        return <UserIcon className={className} />;
     }
   };
 
@@ -460,15 +460,12 @@ const UserManagement = () => {
             <div className="overflow-x-auto">
               <Table>
                 <TableHeader>
-                  <TableRow className="border-b bg-muted/50">
+                  <TableRow className="border-b hover:bg-transparent">
                     <TableHead className="text-left py-3 px-4 font-medium text-muted-foreground">
                       User
                     </TableHead>
                     <TableHead className="text-center py-3 px-4 font-medium text-muted-foreground">
                       Email
-                    </TableHead>
-                    <TableHead className="text-center py-3 px-4 font-medium text-muted-foreground">
-                      Role
                     </TableHead>
                     <TableHead className="text-center py-3 px-4 font-medium text-muted-foreground">
                       Joined
@@ -502,18 +499,23 @@ const UserManagement = () => {
                             </AvatarFallback>
                           </Avatar>
                           <div>
-                            {user.personal_info?.username ? (
-                              <Link
-                                to={`/${user.personal_info.username}`}
-                                className="font-medium hover:text-primary transition-colors cursor-pointer hover:underline"
-                              >
-                                {user.personal_info?.name || "Unnamed User"}
-                              </Link>
-                            ) : (
-                              <p className="font-medium">
-                                {user.personal_info?.name || "Unnamed User"}
-                              </p>
-                            )}
+                            <div className="flex items-center gap-1.5">
+                              {user.personal_info?.username ? (
+                                <Link
+                                  to={`/${user.personal_info.username}`}
+                                  className="font-medium hover:text-primary transition-colors cursor-pointer hover:underline"
+                                >
+                                  {user.personal_info?.name || "Unnamed User"}
+                                </Link>
+                              ) : (
+                                <p className="font-medium">
+                                  {user.personal_info?.name || "Unnamed User"}
+                                </p>
+                              )}
+                              <span className="text-muted-foreground shrink-0" title={`Role: ${user.role}`}>
+                                {getRoleIcon(user.role, "w-4 h-4")}
+                              </span>
+                            </div>
                             <p className="text-sm text-muted-foreground">
                               {user.personal_info?.username
                                 ? `@${user.personal_info.username}`
@@ -532,16 +534,6 @@ const UserManagement = () => {
                             <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
                           )}
                         </div>
-                      </TableCell>
-
-                      <TableCell className="py-4 px-4 text-center">
-                        <Badge
-                          variant={getRoleBadgeVariant(user.role)}
-                          className="text-xs"
-                        >
-                          {getRoleIcon(user.role)}
-                          {user.role}
-                        </Badge>
                       </TableCell>
 
                       <TableCell className="py-4 px-4 text-center">
@@ -687,9 +679,9 @@ const UserManagement = () => {
           <Card key={user._id} className="hover:shadow-md transition-shadow">
             <CardContent className="p-4">
               <div className="space-y-3">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Avatar className="h-10 w-10">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-3 flex-1 min-w-0">
+                    <Avatar className="h-10 w-10 shrink-0">
                       <AvatarImage
                         src={user.personal_info?.profile_img}
                         alt={user.personal_info?.name || "User"}
@@ -702,33 +694,31 @@ const UserManagement = () => {
                           "U"}
                       </AvatarFallback>
                     </Avatar>
-                    <div>
-                      {user.personal_info?.username ? (
-                        <Link
-                          to={`/${user.personal_info.username}`}
-                          className="font-medium text-lg hover:text-primary transition-colors cursor-pointer hover:underline"
-                        >
-                          {user.personal_info?.name || "Unnamed User"}
-                        </Link>
-                      ) : (
-                        <p className="font-medium text-lg">
-                          {user.personal_info?.name || "Unnamed User"}
-                        </p>
-                      )}
-                      <p className="text-sm text-muted-foreground">
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        {user.personal_info?.username ? (
+                          <Link
+                            to={`/${user.personal_info.username}`}
+                            className="font-medium text-lg hover:text-primary transition-colors cursor-pointer hover:underline truncate block"
+                          >
+                            {user.personal_info?.name || "Unnamed User"}
+                          </Link>
+                        ) : (
+                          <p className="font-medium text-lg truncate">
+                            {user.personal_info?.name || "Unnamed User"}
+                          </p>
+                        )}
+                        <span className="text-muted-foreground shrink-0" title={`Role: ${user.role}`}>
+                          {getRoleIcon(user.role, "w-4 h-4")}
+                        </span>
+                      </div>
+                      <p className="text-sm text-muted-foreground truncate">
                         {user.personal_info?.username
                           ? `@${user.personal_info.username}`
                           : user.personal_info?.email}
                       </p>
                     </div>
                   </div>
-                  <Badge
-                    variant={getRoleBadgeVariant(user.role)}
-                    className="text-xs"
-                  >
-                    {getRoleIcon(user.role)}
-                    {user.role}
-                  </Badge>
                 </div>
 
                 <div className="space-y-2 text-sm">

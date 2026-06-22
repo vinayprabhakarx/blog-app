@@ -102,7 +102,7 @@ const CategoryManagement = () => {
 
 
   return (
-    <section className="p-6 space-y-6">
+    <section className="p-6 space-y-4">
       {/* Header with Stats */}
       <div className="text-center">
         <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
@@ -146,17 +146,17 @@ const CategoryManagement = () => {
             <div className="overflow-x-auto">
               <table className="w-full">
                 <thead>
-                  <tr className="border-b bg-muted/50">
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">
+                  <tr className="border-b">
+                    <th className="text-left py-2 px-4 font-medium text-muted-foreground text-sm">
                       Category
                     </th>
-                    <th className="text-center py-3 px-4 font-medium text-muted-foreground">
+                    <th className="text-center py-2 px-4 font-medium text-muted-foreground text-sm">
                       Articles
                     </th>
-                    <th className="text-center py-3 px-4 font-medium text-muted-foreground">
+                    <th className="text-center py-2 px-4 font-medium text-muted-foreground text-sm">
                       Featured
                     </th>
-                    <th className="text-center py-3 px-4 font-medium text-muted-foreground">
+                    <th className="text-center py-2 px-4 font-medium text-muted-foreground text-sm">
                       Actions
                     </th>
                   </tr>
