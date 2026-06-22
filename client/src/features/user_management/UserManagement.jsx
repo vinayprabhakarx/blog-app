@@ -336,18 +336,10 @@ const UserManagement = () => {
         </h1>
         <PageStats
           stats={[
-            { value: analytics.total, label: "users" },
-            { value: analytics.verified, label: "verified" },
-            {
-              value: analytics.recentSignups,
-              label: "this week",
-              hidden: analytics.recentSignups === 0,
-            },
-            {
-              value: analytics.admins,
-              label: "admins",
-              hidden: analytics.admins === 0,
-            },
+            { value: analytics.total, label: "total" },
+            { value: analytics.regularUsers, label: "users" },
+            { value: analytics.authors, label: "authors" },
+            { value: analytics.admins, label: "admins" },
           ]}
         />
       </div>
