@@ -37,7 +37,7 @@ The app provides authentication, blog publishing, comments, likes, notifications
 - **Rich Content Creation**
   - Markdown editor with live preview and fullscreen mode
   - Image upload with cropping (Cloudinary integration)
-  - Auto-save functionality (localStorage with 24-hour expiry)
+  - Auto-save functionality (all form fields via localStorage with 12-hour expiry)
   - LaTeX math support for technical content
   - Blog categorization (Admin-defined categories)
   - Draft & publish workflow
@@ -323,7 +323,7 @@ root/
   - `blog/` – Blog editor, display, form
   - `comment/` – Comment management, forms
   - `auth/` – Login, register, verification
-  - `notification/` – Notification dashboard
+  - `notification/` – Notification center
   - `user_management/` – Admin analytics & user management
 - `src/app/store.js` – Redux store configuration
 - `src/hooks/` – Custom hooks (useAuth, useBlogLike, useFetch, etc.)
@@ -459,7 +459,7 @@ The application is deployed and available for live testing.
 - **Client-Side Caching**
   - Search results: 5-minute expiry, max 50 entries
   - User mentions: 5-minute expiry, max 50 entries
-  - Auto-save: localStorage with 24-hour expiry
+  - Auto-save: localStorage with 12-hour expiry for all form fields
   - Cache cleanup: FIFO (First In, First Out)
 
 ### Component Optimization
