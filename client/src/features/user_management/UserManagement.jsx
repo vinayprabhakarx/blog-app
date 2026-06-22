@@ -334,15 +334,11 @@ const UserManagement = () => {
             User Management
           </h1>
         </div>
-        <Card>
-          <CardContent className="p-0">
-            <EmptyState 
-              icon={Users} 
-              title="No Users Found" 
-              description="No users have registered yet."
-            />
-          </CardContent>
-        </Card>
+        <EmptyState 
+          icon={Users} 
+          title="No Users Found" 
+          description="No users have registered yet."
+        />
       </div>
     );
   }

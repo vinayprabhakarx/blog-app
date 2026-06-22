@@ -260,15 +260,11 @@ const CommentManagement = () => {
             Comment Management
           </h1>
         </div>
-        <Card>
-          <CardContent className="p-0">
-            <EmptyState
-              icon={MessageSquare}
-              title="No comments found"
-              description="There are no comments available to manage at this time."
-            />
-          </CardContent>
-        </Card>
+        <EmptyState
+          icon={MessageSquare}
+          title="No comments found"
+          description="There are no comments available to manage at this time."
+        />
       </div>
     );
   }
