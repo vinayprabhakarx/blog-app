@@ -6,7 +6,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "../../components/ui/avatar";
+} from "@/components/ui/avatar";
 
 const BlogCard = React.memo(
   ({ blog, variant = "default", showAuthor = true, className, ...props }) => {

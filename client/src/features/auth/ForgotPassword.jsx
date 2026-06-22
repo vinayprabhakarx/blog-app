@@ -3,11 +3,11 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, Link } from "react-router-dom";
-import { Card } from "../../components/ui/card";
-import { RouteLogin } from "../../utils/RouteName";
-import { showToast } from "../../utils/showToast";
+import { Card } from "@/components/ui/card";
+import { RouteLogin } from "@/utils/RouteName";
+import { showToast } from "@/utils/showToast";
 import authService from "./authService";
-import LoadingButton from "../../components/common/LoadingButton";
+import LoadingButton from "@/components/common/LoadingButton";
 import { FaEnvelope } from "react-icons/fa6";
 import {
   Form,
@@ -16,7 +16,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../components/ui/form";
+} from "@/components/ui/form";
 
 const ForgotPassword = () => {
   const [isLoading, setIsLoading] = useState(false);

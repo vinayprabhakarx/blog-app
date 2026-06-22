@@ -10,7 +10,7 @@ import {
   selectNotificationsLoading,
   selectNotificationsError,
   selectUnreadCount,
-} from "../features/notification/notificationsSlice";
+} from "@/features/notification/notificationsSlice";
 
 export const useNotifications = () => {
   const dispatch = useDispatch();

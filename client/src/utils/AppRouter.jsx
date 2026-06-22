@@ -4,9 +4,9 @@ import PrivateRoute from "./PrivateRoute";
 import PublicRoute from "./PublicRoute";
 import AdminRoute from "./AdminRoute";
 import AuthorRoute from "./AuthorRoute";
-import AppLayout from "../components/layout/AppLayout";
-import Loading from "../components/common/Loading";
-import { useAuth } from "../hooks/useAuth";
+import AppLayout from "@/components/layout/AppLayout";
+import Loading from "@/components/common/Loading";
+import { useAuth } from "@/hooks/useAuth";
 
 // Lazy load components for better code splitting
 const HomePage = React.lazy(() => import("../pages/HomePage"));
@@ -31,8 +31,8 @@ const Dashboard = React.lazy(() => import("../features/dashboard/Dashboard"));
 const CommentManagement = React.lazy(() =>
   import("../features/comment/CommentManagement")
 );
-const NotificationDashboard = React.lazy(() =>
-  import("../features/notification/NotificationDashboard")
+const NotificationCenter = React.lazy(() =>
+  import("../features/notification/NotificationCenter")
 );
 
 const CategoryManagement = React.lazy(() =>
@@ -44,7 +44,7 @@ const PublicCategoriesView = React.lazy(() =>
 const CategoryForm = React.lazy(() =>
   import("../features/category/CategoryForm")
 );
-const BlogList = React.lazy(() => import("../features/blog/BlogList"));
+const BlogManagement = React.lazy(() => import("../features/blog/BlogManagement"));
 const BlogForm = React.lazy(() => import("../features/blog/BlogForm"));
 const BlogFormWrapper = React.lazy(() =>
   import("../features/blog/BlogFormWrapper")
@@ -97,20 +97,20 @@ const AppRouter = () => {
             {/* Blog Routes - Public access */}
             <Route path="blog/:slug" element={<BlogPage />} />
             <Route path="blog/id/:id" element={<BlogPage />} />
-            <Route path="blogs" element={<BlogList />} />
-            <Route path="category/:slug" element={<BlogList />} />
+            <Route path="blogs" element={<BlogManagement />} />
+            <Route path="category/:slug" element={<BlogManagement />} />
             <Route
               path="browse-categories"
               element={<PublicCategoriesView />}
             />
             <Route path="category" element={<ConditionalCategories />} />
             <Route path=":username" element={<ProfilePage />} />
-            <Route path=":username/blogs" element={<BlogList />} />
+            <Route path=":username/blogs" element={<BlogManagement />} />
 
             {/* Private Routes */}
             <Route element={<PrivateRoute />}>
               <Route path="dashboard" element={<Dashboard />} />
-              <Route path="notifications" element={<NotificationDashboard />} />
+              <Route path="notifications" element={<NotificationCenter />} />
               <Route path="categories/add" element={<CategoryForm />} />
               <Route path="categories/edit/:id" element={<CategoryForm />} />
               <Route path="profile" element={<ProfilePage />} />
@@ -119,7 +119,7 @@ const AppRouter = () => {
 
               {/* Author Routes - Only for authors and admins */}
               <Route element={<AuthorRoute />}>
-                <Route path="my-blogs" element={<BlogList />} />
+                <Route path="my-blogs" element={<BlogManagement />} />
                 <Route path="blogs/create" element={<BlogForm />} />
                 <Route path="blogs/edit/:slug" element={<BlogFormWrapper />} />
                 <Route path="write-blog" element={<BlogForm />} />

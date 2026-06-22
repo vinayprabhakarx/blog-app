@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { fetchBlogBySlug, fetchBlogById, clearCurrentBlog } from "./blogSlice";
 import BlogForm from "./BlogForm";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const BlogFormWrapper = () => {
   const { slug, id } = useParams();

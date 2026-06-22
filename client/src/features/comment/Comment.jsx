@@ -11,20 +11,20 @@ import {
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
-import { refreshNotificationsAfterAction } from "../../utils/notificationRefresh";
+import { refreshNotificationsAfterAction } from "@/utils/notificationRefresh";
 
 import {
   Avatar,
   AvatarImage,
   AvatarFallback,
-} from "../../components/ui/avatar";
-import { Button } from "../../components/ui/button";
+} from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
-} from "../../components/ui/dropdown-menu";
+} from "@/components/ui/dropdown-menu";
 
 import CommentForm from "./CommentForm";
 import ReportDialog from "./ReportDialog";

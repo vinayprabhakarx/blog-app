@@ -1,10 +1,10 @@
-import AppSidebar from "../common/AppSidebar";
-import { SidebarProvider } from "../common/sidebar-context.jsx";
-import Footer from "../common/Footer";
-import Topbar from "../common/Topbar";
+import AppSidebar from "@/components/common/AppSidebar";
+import { SidebarProvider } from "@/components/common/sidebar-context.jsx";
+import Footer from "@/components/common/Footer";
+import Topbar from "@/components/common/Topbar";
 import React, { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 
 const AppLayout = () => {
   const location = useLocation();

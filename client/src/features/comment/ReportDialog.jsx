@@ -6,17 +6,17 @@ import {
   DialogHeader,
   DialogTitle,
   DialogFooter,
-} from "../../components/ui/dialog";
-import { Button } from "../../components/ui/button";
+} from "@/components/ui/dialog";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "../../components/ui/select";
+} from "@/components/ui/select";
 import { reportComment, selectCommentsError } from "./commentsSlice";
-import { showToast } from "../../utils/showToast";
+import { showToast } from "@/utils/showToast";
 
 const ReportDialog = ({
   open,

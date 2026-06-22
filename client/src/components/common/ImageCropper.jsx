@@ -1,15 +1,15 @@
 import React, { useState, useCallback } from "react";
 import Cropper from "react-easy-crop";
 import Slider from "@mui/material/Slider";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
   DialogDescription,
-} from "../../components/ui/dialog";
-import { Badge } from "../../components/ui/badge";
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
 
 const getCroppedImg = (imageSrc, pixelCrop) => {
   return new Promise((resolve, reject) => {

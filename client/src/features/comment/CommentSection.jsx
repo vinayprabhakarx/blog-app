@@ -8,7 +8,7 @@ import {
   Avatar,
   AvatarImage,
   AvatarFallback,
-} from "../../components/ui/avatar";
+} from "@/components/ui/avatar";
 // Removed LoadingSpinner for instant updates
 
 import Comment from "./Comment";

@@ -6,7 +6,7 @@ import rehypeRaw from "rehype-raw";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import "katex/dist/katex.min.css";
-import { useTheme } from "../../utils/ThemeContext";
+import { useTheme } from "@/utils/ThemeContext";
 import { Trash2 } from "lucide-react";
 
 // Memoize markdown component renderers to prevent re-creation on every render

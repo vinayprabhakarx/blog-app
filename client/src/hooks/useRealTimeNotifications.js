@@ -1,7 +1,7 @@
 import { useEffect, useRef, useCallback } from "react";
 import { useNotificationContext } from "./useNotificationContext";
 import { useAuth } from "./useAuth";
-import { showToast } from "../helpers/showToast";
+import { showToast } from "@/helpers/showToast";
 
 export const useRealTimeNotifications = () => {
   const { user, isAuthenticated } = useAuth();

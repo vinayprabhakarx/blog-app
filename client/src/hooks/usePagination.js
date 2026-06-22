@@ -8,7 +8,7 @@ import { useState, useMemo, useCallback } from "react";
  */
 export const usePagination = (
   data = [],
-  initialItemsPerPage = 10,
+  initialItemsPerPage = 9,
   initialPage = 1
 ) => {
   const [currentPage, setCurrentPage] = useState(initialPage);
@@ -113,7 +113,7 @@ export const usePagination = (
  */
 export const useServerPagination = ({
   totalItems = 0,
-  initialItemsPerPage = 10,
+  initialItemsPerPage = 9,
   initialPage = 1,
   onPageChange,
   onItemsPerPageChange,

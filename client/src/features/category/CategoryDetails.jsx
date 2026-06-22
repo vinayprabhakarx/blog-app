@@ -1,16 +1,16 @@
 import React, { useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
-import { Button } from "../../components/ui/button";
-import { Card, CardContent, CardHeader } from "../../components/ui/card";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import {
   RouteAddCategory,
   RouteEditCategory,
   RouteCategoryView,
-} from "../../utils/RouteName";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
-import { showToast } from "../../utils/showToast";
-import { useAuth } from "../../hooks/useAuth";
+} from "@/utils/RouteName";
+import { EmptyState, LoadingState } from "@/components/common/StateDisplays";
+import { showToast } from "@/utils/showToast";
+import { useAuth } from "@/hooks/useAuth";
 import {
   fetchAllCategories,
   deleteCategory,
@@ -18,7 +18,8 @@ import {
   selectCategoriesLoading,
   selectOperationLoading,
 } from "./categoriesSlice";
-import { Tag, ChevronRight, Star, Edit, Trash2, Plus } from "lucide-react";
+import { Tag, FileText, RefreshCw, Star, Edit, Trash2, Plus } from "lucide-react";
+import { PageStats } from "@/components/common/PageStats";
 
 const CategoryManagement = () => {
   const dispatch = useDispatch();
@@ -85,18 +86,14 @@ const CategoryManagement = () => {
     [dispatch]
   );
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <LoadingSpinner />
-      </div>
-    );
+  if (loading && (!categories || categories.length === 0)) {
+    return <LoadingState message="Loading categories..." />;
   }
 
   if (!categories || categories.length === 0) {
     return (
       <div className="p-6 space-y-6">
-        <div className="text-center">
+        <div className="text-center mb-8">
           <h1 className="text-3xl md:text-4xl font-bold mb-2">
             Category Management
           </h1>
@@ -113,20 +110,18 @@ const CategoryManagement = () => {
             </div>
           </CardHeader>
           <CardContent>
-            <div className="text-center py-8">
-              <Tag className="h-16 w-16 mx-auto mb-4 text-muted-foreground/60" />
-              <h2 className="text-xl font-semibold mb-2 text-muted-foreground">
-                No Categories Yet
-              </h2>
-              <p className="text-base sm:text-lg text-muted-foreground max-w-md mx-auto mb-4">
-                Create your first category to start organizing your content.
-              </p>
-              <Button asChild variant="outline">
-                <Link to={RouteAddCategory(userRole)}>
-                  Create your first category
-                </Link>
-              </Button>
-            </div>
+            <EmptyState 
+              icon={Tag} 
+              title="No Categories Yet" 
+              description="Create your first category to start organizing your content."
+              action={
+                <Button asChild variant="outline">
+                  <Link to={RouteAddCategory(userRole)}>
+                    Create your first category
+                  </Link>
+                </Button>
+              }
+            />
           </CardContent>
         </Card>
       </div>
@@ -140,17 +135,17 @@ const CategoryManagement = () => {
         <h1 className="text-3xl md:text-4xl font-bold mb-2">
           Category Management
         </h1>
-        <div className="flex justify-center gap-4 text-sm text-muted-foreground">
-          <span>{categoryStats.total} categories</span>
-          <span>•</span>
-          <span>{categoryStats.totalArticles} articles</span>
-          {categoryStats.featured > 0 && (
-            <>
-              <span>•</span>
-              <span>{categoryStats.featured} featured</span>
-            </>
-          )}
-        </div>
+        <PageStats
+          stats={[
+            { value: categoryStats.total, label: "categories" },
+            { value: categoryStats.totalArticles, label: "articles" },
+            {
+              value: categoryStats.featured,
+              label: "featured",
+              hidden: categoryStats.featured === 0,
+            },
+          ]}
+        />
       </div>
 
       {/* Add Category Button */}

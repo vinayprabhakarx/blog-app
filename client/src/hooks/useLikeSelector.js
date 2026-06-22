@@ -4,7 +4,7 @@ import {
   selectLikeCount,
   selectUserLikeStatus,
   selectToggleLoading,
-} from "../features/like/likesSlice";
+} from "@/features/like/likesSlice";
 
 export const useLikeSelector = (itemId, itemType) => {
   // Memoize the selectors with stable references

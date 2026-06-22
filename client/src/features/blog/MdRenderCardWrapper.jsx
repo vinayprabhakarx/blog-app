@@ -1,5 +1,5 @@
 import React, { Suspense } from "react";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 // Lazy load the heavy markdown component
 const MdRenderCardLazy = React.lazy(() => import("./MdRenderCard"));

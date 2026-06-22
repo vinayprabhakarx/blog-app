@@ -1,11 +1,11 @@
 import React from "react";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { FaGoogle } from "react-icons/fa";
-import { auth, provider } from "../../utils/firebase";
+import { auth, provider } from "@/utils/firebase";
 import { signInWithPopup } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { showToast } from "../../utils/showToast";
-import { getRoleBasedRedirect } from "../../utils/RouteName";
+import { showToast } from "@/utils/showToast";
+import { getRoleBasedRedirect } from "@/utils/RouteName";
 import { useDispatch } from "react-redux";
 import { googleAuth, getCurrentUser } from "./authSlice";
 

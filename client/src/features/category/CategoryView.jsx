@@ -1,9 +1,9 @@
 import React, { useEffect, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent } from "../../components/ui/card";
-import { Button } from "../../components/ui/button";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
+import { Card, CardContent } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
+import { EmptyState, ErrorState, LoadingState } from "@/components/common/StateDisplays";
 import {
   fetchAllCategories,
   selectAllCategories,
@@ -11,6 +11,7 @@ import {
   selectCategoriesError,
 } from "./categoriesSlice";
 import { Tag, FileText, RefreshCw, ChevronRight, Star } from "lucide-react";
+import { PageStats } from "@/components/common/PageStats";
 
 const CategoriesView = () => {
   const dispatch = useDispatch();
@@ -76,54 +77,32 @@ const CategoriesView = () => {
     [handleCategoryClick]
   );
 
-  if (loading) {
-    return (
-      <div className="flex justify-center items-center min-h-screen">
-        <LoadingSpinner />
-      </div>
-    );
+  // Initial loading state
+  if (loading && !hasFetched && categories.length === 0) {
+    return <LoadingState message="Loading categories..." />;
   }
 
+  // Error state
   if (error) {
     return (
-      <div className="p-6 space-y-6">
-        <div className="text-center text-destructive p-8">
-          <FileText className="h-16 w-16 mx-auto mb-4 text-destructive/60" />
-          <h2 className="text-xl font-semibold text-destructive mb-2">
-            Failed to Load Categories
-          </h2>
-          <p className="text-base sm:text-lg text-muted-foreground mb-6 max-w-md mx-auto">
-            {error ||
-              "Something went wrong while fetching categories. Please try again."}
-          </p>
-          <Button
-            onClick={handleRetry}
-            variant="outline"
-            className="flex items-center gap-2"
-          >
-            <RefreshCw className="h-4 w-4" />
-            Retry
-          </Button>
-        </div>
+      <div className="p-6">
+        <ErrorState 
+          title="Failed to Load Categories" 
+          message={error || "Something went wrong while fetching categories. Please try again."}
+          onRetry={handleRetry}
+        />
       </div>
     );
   }
 
   if (!categories || categories.length === 0) {
     return (
-      <div className="p-6 space-y-6">
-        <div className="text-center p-8">
-          <div className="flex items-center justify-center gap-3 mb-4">
-            <Tag className="h-8 w-8 text-muted-foreground/60" />
-            <h2 className="text-xl font-semibold text-muted-foreground">
-              No Categories Yet
-            </h2>
-          </div>
-          <p className="text-base sm:text-lg text-muted-foreground max-w-md mx-auto">
-            Categories will appear here once they are created. Check back later
-            for organized content.
-          </p>
-        </div>
+      <div className="p-6">
+        <EmptyState 
+          icon={Tag} 
+          title="No Categories Yet" 
+          description="Categories will appear here once they are created. Check back later for organized content."
+        />
       </div>
     );
   }
@@ -132,156 +111,57 @@ const CategoriesView = () => {
     <section className="p-6 space-y-6" aria-label="Categories">
       {/* Header with Stats */}
       <div className="text-center mb-8">
-        <div className="flex items-center justify-center gap-3 mb-2">
-          <Tag className="h-8 w-8" />
+        <div className="flex items-center justify-center mb-2">
           <h1 className="text-3xl md:text-4xl font-bold">Categories</h1>
         </div>
-        <div className="flex justify-center gap-4 text-sm text-muted-foreground">
-          <span>{categoryStats.total} categories</span>
-          <span>•</span>
-          <span>{categoryStats.totalArticles} articles</span>
-          {categoryStats.featured > 0 && (
-            <>
-              <span>•</span>
-              <span>{categoryStats.featured} featured</span>
-            </>
-          )}
-        </div>
+        <PageStats
+          stats={[
+            { value: categoryStats.total, label: "categories" },
+            { value: categoryStats.totalArticles, label: "articles" },
+            {
+              value: categoryStats.featured,
+              label: "featured",
+              hidden: categoryStats.featured === 0,
+            },
+          ]}
+        />
       </div>
 
-      {/* Categories Table - Desktop */}
-      <div className="hidden lg:block">
-        <Card>
-          <CardContent className="p-0">
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b bg-muted/50">
-                    <th className="text-left py-3 px-4 font-medium text-muted-foreground">
-                      Category
-                    </th>
-                    <th className="text-center py-3 px-4 font-medium text-muted-foreground">
-                      Articles
-                    </th>
-                    <th className="text-center py-3 px-4 font-medium text-muted-foreground">
-                      Featured
-                    </th>
-                    <th className="py-3 px-4 w-12"></th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {sortedCategories.map((category) => (
-                    <tr
-                      key={category._id}
-                      className="border-b hover:bg-muted/30 cursor-pointer transition-colors group"
-                      onClick={() => handleCategoryClick(category.slug)}
-                      onKeyDown={(e) => handleKeyDown(e, category.slug)}
-                      tabIndex={0}
-                      role="button"
-                      aria-label={`Navigate to ${category.name} category with ${
-                        category.articleCount || 0
-                      } articles`}
-                    >
-                      {/* Category Name */}
-                      <td className="py-4 px-4">
-                        <div className="flex items-center gap-3">
-                          <Tag className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
-                          <span className="font-medium group-hover:text-primary transition-colors">
-                            {category.name}
-                          </span>
-                        </div>
-                      </td>
-
-                      {/* Article Count */}
-                      <td className="py-4 px-4 text-center">
-                        <div className="text-sm font-medium">
-                          {category.articleCount || 0}
-                        </div>
-                        <div className="text-xs text-muted-foreground">
-                          {category.articleCount === 1 ? "article" : "articles"}
-                        </div>
-                      </td>
-
-                      {/* Featured Star */}
-                      <td className="py-4 px-4 text-center">
-                        {category.featured ? (
-                          <Star className="h-5 w-5 text-amber-500 fill-amber-500 mx-auto" />
-                        ) : (
-                          <span className="text-muted-foreground/50">-</span>
-                        )}
-                      </td>
-
-                      {/* Action */}
-                      <td className="py-4 px-4 text-center">
-                        <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary group-hover:translate-x-0.5 transition-all mx-auto" />
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
-      {/* Categories Cards - Mobile/Tablet */}
-      <div className="lg:hidden space-y-4">
+      {/* Categories Grid - Unified Responsive Layout */}
+      <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
         {sortedCategories.map((category) => (
-          <Card
+          <div
             key={category._id}
-            className="hover:shadow-md transition-shadow"
+            onClick={() => handleCategoryClick(category.slug)}
+            onKeyDown={(e) => handleKeyDown(e, category.slug)}
+            tabIndex={0}
+            role="button"
+            className="group flex items-center justify-between p-5 border border-border/50 rounded-xl hover:border-primary/50 hover:bg-muted/30 hover:shadow-sm transition-all cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            aria-label={`Navigate to ${category.name} category with ${
+              category.articleCount || 0
+            } articles`}
+            title={`View all posts in ${category.name}`}
           >
-            <CardContent className="p-4">
-              <div className="space-y-3">
-                {/* Category Header */}
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3">
-                    <Tag className="h-5 w-5 text-muted-foreground flex-shrink-0" />
-                    <span
-                      className="font-medium text-lg hover:text-primary transition-colors cursor-pointer"
-                      onClick={() => handleCategoryClick(category.slug)}
-                      onKeyDown={(e) => handleKeyDown(e, category.slug)}
-                      tabIndex={0}
-                      role="button"
-                      aria-label={`Navigate to ${category.name} category with ${
-                        category.articleCount || 0
-                      } articles`}
-                      title={`View all posts in ${category.name}`}
-                    >
-                      {category.name}
-                    </span>
-                  </div>
-                  {category.featured && (
-                    <Star className="h-5 w-5 text-amber-500 fill-amber-500" />
-                  )}
-                </div>
-
-                {/* Category Stats */}
-                <div className="flex items-center justify-between text-sm text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <span className="font-medium">
-                      {category.articleCount || 0}
-                    </span>
-                    <span>
-                      {category.articleCount === 1 ? "article" : "articles"}
-                    </span>
-                  </div>
-                  {category.featured && (
-                    <span className="text-amber-600 font-medium">Featured</span>
-                  )}
-                </div>
+            <div className="flex items-center">
+              <span className="font-medium text-lg group-hover:text-primary transition-colors">
+                {category.name}
+              </span>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              {category.featured && (
+                <Star className="h-4 w-4 text-amber-500 fill-amber-500" />
+              )}
+              <div className="flex items-center gap-1.5 text-sm text-muted-foreground bg-muted/50 px-3 py-1 rounded-full border border-border/50">
+                <FileText className="h-3.5 w-3.5" />
+                <span className="font-medium">{category.articleCount || 0}</span>
               </div>
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
 
-      {/* Footer Stats */}
-      {categories.length > 5 && (
-        <div className="text-center text-sm text-muted-foreground">
-          Showing all {categoryStats.total} categories
-        </div>
-      )}
+
     </section>
   );
 };

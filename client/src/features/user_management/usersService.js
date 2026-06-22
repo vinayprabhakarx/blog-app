@@ -1,4 +1,4 @@
-import api from "../../api/api.js";
+import api from "@/api/api.js";
 
 const userService = {
   // Get user by ID

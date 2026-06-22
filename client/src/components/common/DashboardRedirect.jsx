@@ -1,7 +1,7 @@
 import React, { useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import { getRoleBasedRedirect } from "../../utils/RouteName";
+import { useAuth } from "@/hooks/useAuth";
+import { getRoleBasedRedirect } from "@/utils/RouteName";
 import LoadingSpinner from "./LoadingSpinner";
 
 const DashboardRedirect = () => {

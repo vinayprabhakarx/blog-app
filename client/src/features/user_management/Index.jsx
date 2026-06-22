@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { Navigate } from "react-router-dom";
-import { fetchAllBlogs as fetchBlogs } from "../blog/blogSlice";
+import { fetchAllBlogs as fetchBlogs } from "@/features/blog/blogSlice";
 import { Link } from "react-router-dom";
 import {
   Card,
   CardContent,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
-import { Skeleton } from "../../components/ui/skeleton";
-import BlogCard from "../../features/blog/BlogCard";
+} from "@/components/ui/card";
+import { Skeleton } from "@/components/ui/skeleton";
+import BlogCard from "@/features/blog/BlogCard";
 
 const Index = () => {
   const dispatch = useDispatch();

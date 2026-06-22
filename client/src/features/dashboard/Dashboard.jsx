@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useAuth } from "../../hooks/useAuth";
-import { Badge } from "../../components/ui/badge";
+import { useAuth } from "@/hooks/useAuth";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import {
   fetchAdminStats,
@@ -10,7 +11,7 @@ import {
   selectAdminStatsLoading,
   selectRecentActivities,
   selectRecentActivitiesLoading,
-} from "../user_management/userSlice";
+} from "@/features/user_management/userSlice";
 import {
   BarChart3,
   Users,
@@ -22,8 +23,11 @@ import {
   TrendingUp,
   Eye,
   FolderOpen,
+  Activity,
+  PenTool
 } from "lucide-react";
-import api from "../../api/api";
+import api from "@/api/api";
+import { EmptyState, LoadingState } from "@/components/common/StateDisplays";
 
 const Dashboard = () => {
   const { user, isAdmin, isAuthor } = useAuth();
@@ -321,15 +325,14 @@ const Dashboard = () => {
             </div>
             <div className="p-6 pt-0">
               {recentActivitiesLoading ? (
-                <div className="text-center py-4">
-                  <p className="text-muted-foreground">Loading activities...</p>
-                </div>
+                <LoadingState variant="compact" message="Loading activities..." />
               ) : recentActivities?.length === 0 ? (
-                <div className="text-center py-4">
-                  <p className="text-muted-foreground">
-                    No recent activities found
-                  </p>
-                </div>
+                <EmptyState 
+                  variant="compact" 
+                  icon={Activity} 
+                  title="No Activity Yet" 
+                  description="Recent activities will appear here once users interact with the platform."
+                />
               ) : (
                 <div className="space-y-4">
                   {recentActivities.map((activity, index) => (
@@ -366,15 +369,19 @@ const Dashboard = () => {
             </div>
             <div className="p-6 pt-0">
               {blogsLoading ? (
-                <div className="text-center py-4">
-                  <p className="text-muted-foreground">Loading blogs...</p>
-                </div>
+                <LoadingState variant="compact" message="Loading blogs..." />
               ) : recentBlogs.length === 0 ? (
-                <div className="text-center py-4">
-                  <p className="text-muted-foreground">
-                    No blogs found. Start writing your first blog!
-                  </p>
-                </div>
+                <EmptyState 
+                  variant="compact" 
+                  icon={PenTool} 
+                  title="No Blogs Yet" 
+                  description="You haven't published any blogs yet. Start writing your first one!"
+                  action={
+                    <Button asChild variant="outline" size="sm" className="mt-2">
+                      <Link to="/write-blog">Write a Blog</Link>
+                    </Button>
+                  }
+                />
               ) : (
                 <div className="space-y-4">
                   {recentBlogs.map((blog, index) => (

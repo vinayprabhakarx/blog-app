@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 import { useAuth } from './useAuth';
 import { useSelector } from 'react-redux';
-import { selectAllCategories } from '../features/category/categoriesSlice';
+import { selectAllCategories } from '@/features/category/categoriesSlice';
 import { Home, Search, BookOpen, Users, Settings, Shield, MessageCircle, BarChart, FileText, Lock, UserX, Globe, Folder, User, PenTool } from 'lucide-react';
 
 export const useNotFoundContext = () => {

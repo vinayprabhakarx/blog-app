@@ -1,14 +1,14 @@
 import React, { useState, useEffect, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { store } from "../../app/store";
+import { store } from "@/app/store";
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from "../../components/ui/card";
-import { Badge } from "../../components/ui/badge";
+} from "@/components/ui/card";
+import { Badge } from "@/components/ui/badge";
 import {
   BarChart3,
   TrendingUp,
@@ -20,8 +20,9 @@ import {
   FileText,
   FolderOpen,
 } from "lucide-react";
-import { showToast } from "../../utils/showToast";
-import api from "../../api/api";
+import { showToast } from "@/utils/showToast";
+import api from "@/api/api";
+import { EmptyState, LoadingState } from "@/components/common/StateDisplays";
 import {
   fetchAdminStats,
   fetchMonthlyPerformance,
@@ -325,17 +326,14 @@ const Analytics = () => {
                     </div>
                   ))
                 ) : monthlyPerformanceLoading ? (
-                  <div className="text-center py-4">
-                    <p className="text-muted-foreground">
-                      Loading monthly performance...
-                    </p>
-                  </div>
+                  <LoadingState variant="compact" message="Loading monthly performance..." />
                 ) : (
-                  <div className="text-center py-4">
-                    <p className="text-muted-foreground">
-                      No performance data available
-                    </p>
-                  </div>
+                  <EmptyState 
+                    variant="compact" 
+                    icon={BarChart3} 
+                    title="No Data Yet" 
+                    description="No performance data available for the selected period."
+                  />
                 )}
               </div>
             </CardContent>

@@ -1,4 +1,4 @@
-import api from "../../api/api.js";
+import api from "@/api/api.js";
 
 const commentService = {
   // Get all comments for a blog (with nested structure)

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import {
   updateProfile,
@@ -8,12 +8,12 @@ import {
   removeProfileImage,
   clearProfileImageRemovalStatus,
 } from "./settingsSlice";
-import { updateUserProfile, logout } from "../auth/authSlice";
-import { showToast } from "../../utils/showToast";
-import LoadingButton from "../../components/common/LoadingButton";
-import InputBox from "../../components/common/InputBox";
-import SocialInputBox from "../../components/common/SocialInputBox";
-import ImageCropper from "../../components/common/ImageCropper";
+import { updateUserProfile, logout } from "@/features/auth/authSlice";
+import { showToast } from "@/utils/showToast";
+import LoadingButton from "@/components/common/LoadingButton";
+import InputBox from "@/components/common/InputBox";
+import SocialInputBox from "@/components/common/SocialInputBox";
+import ImageCropper from "@/components/common/ImageCropper";
 import {
   FaUser,
   FaEnvelope,
@@ -29,8 +29,8 @@ import {
   FaPlus,
 } from "react-icons/fa6";
 
-import LoadingSpinner from "../../components/common/LoadingSpinner";
-import userService from "../user_management/usersService";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import userService from "@/features/user_management/usersService";
 
 const EditProfile = () => {
   const { user, loading: authLoading } = useAuth();

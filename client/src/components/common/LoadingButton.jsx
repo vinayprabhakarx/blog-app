@@ -1,5 +1,5 @@
 import React from "react";
-import { Button } from "../../components/ui/button";
+import { Button } from "@/components/ui/button";
 import { AiOutlineLoading3Quarters } from "react-icons/ai";
 
 const LoadingButton = ({

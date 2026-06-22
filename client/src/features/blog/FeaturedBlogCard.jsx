@@ -6,7 +6,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "../../components/ui/avatar";
+} from "@/components/ui/avatar";
 
 const FeaturedBlogCard = React.memo(({ blog, className, ...props }) => {
   // Memoize utility functions

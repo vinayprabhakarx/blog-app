@@ -14,12 +14,12 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../components/ui/form";
-import { Input } from "../../components/ui/input";
-import { Textarea } from "../../components/ui/textarea";
-import { Card } from "../../components/ui/card";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
-import LoadingButton from "../../components/common/LoadingButton";
+} from "@/components/ui/form";
+import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
+import { Card } from "@/components/ui/card";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import LoadingButton from "@/components/common/LoadingButton";
 
 // Redux
 import {
@@ -34,7 +34,7 @@ import {
 } from "./categoriesSlice";
 
 // Utils
-import { showToast } from "../../utils/showToast";
+import { showToast } from "@/utils/showToast";
 
 const formSchema = z.object({
   name: z.string().min(3, "Name must be at least 3 characters long."),

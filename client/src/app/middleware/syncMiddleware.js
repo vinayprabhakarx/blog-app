@@ -1,11 +1,11 @@
-import { setLikeData, getLikeCount } from "../../features/like/likesSlice";
+import { setLikeData, getLikeCount } from "@/features/like/likesSlice";
 import {
   fetchBlogBySlug,
   fetchBlogById,
   fetchAllBlogs,
   fetchMyBlogs,
   fetchBlogsByAuthor,
-} from "../../features/blog/blogSlice";
+} from "@/features/blog/blogSlice";
 
 export const syncMiddleware = (store) => (next) => (action) => {
   const result = next(action);

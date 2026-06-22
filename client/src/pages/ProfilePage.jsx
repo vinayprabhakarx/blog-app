@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { useAuth } from "../hooks/useAuth";
-import userService from "../features/user_management/usersService";
-import { Button } from "../components/ui/button";
-import { Avatar, AvatarFallback, AvatarImage } from "../components/ui/avatar";
+import { useAuth } from "@/hooks/useAuth";
+import userService from "@/features/user_management/usersService";
+import { Button } from "@/components/ui/button";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import {
   FaArrowLeft,
   FaGlobe,
@@ -19,8 +19,8 @@ import {
 import { User } from "lucide-react";
 import { FaXTwitter } from "react-icons/fa6";
 import { Link } from "react-router-dom";
-import LoadingSpinner from "../components/common/LoadingSpinner";
-import NotFound from "../components/common/NotFound";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
+import NotFound from "@/components/common/NotFound";
 
 const ProfilePage = React.memo(() => {
   const { username } = useParams();

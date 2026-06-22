@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Card } from "../../components/ui/card";
-import { Button } from "../../components/ui/button";
+import { Card } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 import { CheckCircle, AlertTriangle, XCircle, ArrowRight, Mail, RefreshCw } from "lucide-react";
 import authService from "./authService";
-import LoadingSpinner from "../../components/common/LoadingSpinner";
+import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const VerifyEmail = () => {
   const [searchParams] = useSearchParams();

@@ -1,5 +1,5 @@
-import { store } from "../app/store";
-import { fetchNotifications } from "../features/notification/notificationsSlice";
+import { store } from "@/app/store";
+import { fetchNotifications } from "@/features/notification/notificationsSlice";
 
 // Refresh notifications after actions
 export const refreshNotificationsAfterAction = () => {

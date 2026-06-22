@@ -1,5 +1,5 @@
 import { showToast } from "./showToast";
-import api from "../api/api";
+import api from "@/api/api";
 
 export const deleteData = async (endpoint) => {
   const confirmed = confirm("Are you sure you want to delete this data?");

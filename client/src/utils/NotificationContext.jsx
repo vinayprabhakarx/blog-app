@@ -1,6 +1,6 @@
 import React, { createContext, useEffect, useState, useCallback } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { useAuth } from "../hooks/useAuth";
+import { useAuth } from "@/hooks/useAuth";
 import {
   fetchNotifications,
   getNotificationSummary,
@@ -10,8 +10,8 @@ import {
   selectNotifications,
   selectUnreadCount,
   selectNotificationSummary,
-} from "../features/notification/notificationsSlice";
-import notificationService from "../features/notification/notificationsService";
+} from "@/features/notification/notificationsSlice";
+import notificationService from "@/features/notification/notificationsService";
 
 const NotificationContext = createContext();
 

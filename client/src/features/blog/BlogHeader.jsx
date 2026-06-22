@@ -3,8 +3,8 @@ import { useSelector } from "react-redux";
 import { MessageCircle, Heart, Clock, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 
-import LikeButton from "../../components/common/LikeButton";
-import useBlogLike from "../../hooks/useBlogLike";
+import LikeButton from "@/components/common/LikeButton";
+import useBlogLike from "@/hooks/useBlogLike";
 
 const BlogHeader = ({ blog, onCommentClick }) => {
   // Use custom hook for optimized like functionality

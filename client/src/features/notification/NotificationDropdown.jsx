@@ -11,10 +11,10 @@ import {
   Shield,
   RefreshCw,
 } from "lucide-react";
-import { cn } from "../../lib/utils";
+import { cn } from "@/lib/utils";
 
-import { useNotificationContext } from "../../hooks/useNotificationContext";
-import CommentForm from "../comment/CommentForm";
+import { useNotificationContext } from "@/hooks/useNotificationContext";
+import CommentForm from "@/features/comment/CommentForm";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -22,16 +22,16 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuLabel,
-} from "../../components/ui/dropdown-menu";
-import { Button } from "../../components/ui/button";
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
 import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "../../components/ui/avatar";
-import { Badge } from "../../components/ui/badge";
-import { Skeleton } from "../../components/ui/skeleton";
-import { showToast } from "../../utils/showToast";
+} from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
+import { showToast } from "@/utils/showToast";
 
 const NotificationDropdown = () => {
   const [isOpen, setIsOpen] = useState(false);

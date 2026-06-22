@@ -3,8 +3,8 @@ import { useDispatch, useSelector } from "react-redux";
 import {
   toggleBlogLike,
   toggleBlogLikeFrontend,
-} from "../features/like/likesSlice";
-import { refreshNotificationsAfterAction } from "../utils/notificationRefresh";
+} from "@/features/like/likesSlice";
+import { refreshNotificationsAfterAction } from "@/utils/notificationRefresh";
 import useLikeSelector from "./useLikeSelector";
 
 export const useBlogLike = (blogId) => {

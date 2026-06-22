@@ -1,6 +1,6 @@
 // Export all notification-related components and hooks
 export { default as NotificationDropdown } from "./NotificationDropdown";
-export { default as NotificationDashboard } from "./NotificationDashboard";
+export { default as NotificationCenter } from "./NotificationCenter";
 
 export { default as notificationService } from "./notificationsService";
 export { default as useNotifications } from "./useNotifications";

@@ -7,18 +7,18 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../components/ui/form";
+} from "@/components/ui/form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Card } from "../../components/ui/card";
+import { Card } from "@/components/ui/card";
 import { Link, useNavigate } from "react-router-dom";
-import { RouteSignUp, getRoleBasedRedirect } from "../../utils/RouteName";
-import { showToast } from "../../utils/showToast";
+import { RouteSignUp, getRoleBasedRedirect } from "@/utils/RouteName";
+import { showToast } from "@/utils/showToast";
 import GoogleAuth from "./GoogleAuth";
 import { useDispatch, useSelector } from "react-redux";
-import { loginUser, getCurrentUser } from "../auth/authSlice";
-import InputBox from "../../components/common/InputBox";
-import LoadingButton from "../../components/common/LoadingButton";
+import { loginUser, getCurrentUser } from "@/features/auth/authSlice";
+import InputBox from "@/components/common/InputBox";
+import LoadingButton from "@/components/common/LoadingButton";
 import { FaEnvelope, FaLock } from "react-icons/fa6";
 
 const Login = () => {

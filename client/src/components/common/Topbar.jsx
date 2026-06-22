@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import logoLight from "../../assets/logo-light.png";
-import logoDark from "../../assets/logo-dark.png";
+import logoLight from "@/assets/logo-light.png";
+import logoDark from "@/assets/logo-dark.png";
 import { Link, useNavigate } from "react-router-dom";
 import { FiUser } from "react-icons/fi";
 import SearchBar from "./SearchBar";
@@ -12,18 +12,18 @@ import {
   DropdownMenuLabel,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
-} from "../ui/dropdown-menu";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
+} from "@/components/ui/dropdown-menu";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { FaRegUser } from "react-icons/fa";
 import { IoLogOutOutline } from "react-icons/io5";
 import ThemeToggle from "./ThemeToggle";
-import { logout } from "../../features/auth/authSlice";
-import { showToast } from "../../utils/showToast";
-import { RouteIndex, RouteProfile, RouteSignIn } from "../../utils/RouteName";
-import { useTheme } from "../../utils/ThemeContext";
-import { useAuth } from "../../hooks/useAuth";
+import { logout } from "@/features/auth/authSlice";
+import { showToast } from "@/utils/showToast";
+import { RouteIndex, RouteProfile, RouteSignIn } from "@/utils/RouteName";
+import { useTheme } from "@/utils/ThemeContext";
+import { useAuth } from "@/hooks/useAuth";
 import { Search, Menu, X, ArrowLeft } from "lucide-react";
-import NotificationDropdown from "../../features/notification/NotificationDropdown";
+import NotificationDropdown from "@/features/notification/NotificationDropdown";
 import { useSidebar } from "./sidebar-hooks";
 
 const Topbar = React.memo(() => {

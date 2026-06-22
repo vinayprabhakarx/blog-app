@@ -3,7 +3,7 @@ import {
   Avatar,
   AvatarFallback,
   AvatarImage,
-} from "../../components/ui/avatar";
+} from "@/components/ui/avatar";
 import { useForm } from "react-hook-form";
 import {
   Form,
@@ -16,7 +16,7 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Input } from "@/components/ui/input";
-import { showToast } from "../../utils/showToast";
+import { showToast } from "@/utils/showToast";
 
 import { setUser } from "@/redux/user/user.slice";
 import { useDispatch, useSelector } from "react-redux";

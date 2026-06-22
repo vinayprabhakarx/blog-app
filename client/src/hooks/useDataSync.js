@@ -5,8 +5,8 @@ import {
   addCommentToCache,
   updateCommentInCache,
   removeCommentFromCache,
-} from "../features/comment/commentsSlice";
-import { setLikeData } from "../features/like/likesSlice";
+} from "@/features/comment/commentsSlice";
+import { setLikeData } from "@/features/like/likesSlice";
 
 // Hook for cross-feature data synchronization and cache management
 export const useDataSync = () => {

@@ -10,13 +10,13 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
-} from "../../components/ui/form";
-import InputBox from "../../components/common/InputBox";
-import LoadingButton from "../../components/common/LoadingButton";
-import { useAuth } from "../../hooks/useAuth";
+} from "@/components/ui/form";
+import InputBox from "@/components/common/InputBox";
+import LoadingButton from "@/components/common/LoadingButton";
+import { useAuth } from "@/hooks/useAuth";
 import { useDispatch, useSelector } from "react-redux";
 import { changePassword, clearPasswordChangeStatus } from "./settingsSlice";
-import { showToast } from "../../utils/showToast";
+import { showToast } from "@/utils/showToast";
 import { FaLock, FaUnlock, FaArrowLeft } from "react-icons/fa6";
 
 // Password change validation schema

@@ -3,7 +3,7 @@ import { useDispatch } from "react-redux";
 import { Send, AtSign } from "lucide-react";
 import { cn } from "@/lib/utils";
 import commentService from "./commentsService";
-import { refreshNotificationsAfterAction } from "../../utils/notificationRefresh";
+import { refreshNotificationsAfterAction } from "@/utils/notificationRefresh";
 
 import {
   createComment,

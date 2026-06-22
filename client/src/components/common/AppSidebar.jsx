@@ -6,10 +6,10 @@ import React, {
   useRef,
 } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
-import { useCategories } from "../../hooks/useRedux";
-import { fetchAllCategories } from "../../features/category/categoriesSlice";
-import { cn } from "../../lib/utils";
+import { useAuth } from "@/hooks/useAuth";
+import { useCategories } from "@/hooks/useRedux";
+import { fetchAllCategories } from "@/features/category/categoriesSlice";
+import { cn } from "@/lib/utils";
 import { motion as Motion } from "motion/react";
 import { IconSettings } from "@tabler/icons-react";
 import {

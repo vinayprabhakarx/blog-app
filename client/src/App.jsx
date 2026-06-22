@@ -1,16 +1,16 @@
 import React, { useEffect } from "react";
-import { ThemeProvider } from "./utils/ThemeContext.jsx";
-import { NotificationProvider } from "./utils/NotificationContext";
-import AppRouter from "./utils/AppRouter";
+import { ThemeProvider } from "@/utils/ThemeContext.jsx";
+import { NotificationProvider } from "@/utils/NotificationContext";
+import AppRouter from "@/utils/AppRouter";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import {
   getCurrentUser,
   initializationComplete,
-} from "./features/auth/authSlice";
-import "./index.css";
+} from "@/features/auth/authSlice";
+import "@/index.css";
 import { useDispatch, useSelector } from "react-redux";
-import { useTheme } from "./utils/ThemeContext.jsx";
+import { useTheme } from "@/utils/ThemeContext.jsx";
 
 // Initialize authentication state
 const AuthInitializer = ({ children }) => {

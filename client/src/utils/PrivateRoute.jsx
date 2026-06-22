@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
-import Loading from "../components/common/Loading";
+import Loading from "@/components/common/Loading";
 
 // Route guard for protected routes
 const PrivateRoute = () => {

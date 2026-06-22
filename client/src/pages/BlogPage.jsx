@@ -3,17 +3,17 @@ import { useParams, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
 import { cn } from "@/lib/utils";
 // Redux and hooks
-import { useBlog } from "../hooks/useRedux";
-import { fetchBlogBySlug, fetchBlogById, clearCurrentBlog } from "../features/blog/blogSlice";
-import { setLikeData, getUserLikeStatus } from "../features/like/likesSlice";
+import { useBlog } from "@/hooks/useRedux";
+import { fetchBlogBySlug, fetchBlogById, clearCurrentBlog } from "@/features/blog/blogSlice";
+import { setLikeData, getUserLikeStatus } from "@/features/like/likesSlice";
 // Icons
 import { MessageCircle, MessageCircleOff } from "lucide-react";
 // Components
-import BlogHeader from "../features/blog/BlogHeader";
-import BlogDisplay from "../features/blog/BlogDisplay";
-import { CommentSection } from "../features/comment";
-import NotFound from "../components/common/NotFound";
-import BlogPageSkeleton from "../components/common/BlogPageSkeleton";
+import BlogHeader from "@/features/blog/BlogHeader";
+import BlogDisplay from "@/features/blog/BlogDisplay";
+import { CommentSection } from "@/features/comment";
+import NotFound from "@/components/common/NotFound";
+import BlogPageSkeleton from "@/components/common/BlogPageSkeleton";
 
 const BlogPage = () => {
   const { slug, id } = useParams();

@@ -1,14 +1,14 @@
 import { useDispatch, useSelector } from "react-redux";
 import { useCallback } from "react";
-import { createBlog } from "../features/blog/blogSlice";
-import { toggleBlogLike } from "../features/like/likesSlice";
+import { createBlog } from "@/features/blog/blogSlice";
+import { toggleBlogLike } from "@/features/like/likesSlice";
 import {
   fetchBlogComments,
   createComment as createCommentAction,
   updateComment as updateCommentAction,
   deleteComment as deleteCommentAction,
   toggleCommentLike,
-} from "../features/comment/commentsSlice";
+} from "@/features/comment/commentsSlice";
 
 export const useAppDispatch = () => useDispatch();
 export const useAppSelector = useSelector;
