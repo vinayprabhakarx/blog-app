@@ -19,6 +19,7 @@ import {
   getBlogComments,
 } from "../controllers/comment.controller.js";
 import authenticate from "../middleware/authenticate.js";
+import optionalAuthenticate from "../middleware/optionalAuthenticate.js";
 import onlyAdmin from "../middleware/onlyAdmin.js";
 import authorize from "../middleware/authorize.js";
 import asyncHandler from "../utils/asyncHandler.js";
@@ -63,7 +64,7 @@ const paginationValidation = [
 // @route   GET /api/blogs OR /api/categories/:categoryId/blogs
 // @desc    Get all published blogs (optionally filtered by category)
 // @access  Public
-router.get("/", asyncHandler(getAllBlogs));
+router.get("/", optionalAuthenticate, asyncHandler(getAllBlogs));
 
 // @route   GET /api/blogs/my-blogs
 // @desc    Get blogs for the logged-in author

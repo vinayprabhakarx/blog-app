@@ -104,7 +104,10 @@ export const getAllBlogs = async (req, res, next) => {
   // Determine if this is a standard homepage feed request (no filters)
   const isHomeFeed = !search && !category && !tag && !username;
   
-  let query = { draft: false };
+  let query = {};
+  if (req.user?.role !== "admin") {
+    query.draft = false;
+  }
   let heroPost = null;
 
   // 1. If Home Feed, find the single latest featured post
@@ -160,23 +163,10 @@ export const getAllBlogs = async (req, res, next) => {
   }
 
   // 3. Calculate Pagination
-  let skip, limitNum = parseInt(limit);
-  
-  if (isHomeFeed && heroPost) {
-    // Special Home Feed Pagination
-    if (parseInt(page) === 1) {
-      // Page 1: Hero takes 1 slot, need (limit-1) others
-      skip = 0;
-      limitNum = limitNum - 1;
-    } else {
-      // Page > 1: Skip the standard items we showed on page 1 (which was limit-1 items)
-      // + all full pages in between
-      skip = (parseInt(page) - 1) * parseInt(limit) - 1; 
-    }
-  } else {
-    // Standard Pagination
-    skip = (parseInt(page) - 1) * parseInt(limit);
-  }
+  // The heroPost is an extra featured item on page 1 of the home feed.
+  // It does NOT consume a slot in the standard pagination grid.
+  const skip = (parseInt(page) - 1) * parseInt(limit);
+  const limitNum = parseInt(limit);
 
   // 4. Fetch the "Other" blogs
   let blogQuery = Blog.find(query)
@@ -211,7 +201,7 @@ export const getAllBlogs = async (req, res, next) => {
   // 6. Get Counts
   const totalStandard = await Blog.countDocuments(query);
   const totalBlogs = (isHomeFeed && heroPost) ? totalStandard + 1 : totalStandard;
-  const totalPages = Math.ceil(totalBlogs / parseInt(limit));
+  const totalPages = Math.ceil(totalStandard / parseInt(limit));
 
   // 7. Normalize Author (Admin check)
   const blogsWithAdmin = finalBlogs.map((blog) => ({
@@ -235,7 +225,7 @@ export const getAllBlogs = async (req, res, next) => {
 // @access  Private (Author, Admin)
 export const getAuthorBlogs = async (req, res, next) => {
   const { id: authorId } = req.user;
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 9 } = req.query;
 
   const query = { author: authorId };
   const skip = (parseInt(page) - 1) * parseInt(limit);
@@ -276,7 +266,7 @@ export const getAuthorBlogs = async (req, res, next) => {
 // @access  Public
 export const getBlogsByAuthor = async (req, res, next) => {
   const { username } = req.params;
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 9 } = req.query;
 
   const author = await User.findOne({
     "personal_info.username": username,
@@ -323,7 +313,7 @@ export const getBlogsByAuthor = async (req, res, next) => {
 // @access  Private (Admin)
 export const getBlogsByAuthorForAdmin = async (req, res, next) => {
   const { authorId } = req.params;
-  const { page = 1, limit = 10 } = req.query;
+  const { page = 1, limit = 9 } = req.query;
 
   const author = await User.findById(authorId).catch((err) => {
     if (err.name === "CastError")
