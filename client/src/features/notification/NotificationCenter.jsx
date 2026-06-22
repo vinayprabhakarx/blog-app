@@ -2,29 +2,17 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Bell,
-  Heart,
-  MessageCircle,
   MessageSquare,
-  AlertCircle,
   CheckCircle,
-  Check,
-  CheckSquare,
   Trash2,
-  Trash,
   Filter,
   RefreshCw,
-  Info,
 } from "lucide-react";
 import { PageStats } from "@/components/common/PageStats";
-import {
-  Avatar,
-  AvatarImage,
-  AvatarFallback,
-} from "@/components/ui/avatar";
+
 import { Button } from "@/components/ui/button";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/StateDisplays";
 import { FilterCard } from "@/components/common/FilterCard";
-import { Card } from "@/components/ui/card";
 import {
   Select,
   SelectContent,
@@ -41,7 +29,6 @@ import { useNotifications } from "@/hooks/useNotifications";
 import { cn } from "@/lib/utils";
 import { Link } from "react-router-dom";
 import CommentForm from "@/features/comment/CommentForm";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 const NotificationCenter = () => {
   const dispatch = useDispatch();
@@ -293,154 +280,114 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
   return (
     <div
       className={cn(
-        "group transition-all duration-200 rounded-xl border bg-card border-border/40 hover:bg-muted/30 mb-4",
-        !notification.is_read &&
-          "border-2 border-primary/40 hover:border-primary/60"
+        "group relative flex flex-col sm:flex-row items-start gap-4 p-5 transition-colors duration-200 cursor-default",
+        !notification.is_read ? "bg-muted/20 hover:bg-muted/30" : "bg-transparent hover:bg-muted/10"
       )}
     >
-      {/* Left border accent for unread notifications */}
-      {!notification.is_read && (
-        <div className="absolute left-0 top-0 bottom-0 w-1 bg-primary rounded-l-xl" />
-      )}
-
-      <div className="flex flex-col sm:flex-row items-start gap-3 p-4">
-        {/* User Avatar */}
-        <div className="pt-1 flex-shrink-0">
-          <Avatar className="h-8 w-8 sm:h-9 sm:w-9 ring-1 ring-border/20 group-hover:ring-primary/30 transition-all duration-300">
-            <AvatarImage
-              src={notification.triggered_by?.personal_info?.profile_img}
-              alt={
-                notification.triggered_by?.personal_info?.username ||
-                notification.triggered_by?.personal_info?.name ||
-                "User"
-              }
-            />
-            <AvatarFallback className="text-sm font-semibold bg-gradient-to-br from-primary/20 to-primary/10 text-primary">
-              {notification.triggered_by?.personal_info?.username
-                ?.charAt(0)
-                ?.toUpperCase() || "U"}
-            </AvatarFallback>
-          </Avatar>
-        </div>
-
+      <div className="flex flex-col sm:flex-row items-start w-full">
         {/* Main Content */}
-        <div className="flex-1 min-w-0 w-full">
-          {/* Username */}
-          <div className="flex flex-wrap items-center gap-2 text-sm text-muted-foreground mb-2">
-            <span className="font-semibold text-foreground text-sm sm:text-base">
-              {notification.triggered_by?.personal_info?.username ||
+        <div className="flex-1 min-w-0 w-full space-y-1">
+          {/* Notification Message */}
+          <div className="text-sm leading-relaxed text-foreground">
+            <Link 
+              to={`/${notification.triggered_by?.personal_info?.username || ""}`}
+              className="font-semibold text-foreground hover:text-primary transition-colors cursor-pointer mr-1.5 align-baseline"
+            >
+              @{notification.triggered_by?.personal_info?.username ||
                 notification.triggered_by?.personal_info?.name ||
                 "User"}
-            </span>
-          </div>
-
-          {/* Notification Message */}
-          <div className="text-xs sm:text-sm leading-relaxed text-foreground/90 mb-2">
-            <span className="font-medium">
-              {notification.type === "comment_tag" && "mentioned you"}
-              {notification.type === "blog_comment" && "commented"}
-              {notification.type === "comment_reply" && "replied"}
+            </Link>
+            <span className="text-muted-foreground">
+              {notification.type === "comment_tag" && "mentioned you in a comment"}
+              {notification.type === "blog_comment" && "commented on your blog"}
+              {notification.type === "comment_reply" && "replied to your comment"}
               {notification.type === "comment_like" && "liked your comment"}
               {notification.type === "blog_like" && "liked your blog"}
-              {notification.type === "comment_report" &&
-                "reported your comment"}
+              {notification.type === "comment_report" && "reported on your comment"}
               {notification.type === "report_resolved" && "report resolved"}
-              {notification.type === "admin_notification" &&
-                !notification.comment_id?.content &&
-                "sent you a message"}
-              {notification.type === "blog_comment" &&
-                notification.comment_id?.content &&
-                ":"}
-              {notification.type === "comment_reply" &&
-                notification.comment_id?.content &&
-                ":"}
+              {notification.type === "admin_notification" && !notification.comment_id?.content && "sent you a message"}
             </span>
-
-            {/* Comment Content */}
-            {notification.comment_id?.content && (
-              <div className="mt-2 p-3 bg-muted/30 rounded-lg border-l-2 border-primary/30">
-                <p className="text-sm text-foreground/80 italic">
-                  "{notification.comment_id.content}"
-                </p>
-              </div>
+            {notification.blog_id?.title && (
+              <span className="text-muted-foreground">
+                {notification.type === "comment_report" ? " of this blog " : " on "}
+                <Link
+                  to={`/blog/${notification.blog_id.slug || notification.blog_id._id}`}
+                  className="font-medium text-foreground hover:text-primary transition-colors cursor-pointer"
+                >
+                  "{notification.blog_id.title}"
+                </Link>
+              </span>
             )}
+            {!notification.is_read && (
+              <span className="inline-block w-2 h-2 bg-primary rounded-full ml-2 align-middle" />
+            )}
+          </div>
+
+          {/* Comment Content Preview */}
+          {notification.comment_id?.content && (
+            <div className="mt-2.5 p-3.5 bg-muted/30 rounded-lg border border-border/40">
+              <p className="text-sm text-muted-foreground line-clamp-3">
+                "{notification.comment_id.content}"
+              </p>
+            </div>
+          )}
 
             {/* Report Reason */}
             {notification.metadata?.reason && (
-              <div className="mt-2 p-3 bg-warning/10 border border-warning/20 rounded-lg">
-                <p className="text-xs text-warning font-semibold mb-1 uppercase tracking-wide">
+              <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
+                <p className="text-xs text-destructive font-semibold mb-1 uppercase tracking-wide">
                   Report Reason
                 </p>
-                <p className="text-sm text-warning/90">
+                <p className="text-sm text-destructive/90">
                   {notification.metadata.reason}
                 </p>
               </div>
             )}
-          </div>
+          {/* Footer Info & Actions */}
+          <div className="flex items-center justify-between mt-3">
+            <div className="text-xs text-muted-foreground font-medium">
+              {formatTimestamp(new Date(notification.created_at))}
+            </div>
 
-          {/* Footer Info */}
-          <div className="text-xs text-muted-foreground mb-3">
-            <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-              <div className="flex items-center gap-1 min-w-0 max-w-full">
-                <span className="text-xs text-muted-foreground cursor-pointer font-medium flex-shrink-0">
-                  on
-                </span>
-                {notification.blog_id?.title && (
-                  <Link
-                    to={`/blog/${
-                      notification.blog_id.slug || notification.blog_id._id
-                    }`}
-                    className="text-primary hover:text-primary/80 hover:underline font-medium truncate cursor-pointer"
-                  >
-                    {notification.blog_id.title}
-                  </Link>
-                )}
-              </div>
-              <div className="text-xs text-muted-foreground font-medium flex-shrink-0 whitespace-nowrap">
-                {formatTimestamp(new Date(notification.created_at))}
-              </div>
+            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+              {canReply(notification) && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setReplyingTo(
+                      replyingTo === notification._id ? null : notification._id
+                    );
+                  }}
+                  className={cn(
+                    "h-7 px-3 text-xs font-medium transition-colors cursor-pointer rounded-full",
+                    replyingTo === notification._id
+                      ? "bg-muted text-foreground"
+                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
+                  )}
+                >
+                  <MessageSquare className="h-3 w-3 mr-1.5" />
+                  {replyingTo === notification._id ? "Cancel" : "Reply"}
+                </Button>
+              )}
+
+              {!notification.is_read && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onMarkAsRead(notification._id);
+                  }}
+                  className="h-7 px-3 text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 cursor-pointer rounded-full"
+                >
+                  <CheckCircle className="h-3 w-3 mr-1.5" />
+                  Mark Read
+                </Button>
+              )}
             </div>
           </div>
-        </div>
-
-        {/* Action Buttons */}
-        <div className="flex items-center gap-2 w-full sm:w-auto sm:ml-auto mt-3 sm:mt-0">
-          {canReply(notification) && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                setReplyingTo(
-                  replyingTo === notification._id ? null : notification._id
-                );
-              }}
-              className={cn(
-                "h-8 px-3 text-xs transition-colors cursor-pointer flex-1 sm:flex-none",
-                replyingTo === notification._id
-                  ? "text-primary bg-primary/10 hover:bg-primary/20"
-                  : "text-muted-foreground hover:text-foreground hover:bg-muted/50"
-              )}
-            >
-              <MessageSquare className="h-3 w-3 mr-1" />
-              {replyingTo === notification._id ? "Cancel" : "Reply"}
-            </Button>
-          )}
-
-          {!notification.is_read && (
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={(e) => {
-                e.stopPropagation();
-                onMarkAsRead(notification._id);
-              }}
-              className="h-8 px-3 text-xs text-primary hover:text-primary hover:bg-primary/10 cursor-pointer flex-1 sm:flex-none"
-            >
-              <CheckCircle className="h-3 w-3 mr-1" />
-              Mark Read
-            </Button>
-          )}
         </div>
       </div>
 
