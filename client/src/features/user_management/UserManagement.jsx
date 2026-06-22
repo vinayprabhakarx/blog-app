@@ -280,16 +280,6 @@ const UserManagement = () => {
     return formatDistanceToNow(new Date(dateString), { addSuffix: true });
   };
 
-  const getRoleBadgeVariant = (role) => {
-    switch (role) {
-      case "admin":
-        return "default";
-      case "author":
-        return "secondary";
-      default:
-        return "outline";
-    }
-  };
 
   const getRoleIcon = (role, className = "w-4 h-4") => {
     switch (role) {

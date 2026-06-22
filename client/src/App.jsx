@@ -16,7 +16,7 @@ import { useTheme } from "@/utils/ThemeContext.jsx";
 // Initialize authentication state
 const AuthInitializer = ({ children }) => {
   const dispatch = useDispatch();
-  const { token, initializing } = useSelector((state) => state.auth);
+  const { initializing } = useSelector((state) => state.auth);
 
   useEffect(() => {
     // Only run once on mount

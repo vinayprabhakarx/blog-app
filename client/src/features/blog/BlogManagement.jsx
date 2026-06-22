@@ -258,10 +258,6 @@ const BlogManagement = () => {
     }
   }, [currentBlogs, isMyBlogsPage, urlDraftFilter, urlAuthor]);
 
-  const hasActiveFilters = 
-    urlCategory !== "all" || 
-    urlDraftFilter !== "all" || 
-    urlAuthor !== "all";
 
   const sortedAndFilteredBlogs = useMemo(() => {
     return [...filteredBlogs].sort((a, b) => {
