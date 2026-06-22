@@ -126,3 +126,5 @@ ui-debug.log
 
 # Local environment files
 .env*.local
+deploy.md
+deploy.sh
