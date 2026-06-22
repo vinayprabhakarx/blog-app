@@ -250,24 +250,7 @@ const CommentManagement = () => {
     );
   }
 
-  const hasActiveFilters = searchTerm !== "" || filterStatus !== "all" || sortBy !== "newest";
 
-  if (!isLoading && allComments.length === 0 && !hasActiveFilters) {
-    return (
-      <div className="p-6 space-y-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground mb-6">
-            Comment Management
-          </h1>
-        </div>
-        <EmptyState
-          icon={MessageSquare}
-          title="No comments found"
-          description="There are no comments available to manage at this time."
-        />
-      </div>
-    );
-  }
 
   return (
     <section className="max-w-7xl mx-auto p-4 sm:p-6 md:p-8 space-y-6 sm:space-y-8">

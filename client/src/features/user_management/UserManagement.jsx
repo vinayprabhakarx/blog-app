@@ -326,22 +326,7 @@ const UserManagement = () => {
     );
   }
 
-  if (!users || users.length === 0) {
-    return (
-      <div className="p-6 space-y-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
-            User Management
-          </h1>
-        </div>
-        <EmptyState 
-          icon={Users} 
-          title="No Users Found" 
-          description="No users have registered yet."
-        />
-      </div>
-    );
-  }
+
 
   return (
     <section className="p-6 space-y-6" aria-label="User Management">
@@ -468,7 +453,15 @@ const UserManagement = () => {
                 </Select>
       </FilterCard>
 
-      <div className="hidden lg:block">
+      {processedUsers.length === 0 ? (
+        <EmptyState 
+          icon={Users} 
+          title="No Users Found" 
+          description="We couldn't find any users. Please try adjusting your filters."
+        />
+      ) : (
+        <>
+          <div className="hidden lg:block">
         <Card>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
@@ -878,6 +871,8 @@ const UserManagement = () => {
           </Card>
         ))}
       </div>
+        </>
+      )}
 
       {pagination.totalUsers > 10 && (
         <div className="flex justify-center">
