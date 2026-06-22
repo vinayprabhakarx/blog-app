@@ -576,7 +576,17 @@ const UserManagement = () => {
                       <TableCell className="py-4 px-4 text-center">
                         <div className="flex justify-center gap-2">
                           {canChangeRole(user) && (
-                            <Dialog>
+                            <Dialog
+                              open={roleChangeUser?._id === user._id}
+                              onOpenChange={(isOpen) => {
+                                if (!isOpen) {
+                                  setRoleChangeUser(null);
+                                } else {
+                                  setRoleChangeUser(user);
+                                  setNewRole(user.role);
+                                }
+                              }}
+                            >
                               <DialogTrigger asChild>
                                 <Button
                                   variant="outline"
@@ -584,14 +594,16 @@ const UserManagement = () => {
                                   className="transition-colors duration-200 hover:bg-primary hover:text-primary-foreground cursor-pointer"
                                   title="Change Role"
                                   onClick={() => {
-                                    setRoleChangeUser(user);
-                                    setNewRole(user.role);
+                                    if (roleChangeUser?._id !== user._id) {
+                                      setRoleChangeUser(user);
+                                      setNewRole(user.role);
+                                    }
                                   }}
                                 >
                                   <UserCog className="h-4 w-4" />
                                 </Button>
                               </DialogTrigger>
-                              <DialogContent>
+                              <DialogContent className="w-[90vw] sm:w-[400px] sm:max-w-none">
                                 <DialogHeader>
                                   <DialogTitle>Change User Role</DialogTitle>
                                   <DialogDescription>
@@ -650,7 +662,7 @@ const UserManagement = () => {
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </AlertDialogTrigger>
-                              <AlertDialogContent>
+                              <AlertDialogContent className="w-[90vw] sm:w-[400px] sm:max-w-none">
                                 <AlertDialogHeader>
                                   <AlertDialogTitle>
                                     Delete User
@@ -757,7 +769,17 @@ const UserManagement = () => {
 
                 <div className="flex justify-center gap-2 pt-2 border-t">
                   {canChangeRole(user) && (
-                    <Dialog>
+                    <Dialog
+                      open={roleChangeUser?._id === user._id}
+                      onOpenChange={(isOpen) => {
+                        if (!isOpen) {
+                          setRoleChangeUser(null);
+                        } else {
+                          setRoleChangeUser(user);
+                          setNewRole(user.role);
+                        }
+                      }}
+                    >
                       <DialogTrigger asChild>
                         <Button
                           variant="outline"
@@ -765,15 +787,17 @@ const UserManagement = () => {
                           className="px-3 py-1 h-8 text-xs transition-colors duration-200 hover:bg-primary hover:text-primary-foreground cursor-pointer"
                           title="Change Role"
                           onClick={() => {
-                            setRoleChangeUser(user);
-                            setNewRole(user.role);
+                            if (roleChangeUser?._id !== user._id) {
+                              setRoleChangeUser(user);
+                              setNewRole(user.role);
+                            }
                           }}
                         >
                           <UserCog className="h-3 w-3 mr-1" />
                           Role
                         </Button>
                       </DialogTrigger>
-                      <DialogContent>
+                      <DialogContent className="w-[90vw] sm:w-[400px] sm:max-w-none">
                         <DialogHeader>
                           <DialogTitle>Change User Role</DialogTitle>
                           <DialogDescription>
@@ -828,7 +852,7 @@ const UserManagement = () => {
                           Delete
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent>
+                      <AlertDialogContent className="w-[90vw] sm:w-[400px] sm:max-w-none">
                         <AlertDialogHeader>
                           <AlertDialogTitle>Delete User</AlertDialogTitle>
                           <AlertDialogDescription>
