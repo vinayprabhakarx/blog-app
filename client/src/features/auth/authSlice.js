@@ -7,11 +7,29 @@ export const loginUser = createAsyncThunk(
   async (credentials, { rejectWithValue }) => {
     try {
       const data = await authService.login(credentials);
-      localStorage.setItem("token", data.token);
       return data;
     } catch (error) {
-      localStorage.removeItem("token");
-      return rejectWithValue(error.response?.data?.message || "Login failed");
+      const isNetworkError = !error.response;
+      return rejectWithValue({
+        message: error.response?.data?.message || "Login failed",
+        isNetworkError
+      });
+    }
+  }
+);
+
+export const refreshTokenThunk = createAsyncThunk(
+  "auth/refreshToken",
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await authService.refresh();
+      return data;
+    } catch (error) {
+      const isNetworkError = !error.response;
+      return rejectWithValue({
+        message: error.response?.data?.message || "Refresh failed",
+        isNetworkError
+      });
     }
   }
 );
@@ -22,12 +40,13 @@ export const registerUser = createAsyncThunk(
     try {
       const data = await authService.register(userData);
       // Do not auto-login on register; require email verification
-      localStorage.removeItem("token");
       return data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Registration failed"
-      );
+      const isNetworkError = !error.response;
+      return rejectWithValue({
+        message: error.response?.data?.message || "Registration failed",
+        isNetworkError
+      });
     }
   }
 );
@@ -37,12 +56,13 @@ export const googleAuth = createAsyncThunk(
   async (tokenData, { rejectWithValue }) => {
     try {
       const data = await authService.googleAuth(tokenData);
-      localStorage.setItem("token", data.token);
       return data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Google auth failed"
-      );
+      const isNetworkError = !error.response;
+      return rejectWithValue({
+        message: error.response?.data?.message || "Google auth failed",
+        isNetworkError
+      });
     }
   }
 );
@@ -55,10 +75,11 @@ export const getCurrentUser = createAsyncThunk(
       const data = await authService.getCurrentUser();
       return data;
     } catch (error) {
-      localStorage.removeItem("token");
-      return rejectWithValue(
-        error.response?.data?.message || "Failed to get user"
-      );
+      const isNetworkError = !error.response;
+      return rejectWithValue({
+        message: error.response?.data?.message || "Failed to get user",
+        isNetworkError
+      });
     }
   }
 );
@@ -73,9 +94,11 @@ export const changePassword = createAsyncThunk(
       const data = await authService.changePassword(passwordData);
       return data;
     } catch (error) {
-      return rejectWithValue(
-        error.response?.data?.message || "Password change failed"
-      );
+      const isNetworkError = !error.response;
+      return rejectWithValue({
+        message: error.response?.data?.message || "Password change failed",
+        isNetworkError
+      });
     }
   }
 );
@@ -84,11 +107,12 @@ const authSlice = createSlice({
   name: "auth",
   initialState: {
     user: null,
-    token: localStorage.getItem("token"),
-    isAuthenticated: !!localStorage.getItem("token"),
+    token: null,
+    isAuthenticated: false,
     loading: false,
     initializing: true,
     error: null,
+    isServerDown: false,
     passwordChangeLoading: false,
     passwordChangeSuccess: false,
     verificationRequired: false,
@@ -152,8 +176,11 @@ const authSlice = createSlice({
       })
       .addCase(loginUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload?.message || action.payload;
         state.isAuthenticated = false;
+        if (action.payload?.isNetworkError || action.error?.message === 'Network Error') {
+          state.isServerDown = true;
+        }
       });
 
     // Register
@@ -175,7 +202,10 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload?.message || action.payload;
+        if (action.payload?.isNetworkError || action.error?.message === 'Network Error') {
+          state.isServerDown = true;
+        }
       });
 
     // Google Auth
@@ -193,7 +223,10 @@ const authSlice = createSlice({
       })
       .addCase(googleAuth.rejected, (state, action) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload?.message || action.payload;
+        if (action.payload?.isNetworkError || action.error?.message === 'Network Error') {
+          state.isServerDown = true;
+        }
       });
 
     // Get Current User
@@ -214,12 +247,33 @@ const authSlice = createSlice({
         state.user = transformedUser;
         state.isAuthenticated = true;
         state.initializing = false;
+        state.isServerDown = false;
       })
-      .addCase(getCurrentUser.rejected, (state) => {
+      .addCase(getCurrentUser.rejected, (state, action) => {
         state.user = null;
         state.isAuthenticated = false;
         state.token = null;
         state.initializing = false;
+        if (action.payload?.isNetworkError || action.error?.message === 'Network Error') {
+          state.isServerDown = true;
+        }
+      });
+
+    // Refresh Token
+    builder
+      .addCase(refreshTokenThunk.fulfilled, (state, action) => {
+        state.token = action.payload.token;
+        state.isAuthenticated = true;
+        state.isServerDown = false;
+      })
+      .addCase(refreshTokenThunk.rejected, (state, action) => {
+        state.user = null;
+        state.token = null;
+        state.isAuthenticated = false;
+        state.initializing = false;
+        if (action.payload?.isNetworkError || action.error?.message === 'Network Error') {
+          state.isServerDown = true;
+        }
       });
 
     // Change Password
@@ -234,7 +288,10 @@ const authSlice = createSlice({
       })
       .addCase(changePassword.rejected, (state, action) => {
         state.passwordChangeLoading = false;
-        state.error = action.payload;
+        state.error = action.payload?.message || action.payload;
+        if (action.payload?.isNetworkError || action.error?.message === 'Network Error') {
+          state.isServerDown = true;
+        }
       });
   },
 });

@@ -3,7 +3,12 @@ import { Navigate, Outlet } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
 
 const AuthorRoute = () => {
-  const { isAuthenticated, user, isAuthor, isAdmin } = useAuth();
+  const { isAuthenticated, user, isAuthor, isAdmin, isServerDown } = useAuth();
+
+  // If backend is down, redirect to home instead of login
+  if (isServerDown) {
+    return <Navigate to="/" replace />;
+  }
 
   // If not authenticated, redirect to login
   if (!isAuthenticated) {

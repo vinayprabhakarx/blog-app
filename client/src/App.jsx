@@ -7,6 +7,7 @@ import "react-toastify/dist/ReactToastify.css";
 import {
   getCurrentUser,
   initializationComplete,
+  refreshTokenThunk,
 } from "@/features/auth/authSlice";
 import "@/index.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -37,40 +38,34 @@ const AuthInitializer = ({ children }) => {
       const isBypassRoute = bypassRoutes.some((route) =>
         currentPath.startsWith(route)
       );
-      // Bypass routes - just complete initialization, don't touch auth state
-      if (isBypassRoute) {
-        dispatch(initializationComplete());
-        return;
-      }
 
-      // CRITICAL: If on auth pages AND we have a token, clear it immediately
-      // This prevents redirect loops from stale/invalid tokens
-      if (isAuthRoute && token) {
-        console.log("AuthInitializer: Clearing stale token on auth page");
-        localStorage.removeItem("token");
-        dispatch({ type: "auth/logout" });
-        dispatch(initializationComplete());
-        return;
-      }
+      const initAuth = async () => {
+        try {
+          if (isBypassRoute) {
+            return;
+          }
 
-      // If on auth pages without token, just complete initialization
-      if (isAuthRoute) {
-        dispatch(initializationComplete());
-        return;
-      }
+          if (isAuthRoute) {
+            console.log("AuthInitializer: Clearing token on auth page");
+            dispatch({ type: "auth/logout" });
+            return;
+          }
 
-      // Only verify token if we have one AND we're not on a public route
-      if (token) {
-        // Verify the token by fetching current user
-        dispatch(getCurrentUser()).catch(() => {
-          // Token verification failed - 401 interceptor handles redirect
-        });
-      } else {
-        // No token, mark initialization complete
-        dispatch(initializationComplete());
-      }
+          // Try silent refresh
+          const action = await dispatch(refreshTokenThunk());
+          
+          if (refreshTokenThunk.fulfilled.match(action)) {
+            // We got a new token! Now fetch user profile
+            await dispatch(getCurrentUser());
+          }
+        } finally {
+          dispatch(initializationComplete());
+        }
+      };
+
+      initAuth();
     }
-  }, [dispatch, token, initializing]);
+  }, [dispatch, initializing]);
 
   return children;
 };

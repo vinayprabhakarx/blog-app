@@ -13,6 +13,7 @@ import {
   verifyEmail,
   verifyEmailLink,
   resendVerification,
+  refreshToken,
 } from "../controllers/auth.controller.js";
 import asyncHandler from "../utils/asyncHandler.js"; // Assuming you have this utility
 import upload from "../config/multer.js"; // Assuming a multer setup for file uploads
@@ -88,6 +89,11 @@ router.post("/google", asyncHandler(googleAuth));
 // @desc    Logout user and clear cookie
 // @access  Public
 router.post("/logout", asyncHandler(logout));
+
+// @route   POST /api/auth/refresh
+// @desc    Refresh JWT access token using HTTP-only cookie
+// @access  Public
+router.post("/refresh", asyncHandler(refreshToken));
 
 // @route   GET /api/auth/me
 // @desc    Get current user info

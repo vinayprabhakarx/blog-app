@@ -1,5 +1,11 @@
 import axios from "axios";
 
+// Inject Redux store to avoid circular dependency
+let store;
+export const injectStore = (_store) => {
+  store = _store;
+};
+
 const api = axios.create({
   baseURL: `${
     import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
@@ -7,13 +13,14 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // Crucial for sending/receiving HttpOnly cookies
 });
 
 // Add auth token to requests that need authentication
 api.interceptors.request.use(
   (config) => {
-    // Get token from localStorage to avoid circular dependencies
-    const token = localStorage.getItem("token");
+    // Get token from Redux store memory
+    const token = store ? store.getState().auth.token : null;
 
     const publicGetRoutes = [
       "/blogs?",
@@ -50,45 +57,91 @@ api.interceptors.request.use(
   }
 );
 
+let isRefreshing = false;
+let failedQueue = [];
+
+const processQueue = (error, token = null) => {
+  failedQueue.forEach((prom) => {
+    if (error) {
+      prom.reject(error);
+    } else {
+      prom.resolve(token);
+    }
+  });
+  failedQueue = [];
+};
+
 // Handle unauthorized responses
 api.interceptors.response.use(
   (response) => {
     return response;
   },
-  (error) => {
+  async (error) => {
+    const originalRequest = error.config;
+
     // Handle 401 Unauthorized errors
     if (error.response && error.response.status === 401) {
-      const currentPath = typeof window !== "undefined" ? window.location.pathname : "";
-      const isAuthPage = currentPath === "/login" || currentPath === "/signup";
-      const isVerifyPage = currentPath.startsWith("/verify-email") || currentPath.startsWith("/resend-email");
       const isAuthEndpoint = 
-        error.config?.url?.includes("/auth/login") || 
-        error.config?.url?.includes("/auth/register") ||
-        error.config?.url?.includes("/auth/verify-email");
+        originalRequest?.url?.includes("/auth/login") || 
+        originalRequest?.url?.includes("/auth/register") ||
+        originalRequest?.url?.includes("/auth/refresh") ||
+        originalRequest?.url?.includes("/auth/verify-email");
 
-      // If we are already on the login page, just clear the token to be safe
-      if (isAuthPage) {
-        localStorage.removeItem("token");
-        return Promise.reject(error);
-      }
-
-      // If on verify-email or resend-email page, don't redirect - let the page handle the error
-      if (isVerifyPage) {
-        return Promise.reject(error);
-      }
-
-      // If the error comes from a login attempt, we don't redirect (let the form show the error)
+      // If the error comes from an auth endpoint, don't try to refresh
       if (isAuthEndpoint) {
          return Promise.reject(error);
       }
-      
-      // For all other 401s (expired token, invalid token on protected route)
-      // We must clear the token and force a redirect to login.
-      console.warn("Session expired or invalid token. Logging out...");
-      localStorage.removeItem("token");
-      
-      if (typeof window !== "undefined") {
-        window.location.href = "/login";
+
+      if (!originalRequest._retry) {
+        if (isRefreshing) {
+          return new Promise(function (resolve, reject) {
+            failedQueue.push({ resolve, reject });
+          })
+            .then((token) => {
+              originalRequest.headers["Authorization"] = "Bearer " + token;
+              return api(originalRequest);
+            })
+            .catch((err) => {
+              return Promise.reject(err);
+            });
+        }
+
+        originalRequest._retry = true;
+        isRefreshing = true;
+
+        return new Promise(function (resolve, reject) {
+          axios
+            .post(`${api.defaults.baseURL}/auth/refresh`, {}, { withCredentials: true })
+            .then((res) => {
+              const { token } = res.data;
+              
+              // Update Redux state with new token
+              if (store) {
+                store.dispatch({ type: "auth/refreshToken/fulfilled", payload: { token } });
+              }
+              
+              originalRequest.headers["Authorization"] = "Bearer " + token;
+              processQueue(null, token);
+              resolve(api(originalRequest));
+            })
+            .catch((err) => {
+              processQueue(err, null);
+              
+              // Force logout if refresh fails
+              if (store) {
+                store.dispatch({ type: "auth/logout" });
+              }
+              
+              if (typeof window !== "undefined") {
+                window.location.href = "/login";
+              }
+              
+              reject(err);
+            })
+            .finally(() => {
+              isRefreshing = false;
+            });
+        });
       }
     }
     return Promise.reject(error);

@@ -47,9 +47,18 @@ const authService = {
   },
 
   // Logout
-  logout: () => {
-    localStorage.removeItem("token");
-    delete api.defaults.headers.common["Authorization"];
+  logout: async () => {
+    try {
+      await api.post("/auth/logout");
+    } catch (err) {
+      console.error(err);
+    }
+  },
+
+  // Refresh token
+  refresh: async () => {
+    const response = await api.post("/auth/refresh");
+    return response.data;
   },
 
   // Forgot password

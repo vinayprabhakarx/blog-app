@@ -4,7 +4,12 @@ import { Navigate, Outlet } from "react-router-dom";
 
 // Route guard for admin-only routes
 const AdminRoute = () => {
-  const { isAuthenticated, user } = useSelector((state) => state.auth);
+  const { isAuthenticated, user, isServerDown } = useSelector((state) => state.auth);
+
+  // If backend is down, redirect to home instead of login
+  if (isServerDown) {
+    return <Navigate to="/" replace />;
+  }
 
   // Check if user is authenticated
   if (!isAuthenticated) {

@@ -19,9 +19,9 @@ import {
   databaseError,
 } from "../utils/handleError.js";
 
-// Promisify the jwt.sign function to use it with async/await
+// Promisify the jwt.sign and jwt.verify functions to use them with async/await
 const signJwt = promisify(jwt.sign);
-
+const verifyJwt = promisify(jwt.verify);
 // Helper function to convert JWT_EXPIRE string to milliseconds
 const getMaxAgeFromJwtExpire = (jwtExpire) => {
   const match = jwtExpire.match(/^(\d+)([smhd])$/);
@@ -57,19 +57,29 @@ const sendTokenResponse = async (
   };
 
   try {
-    const jwtExpire = process.env.JWT_EXPIRE || "12h";
-    const token = await signJwt(payload, process.env.JWT_SECRET, {
-      expiresIn: jwtExpire,
+    const accessTokenExpire = process.env.JWT_ACCESS_EXPIRE || "15m";
+    const refreshTokenExpire = process.env.JWT_REFRESH_EXPIRE || "7d";
+    
+    const accessToken = await signJwt(payload, process.env.JWT_SECRET, {
+      expiresIn: accessTokenExpire,
+    });
+    
+    const refreshSecret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET;
+    const refreshToken = await signJwt(payload, refreshSecret, {
+      expiresIn: refreshTokenExpire,
     });
 
-    // Set HTTP-only cookie with maxAge matching JWT expiration
-    res.cookie("access_token", token, {
+    // Set HTTP-only cookie with maxAge matching Refresh Token expiration
+    res.cookie("refresh_token", refreshToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "None" : "strict",
       path: "/",
-      maxAge: getMaxAgeFromJwtExpire(jwtExpire),
+      maxAge: getMaxAgeFromJwtExpire(refreshTokenExpire),
     });
+    
+    // Clear legacy access_token cookie if present
+    res.clearCookie("access_token");
 
     // Prepare safe user object
     const safeUser = user.toObject({ getters: true });
@@ -83,11 +93,11 @@ const sendTokenResponse = async (
     res.status(statusCode).json({
       success: true,
       user: safeUser,
-      token,
+      token: accessToken,
       message,
     });
   } catch (error) {
-    throw serverError("Failed to sign the token", error);
+    throw serverError("Failed to sign the tokens", error);
   }
 };
 
@@ -536,6 +546,12 @@ export const googleAuth = async (req, res, next) => {
 // @access  Public
 export const logout = async (req, res, next) => {
   try {
+    res.clearCookie("refresh_token", {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "strict",
+      path: "/",
+    });
     res.clearCookie("access_token", {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -549,6 +565,57 @@ export const logout = async (req, res, next) => {
     });
   } catch (error) {
     next(serverError("Logout failed", error));
+  }
+};
+
+// @route   POST /api/auth/refresh
+// @desc    Refresh access token using HTTP-only cookie
+// @access  Public
+export const refreshToken = async (req, res, next) => {
+  try {
+    const token = req.cookies.refresh_token;
+
+    if (!token) {
+      return next(authError("Not authorized, no refresh token provided"));
+    }
+
+    const refreshSecret = process.env.JWT_REFRESH_SECRET || process.env.JWT_SECRET;
+    
+    // Verify token
+    const decoded = await verifyJwt(token, refreshSecret).catch(() => null);
+    
+    if (!decoded) {
+      res.clearCookie("refresh_token");
+      return next(authError("Refresh token is invalid or expired", 401));
+    }
+
+    const user = await User.findById(decoded.id);
+
+    if (!user) {
+      res.clearCookie("refresh_token");
+      return next(authError("User not found", 404));
+    }
+
+    const payload = {
+      id: user._id,
+      name: user.personal_info?.name,
+      email: user.personal_info?.email,
+      username: user.personal_info?.username,
+      avatar: user.personal_info?.profile_img || "",
+      role: user.role,
+    };
+
+    const accessTokenExpire = process.env.JWT_ACCESS_EXPIRE || "15m";
+    const accessToken = await signJwt(payload, process.env.JWT_SECRET, {
+      expiresIn: accessTokenExpire,
+    });
+
+    res.status(200).json({
+      success: true,
+      token: accessToken,
+    });
+  } catch (error) {
+    next(serverError("Refresh token process failed", error));
   }
 };
 
