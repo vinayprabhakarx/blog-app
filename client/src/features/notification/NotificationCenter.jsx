@@ -193,7 +193,8 @@ const NotificationCenter = () => {
               variant="outline"
               size="sm"
               onClick={() => setShowFilters(!showFilters)}
-              className="h-10 px-0 sm:px-4 w-10 sm:w-auto hover:shadow-md transition-all duration-200 flex items-center justify-center gap-2"
+              disabled={notifications.length === 0}
+              className="h-10 px-0 sm:px-4 w-10 sm:w-auto hover:shadow-md transition-all duration-200 cursor-pointer disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <Filter className="w-7 h-7 sm:w-4 sm:h-4" />
               <span className="hidden sm:inline">Filters</span>

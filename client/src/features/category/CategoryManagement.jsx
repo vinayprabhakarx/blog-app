@@ -99,29 +99,7 @@ const CategoryManagement = () => {
     return <LoadingState message="Loading categories..." />;
   }
 
-  if (!categories || categories.length === 0) {
-    return (
-      <div className="p-6 space-y-6">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
-            Category Management
-          </h1>
-        </div>
-        <EmptyState 
-          icon={Tag} 
-          title="No Categories Yet" 
-          description="Create your first category to start organizing your content."
-          action={
-            <Button asChild variant="outline">
-              <Link to={RouteAddCategory(userRole)}>
-                Create your first category
-              </Link>
-            </Button>
-          }
-        />
-      </div>
-    );
-  }
+
 
   return (
     <section className="p-6 space-y-6">
@@ -154,6 +132,14 @@ const CategoryManagement = () => {
       </div>
 
       {/* Categories Table - Desktop */}
+      {categories.length === 0 ? (
+        <EmptyState 
+          icon={Tag} 
+          title="No Categories Yet" 
+          description="Create your first category to start organizing your content."
+        />
+      ) : (
+      <>
       <div className="hidden lg:block">
         <Card>
           <CardContent className="p-0">
@@ -322,6 +308,8 @@ const CategoryManagement = () => {
           </Card>
         ))}
       </div>
+      </>
+      )}
 
 
     </section>

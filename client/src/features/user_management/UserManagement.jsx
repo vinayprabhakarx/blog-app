@@ -378,7 +378,8 @@ const UserManagement = () => {
           variant="outline"
           size="sm"
           onClick={() => setShowFilters(!showFilters)}
-          className="cursor-pointer flex items-center justify-center gap-2 w-9 sm:w-auto p-0 sm:px-3"
+          disabled={!users || users.length === 0}
+          className="cursor-pointer flex items-center justify-center gap-2 w-9 sm:w-auto p-0 sm:px-3 disabled:cursor-not-allowed"
         >
           <Filter className="w-7 h-7 sm:w-4 sm:h-4" />
           <span className="hidden sm:inline">Filters</span>

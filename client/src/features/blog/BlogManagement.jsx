@@ -455,41 +455,7 @@ const BlogManagement = () => {
     );
   }
 
-  if (!shouldShowInitialLoading && currentBlogs.length === 0 && !hasActiveFilters) {
-    return (
-      <div className="p-6 space-y-6">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-2xl font-bold flex items-center gap-2">
-            <FileText className="w-6 h-6 text-primary" />
-            {isMyBlogsPage
-              ? "My Blogs"
-              : isUserBlogsPage
-              ? `${username}'s Blogs`
-              : "Blog Management"}
-          </h1>
-        </div>
-        <Card>
-          <CardContent className="p-0">
-            <EmptyState
-              icon={FileText}
-              title="No blogs available"
-              description="There are no blogs to display at the moment. Create your first blog!"
-              action={
-                (isMyBlogsPage || (isAdmin && isGeneralBlogsPage)) && (
-                  <Button asChild>
-                    <Link to="/write-blog">
-                      <Plus className="w-4 h-4 mr-2" />
-                      Write Blog
-                    </Link>
-                  </Button>
-                )
-              }
-            />
-          </CardContent>
-        </Card>
-      </div>
-    );
-  }
+
 
   return (
     <section className="p-4 sm:p-6 space-y-4 sm:space-y-6">
@@ -561,7 +527,8 @@ const BlogManagement = () => {
         <Button
           variant="outline"
           onClick={() => setShowFilters(!showFilters)}
-          className="flex items-center justify-center gap-2 h-10 w-10 sm:w-auto p-0 sm:px-4"
+          disabled={currentBlogs.length === 0}
+          className="flex items-center justify-center gap-2 h-10 w-10 sm:w-auto p-0 sm:px-4 cursor-pointer disabled:cursor-not-allowed"
         >
           <Filter className="w-7 h-7 sm:w-4 sm:h-4" />
           <span className="hidden sm:inline">Filters</span>
@@ -685,7 +652,13 @@ const BlogManagement = () => {
           </Select>
       </FilterCard>
 
-      {sortedAndFilteredBlogs.length === 0 ? (
+      {currentBlogs.length === 0 ? (
+        <EmptyState
+          icon={FileText}
+          title="No blogs available"
+          description="There are no blogs to display at the moment. Create your first blog!"
+        />
+      ) : sortedAndFilteredBlogs.length === 0 ? (
         <EmptyState
           icon={FileText}
           title="No matching blogs found"
