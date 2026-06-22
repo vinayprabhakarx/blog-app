@@ -7,6 +7,7 @@ export const SidebarContext = createContext(undefined);
 export const SidebarProvider = React.memo(
   ({ children, open: openProp, setOpen: setOpenProp, animate = true }) => {
     const [openState, setOpenState] = useState(false);
+    
     const open = openProp !== undefined ? openProp : openState;
     const setOpen = setOpenProp !== undefined ? setOpenProp : setOpenState;
 

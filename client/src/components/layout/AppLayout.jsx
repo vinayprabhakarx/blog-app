@@ -9,14 +9,15 @@ import { useAuth } from "@/hooks/useAuth";
 const AppLayout = () => {
   const location = useLocation();
   const { isAuthenticated } = useAuth();
-  const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(() => {
+    const saved = localStorage.getItem("sidebarOpen");
+    return saved !== null ? JSON.parse(saved) : false;
+  });
 
-  // Reset sidebar state when authentication changes
+  // Persist sidebar state
   useEffect(() => {
-    if (!isAuthenticated) {
-      setSidebarOpen(false);
-    }
-  }, [isAuthenticated]);
+    localStorage.setItem("sidebarOpen", JSON.stringify(sidebarOpen));
+  }, [sidebarOpen]);
 
   const isAuthRoute = () => {
     return location.pathname === "/login" || location.pathname === "/register";
@@ -38,34 +39,33 @@ const AppLayout = () => {
   const isAuth = isAuthRoute();
 
   return (
-    <SidebarProvider open={sidebarOpen} setOpen={setSidebarOpen}>
-      <div className="flex flex-col min-h-screen">
+    <SidebarProvider 
+      open={sidebarOpen} 
+      setOpen={setSidebarOpen}
+    >
+      <div className="flex flex-col h-screen overflow-hidden">
         <Topbar />
-        <div className="flex flex-1">
+        <div className="flex flex-1 pt-16 min-h-0">
           {shouldShowSidebar() && <AppSidebar />}
-          <div
-            className={`flex-1 overflow-auto ${
-              shouldShowSidebar() ? "md:ml-[60px]" : ""
-            }`}
-          >
+          <div className="flex-1 overflow-auto min-h-0">
             <main className="mx-auto w-full">
               {isAuth ? (
-                <div className="flex items-center justify-center min-h-[calc(100vh-64px)] pt-10 pb-10 px-4">
+                <div className="flex items-center justify-center min-h-[calc(100vh-64px)] py-4 px-4">
                   <div className="w-full max-w-[400px]">
                     <Outlet />
                   </div>
                 </div>
               ) : (
-                <div className="w-full min-h-[calc(100vh-64px)] pt-20 pb-8 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mx-auto max-w-[2000px]">
+                <div className="w-full min-h-[calc(100vh-64px)] pt-4 pb-8 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mx-auto max-w-[2000px]">
                   <div className="w-full max-w-full mx-auto">
                     <Outlet />
                   </div>
                 </div>
               )}
             </main>
+            <Footer className="border-t border-border mt-auto" />
           </div>
         </div>
-        <Footer className="border-t border-border" />
       </div>
     </SidebarProvider>
   );

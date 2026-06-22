@@ -11,7 +11,7 @@ import { useCategories } from "@/hooks/useRedux";
 import { fetchAllCategories } from "@/features/category/categoriesSlice";
 import { cn } from "@/lib/utils";
 import { motion as Motion } from "motion/react";
-import { IconSettings } from "@tabler/icons-react";
+import { IconSettings, IconPin, IconPinnedOff } from "@tabler/icons-react";
 import {
   NAVIGATION_CONFIG,
   NAVIGATION_SECTIONS,
@@ -46,9 +46,6 @@ export const DesktopSidebar = React.memo(
     const { open, setOpen, animate } = useSidebar();
     const containerRef = useRef(null);
 
-    const handleMouseEnter = useCallback(() => setOpen(true), [setOpen]);
-    const handleMouseLeave = useCallback(() => setOpen(false), [setOpen]);
-
     // Close sidebar on outside click for tablet and smaller (<= 1024px)
     useEffect(() => {
       if (!open) return;
@@ -73,26 +70,32 @@ export const DesktopSidebar = React.memo(
       <Motion.aside
         ref={containerRef}
         className={cn(
-          "fixed left-0 z-50 px-4 py-4 hidden md:flex md:flex-col bg-background border-r border-border shrink-0 overflow-hidden",
+          "relative z-40 px-4 py-4 hidden md:flex md:flex-col bg-background border-r border-border shrink-0",
           className
         )}
+        initial={false}
         animate={{
-          width: animate ? (open ? "300px" : "60px") : "300px",
+          width: animate ? (open ? "16rem" : "4rem") : "16rem",
         }}
         style={{
-          position: "fixed",
-          left: 0,
-          top: "64px",
-          height: "calc(100dvh - 64px)",
-          maxHeight: "calc(100dvh - 64px)",
-          overflowY: "hidden",
-          overflowX: "hidden",
+          height: "calc(100vh - 64px)",
+          maxHeight: "calc(100vh - 64px)",
         }}
-        onMouseEnter={handleMouseEnter}
-        onMouseLeave={handleMouseLeave}
         {...props}
       >
-        {children}
+        <div className="flex-1 flex flex-col overflow-y-auto overflow-x-hidden w-full">
+          {children}
+        </div>
+        <button
+          onClick={(e) => {
+            e.preventDefault();
+            setOpen(!open);
+          }}
+          className="absolute -right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-all z-[60] flex items-center justify-center cursor-pointer bg-transparent border-none outline-none"
+          title={open ? "Unpin sidebar" : "Pin sidebar"}
+        >
+          {open ? <IconPinnedOff size={16} /> : <IconPin size={16} />}
+        </button>
       </Motion.aside>
     );
   }
