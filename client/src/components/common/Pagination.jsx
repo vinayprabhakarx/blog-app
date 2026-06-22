@@ -50,6 +50,15 @@ const Pagination = ({
   const handlePageChange = (page) => {
     if (page >= 1 && page <= totalPages && page !== validCurrentPage) {
       setCurrentPage(page);
+      
+      // Smooth scroll to top of content container
+      const scrollContainer = document.getElementById("main-scroll-container");
+      if (scrollContainer) {
+        scrollContainer.scrollTo({ top: 0, behavior: "smooth" });
+      } else {
+        // Fallback for standard window scrolling
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
     }
   };
 

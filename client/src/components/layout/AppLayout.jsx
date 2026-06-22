@@ -47,7 +47,7 @@ const AppLayout = () => {
         <Topbar />
         <div className="flex flex-1 pt-16 min-h-0">
           {shouldShowSidebar() && <AppSidebar />}
-          <div className="flex-1 overflow-auto min-h-0">
+          <div id="main-scroll-container" className="flex-1 overflow-auto min-h-0">
             <main className="mx-auto w-full">
               {isAuth ? (
                 <div className="flex items-center justify-center min-h-[calc(100vh-64px)] py-4 px-4">
