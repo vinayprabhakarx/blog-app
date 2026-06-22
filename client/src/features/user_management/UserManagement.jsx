@@ -11,7 +11,6 @@ import {
 } from "./userSlice";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Input } from "@/components/ui/input";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/StateDisplays";
 import { FilterCard } from "@/components/common/FilterCard";
@@ -61,12 +60,6 @@ import {
   Filter,
   Trash2,
   RefreshCw,
-  Mail,
-  Shield,
-  Clock,
-  MoreVertical,
-  UserX,
-  UserCheck,
   AlertTriangle,
   Download,
   CheckCircle,
@@ -79,7 +72,6 @@ import { PageStats } from "@/components/common/PageStats";
 import { showToast } from "@/utils/showToast";
 import { formatDistanceToNow } from "date-fns";
 import { Link } from "react-router-dom";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
 import Pagination from "@/components/common/Pagination";
 
 const UserManagement = () => {
@@ -517,11 +509,11 @@ const UserManagement = () => {
 
                       <TableCell className="py-4 px-4 text-center">
                         <div className="flex items-center justify-center gap-2">
-                          <span className="text-sm truncate max-w-[200px]">
+                          <span className="text-sm truncate max-w-52">
                             {user.personal_info?.email}
                           </span>
                           {user.emailVerified && (
-                            <CheckCircle className="h-4 w-4 text-success flex-shrink-0" />
+                            <CheckCircle className="h-4 w-4 text-success shrink-0" />
                           )}
                         </div>
                       </TableCell>
@@ -567,7 +559,7 @@ const UserManagement = () => {
                                   <UserCog className="h-4 w-4" />
                                 </Button>
                               </DialogTrigger>
-                              <DialogContent className="w-[90vw] sm:w-[400px] sm:max-w-none">
+                              <DialogContent className="w-[90vw] sm:max-w-sm sm:w-full">
                                 <DialogHeader>
                                   <DialogTitle>Change User Role</DialogTitle>
                                   <DialogDescription>
@@ -626,7 +618,7 @@ const UserManagement = () => {
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </AlertDialogTrigger>
-                              <AlertDialogContent className="w-[90vw] sm:w-[400px] sm:max-w-none">
+                              <AlertDialogContent className="w-[90vw] sm:max-w-sm sm:w-full">
                                 <AlertDialogHeader>
                                   <AlertDialogTitle>
                                     Delete User
@@ -715,7 +707,7 @@ const UserManagement = () => {
                   <div className="flex items-center justify-between">
                     <span className="text-muted-foreground">Email:</span>
                     <div className="flex items-center gap-2">
-                      <span className="truncate max-w-[150px]">
+                      <span className="truncate max-w-40">
                         {user.personal_info?.email}
                       </span>
                       {user.emailVerified && (
@@ -759,7 +751,7 @@ const UserManagement = () => {
                           Role
                         </Button>
                       </DialogTrigger>
-                      <DialogContent className="w-[90vw] sm:w-[400px] sm:max-w-none">
+                      <DialogContent className="w-[90vw] sm:max-w-sm sm:w-full">
                         <DialogHeader>
                           <DialogTitle>Change User Role</DialogTitle>
                           <DialogDescription>
@@ -814,7 +806,7 @@ const UserManagement = () => {
                           Delete
                         </Button>
                       </AlertDialogTrigger>
-                      <AlertDialogContent className="w-[90vw] sm:w-[400px] sm:max-w-none">
+                      <AlertDialogContent className="w-[90vw] sm:max-w-sm sm:w-full">
                         <AlertDialogHeader>
                           <AlertDialogTitle>Delete User</AlertDialogTitle>
                           <AlertDialogDescription>

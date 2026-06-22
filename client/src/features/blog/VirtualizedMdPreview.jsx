@@ -37,7 +37,7 @@ const VirtualizedMdPreview = ({ content }) => {
       // Overscan ensures smooth scrolling by rendering a bit outside current view
       overscan={500} 
       itemContent={(index, chunkContent) => (
-        <div className="pb-4 min-h-[50px] relative">
+        <div className="pb-4 min-h-12.5 relative">
            <MdRenderCard content={chunkContent} />
         </div>
       )}

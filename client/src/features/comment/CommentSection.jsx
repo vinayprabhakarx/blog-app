@@ -9,7 +9,6 @@ import {
   AvatarImage,
   AvatarFallback,
 } from "@/components/ui/avatar";
-// Removed LoadingSpinner for instant updates
 
 import Comment from "./Comment";
 import CommentForm from "./CommentForm";
@@ -69,12 +68,12 @@ const CommentSection = ({
       {/* Create Comment Form - Instagram style */}
       {showCreateForm && currentUser && (
         <div className="flex items-start gap-3 pb-4 border-b border-border/30">
-          <Avatar className="h-8 w-8 flex-shrink-0 ring-1 ring-transparent transition-all duration-200 hover:ring-border/50 cursor-pointer">
+          <Avatar className="h-8 w-8 shrink-0 ring-1 ring-transparent transition-all duration-200 hover:ring-border/50 cursor-pointer">
             <AvatarImage
               src={currentUser.personal_info?.profile_img}
               alt={currentUser.personal_info?.name}
             />
-            <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-primary/10 to-secondary/20 text-foreground">
+            <AvatarFallback className="text-xs font-medium bg-linear-to-br from-primary/10 to-secondary/20 text-foreground">
               {getInitials(currentUser.personal_info?.name)}
             </AvatarFallback>
           </Avatar>
@@ -92,7 +91,7 @@ const CommentSection = ({
       {/* Sign in prompt for non-logged users - only show when there are comments */}
       {showCreateForm && !currentUser && topLevelComments.length > 0 && (
         <div className="flex flex-col items-center py-2">
-          <div className="h-10 w-10 flex-shrink-0 mb-2 ring-1 ring-transparent transition-all duration-200 cursor-pointer">
+          <div className="h-10 w-10 shrink-0 mb-2 ring-1 ring-transparent transition-all duration-200 cursor-pointer">
             <div className="flex items-center justify-center w-full h-full rounded-full bg-muted/50 dark:bg-muted/20">
               <Link to="/login">
                 <MessageCircle className="h-6 w-6 text-foreground/70" />
@@ -120,7 +119,7 @@ const CommentSection = ({
       {error && (
         <div className="p-4 bg-destructive/5 border border-destructive/20 rounded-lg">
           <div className="flex items-center gap-2">
-            <div className="w-2 h-2 bg-destructive rounded-full flex-shrink-0" />
+            <div className="w-2 h-2 bg-destructive rounded-full shrink-0" />
             <p className="text-base text-destructive">
               Failed to load comments: {error}
             </p>

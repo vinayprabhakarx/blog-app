@@ -1,8 +1,6 @@
 import React, { useEffect, useCallback, useMemo } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
-import { Card, CardContent } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
 import { EmptyState, ErrorState, LoadingState } from "@/components/common/StateDisplays";
 import {
   fetchAllCategories,
@@ -10,7 +8,7 @@ import {
   selectCategoriesLoading,
   selectCategoriesError,
 } from "./categoriesSlice";
-import { Tag, FileText, RefreshCw, ChevronRight, Star } from "lucide-react";
+import {Star}  from "lucide-react";
 import { PageStats } from "@/components/common/PageStats";
 
 const CategoriesView = () => {
@@ -99,7 +97,6 @@ const CategoriesView = () => {
     return (
       <div className="p-6">
         <EmptyState 
-          icon={Tag} 
           title="No Categories Yet" 
           description="Categories will appear here once they are created. Check back later for organized content."
         />

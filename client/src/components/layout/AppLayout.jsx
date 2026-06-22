@@ -51,12 +51,12 @@ const AppLayout = () => {
             <main className="mx-auto w-full">
               {isAuth ? (
                 <div className="flex items-center justify-center min-h-[calc(100vh-64px)] py-4 px-4">
-                  <div className="w-full max-w-[400px]">
+                  <div className="w-full max-w-100">
                     <Outlet />
                   </div>
                 </div>
               ) : (
-                <div className="w-full min-h-[calc(100vh-64px)] pt-4 pb-8 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mx-auto max-w-[2000px]">
+                <div className="w-full min-h-[calc(100vh-64px)] pt-4 pb-8 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mx-auto max-w-500">
                   <div className="w-full max-w-full mx-auto">
                     <Outlet />
                   </div>

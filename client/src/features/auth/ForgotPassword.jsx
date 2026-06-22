@@ -88,7 +88,7 @@ const ForgotPassword = () => {
 
   return (
     <section className="flex justify-center items-start pt-32 w-screen min-h-screen bg-background">
-      <Card className="w-[400px] p-5 bg-background text-foreground">
+      <Card className="w-full max-w-sm p-5 bg-background text-foreground">
         <h1 className="text-2xl font-bold text-center mb-6">
           Forgot your password?
         </h1>

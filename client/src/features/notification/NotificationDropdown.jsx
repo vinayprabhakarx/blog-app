@@ -18,19 +18,12 @@ import CommentForm from "@/features/comment/CommentForm";
 import {
   DropdownMenu,
   DropdownMenuContent,
-  DropdownMenuItem,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
   DropdownMenuLabel,
 } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
-import { Skeleton } from "@/components/ui/skeleton";
 import { showToast } from "@/utils/showToast";
 
 const NotificationDropdown = () => {
@@ -221,7 +214,7 @@ const NotificationDropdown = () => {
                 onClick={() => handleNotificationClick(notification)}
               >
                 <div className="flex items-start gap-2 sm:gap-3">
-                  <div className="flex-shrink-0 mt-1">
+                  <div className="shrink-0 mt-1">
                     {getNotificationIcon(notification.type)}
                   </div>
 
@@ -249,7 +242,7 @@ const NotificationDropdown = () => {
                           "comment_tag",
                         ].includes(notification.type) && notification.title}
                       </h4>
-                      <div className="flex items-center gap-1 flex-shrink-0">
+                      <div className="flex items-center gap-1 shrink-0">
                         <span className="text-xs text-muted-foreground">
                           {formatDistanceToNow(
                             new Date(notification.created_at),

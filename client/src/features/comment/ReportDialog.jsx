@@ -74,7 +74,7 @@ const ReportDialog = ({
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="w-[90vw] sm:w-[400px] sm:max-w-none px-4 sm:px-6 rounded-lg">
+      <DialogContent className="w-[90vw] sm:w-100 sm:max-w-none px-4 sm:px-6 rounded-lg">
         <DialogHeader>
           <DialogTitle className="text-foreground text-lg">
             Report Comment

@@ -26,18 +26,12 @@ import {
   Heading2,
   Heading3,
   Minus,
-  Trash2,
 } from "lucide-react";
 import VirtualizedMdPreview from "./VirtualizedMdPreview";
-
-// ... (other imports)
-
-// ... inside component ...
-
-
 import { useTheme } from "@/utils/ThemeContext";
 import ImageCropper from "@/components/common/ImageCropper";
 import { showToast } from "@/utils/showToast";
+
 const ToolButton = React.memo(({ onClick, title, children }) => (
   <button
     type="button"
@@ -74,7 +68,7 @@ const BlogEditor = ({
         onChange(e.target.value);
       }
     },
-    [onChange]
+    [onChange],
   );
 
   // Insert text at cursor position with proper cursor placement
@@ -106,53 +100,53 @@ const BlogEditor = ({
         textarea.focus();
       }, 0);
     },
-    [value, onChange]
+    [value, onChange],
   );
 
   // Formatting functions (memoized)
   const formatBold = useCallback(
     () => insertAtCursor("**", "**", "bold text"),
-    [insertAtCursor]
+    [insertAtCursor],
   );
   const formatItalic = useCallback(
     () => insertAtCursor("*", "*", "italic text"),
-    [insertAtCursor]
+    [insertAtCursor],
   );
   const formatStrikethrough = useCallback(
     () => insertAtCursor("~~", "~~", "strikethrough text"),
-    [insertAtCursor]
+    [insertAtCursor],
   );
   const formatInlineCode = useCallback(
     () => insertAtCursor("`", "`", "code"),
-    [insertAtCursor]
+    [insertAtCursor],
   );
   const formatH1 = useCallback(
     () => insertAtCursor("# ", "", "Heading 1"),
-    [insertAtCursor]
+    [insertAtCursor],
   );
   const formatH2 = useCallback(
     () => insertAtCursor("## ", "", "Heading 2"),
-    [insertAtCursor]
+    [insertAtCursor],
   );
   const formatH3 = useCallback(
     () => insertAtCursor("### ", "", "Heading 3"),
-    [insertAtCursor]
+    [insertAtCursor],
   );
   const formatQuote = useCallback(
     () => insertAtCursor("> ", "", "Quote text"),
-    [insertAtCursor]
+    [insertAtCursor],
   );
   const formatUnorderedList = useCallback(
     () => insertAtCursor("- ", "", "List item"),
-    [insertAtCursor]
+    [insertAtCursor],
   );
   const formatOrderedList = useCallback(
     () => insertAtCursor("1. ", "", "List item"),
-    [insertAtCursor]
+    [insertAtCursor],
   );
   const formatHorizontalRule = useCallback(
     () => insertAtCursor("\n---\n", "", ""),
-    [insertAtCursor]
+    [insertAtCursor],
   );
 
   const formatLink = useCallback(() => {
@@ -224,7 +218,7 @@ const BlogEditor = ({
             Authorization: `Bearer ${token}`,
           },
           body: formData,
-        }
+        },
       );
 
       const data = await uploadResponse.json();
@@ -251,7 +245,7 @@ const BlogEditor = ({
         }
         showToast(
           "error",
-          "Failed to upload image: " + (data.message || "Unknown error")
+          "Failed to upload image: " + (data.message || "Unknown error"),
         );
       }
     } catch (error) {
@@ -265,8 +259,6 @@ const BlogEditor = ({
       showToast("error", "Failed to upload image. Please try again.");
     }
   };
-
-
 
   const formatCodeBlock = useCallback(() => {
     const language = prompt("Enter language (optional):") || "";
@@ -316,7 +308,7 @@ const BlogEditor = ({
       width: isFullscreen ? "100vw" : "100%",
       zIndex: isFullscreen ? 9999 : "auto",
     }),
-    [isFullscreen, height]
+    [isFullscreen, height],
   );
 
   // Debounce preview content to prevent lag during typing
@@ -339,7 +331,7 @@ const BlogEditor = ({
       style={editorStyle}
     >
       {/* (Toolbar code omitted for brevity as it is unchanged, but we are inside the component) */}
-      
+
       {/* ... Toolbar ... */}
       <div
         className="flex items-center justify-between p-2 border-b sticky top-0 gap-2"
@@ -352,53 +344,121 @@ const BlogEditor = ({
       >
         {/* ... Toolbar content same as before ... */}
         <div className="flex items-center gap-2 flex-1 min-w-0 overflow-x-auto">
-           {(viewMode === "edit" || viewMode === "split") && (
-             <div className="flex items-center gap-1 flex-1 min-w-0">
-               {/* Headings */}
-               <div className="flex items-center gap-1 pr-2 border-r" style={{ borderColor: "var(--border)" }}>
-                 <ToolButton onClick={formatH1} title="Heading 1"><Heading1 className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
-                 <ToolButton onClick={formatH2} title="Heading 2"><Heading2 className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
-                 <ToolButton onClick={formatH3} title="Heading 3"><Heading3 className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
-               </div>
-               {/* Text Formatting */}
-               <div className="flex items-center gap-1 pr-2 border-r" style={{ borderColor: "var(--border)" }}>
-                 <ToolButton onClick={formatBold} title="Bold"><Bold className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
-                 <ToolButton onClick={formatItalic} title="Italic"><Italic className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
-                 <ToolButton onClick={formatStrikethrough} title="Strikethrough"><Strikethrough className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
-               </div>
-               {/* Links/Images */}
-               <div className="flex items-center gap-1 pr-2 border-r" style={{ borderColor: "var(--border)" }}>
-                 <ToolButton onClick={formatLink} title="Link"><Link className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
-                 <ToolButton onClick={formatImage} title="Image"><Image className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
-               </div>
-               {/* Lists */}
-               <div className="flex items-center gap-1 pr-2 border-r" style={{ borderColor: "var(--border)" }}>
-                 <ToolButton onClick={formatUnorderedList} title="Bullet List"><List className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
-                 <ToolButton onClick={formatOrderedList} title="Numbered List"><ListOrdered className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
-               </div>
-               {/* Code/Quote */}
-               <div className="flex items-center gap-1 pr-2 border-r" style={{ borderColor: "var(--border)" }}>
-                 <ToolButton onClick={formatInlineCode} title="Inline Code"><Code className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
-                 <ToolButton onClick={formatCodeBlock} title="Code Block"><Code2 className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
-                 <ToolButton onClick={formatQuote} title="Quote"><Quote className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
-               </div>
-               {/* Table/HR */}
-               <div className="flex items-center gap-1">
-                 <ToolButton onClick={formatTable} title="Table"><Table className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
-                 <ToolButton onClick={formatHorizontalRule} title="Horizontal Rule"><Minus className="w-3 h-3 sm:w-4 sm:h-4" /></ToolButton>
-               </div>
-             </div>
-           )}
+          {(viewMode === "edit" || viewMode === "split") && (
+            <div className="flex items-center gap-1 flex-1 min-w-0">
+              {/* Headings */}
+              <div
+                className="flex items-center gap-1 pr-2 border-r"
+                style={{ borderColor: "var(--border)" }}
+              >
+                <ToolButton onClick={formatH1} title="Heading 1">
+                  <Heading1 className="w-3 h-3 sm:w-4 sm:h-4" />
+                </ToolButton>
+                <ToolButton onClick={formatH2} title="Heading 2">
+                  <Heading2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                </ToolButton>
+                <ToolButton onClick={formatH3} title="Heading 3">
+                  <Heading3 className="w-3 h-3 sm:w-4 sm:h-4" />
+                </ToolButton>
+              </div>
+              {/* Text Formatting */}
+              <div
+                className="flex items-center gap-1 pr-2 border-r"
+                style={{ borderColor: "var(--border)" }}
+              >
+                <ToolButton onClick={formatBold} title="Bold">
+                  <Bold className="w-3 h-3 sm:w-4 sm:h-4" />
+                </ToolButton>
+                <ToolButton onClick={formatItalic} title="Italic">
+                  <Italic className="w-3 h-3 sm:w-4 sm:h-4" />
+                </ToolButton>
+                <ToolButton onClick={formatStrikethrough} title="Strikethrough">
+                  <Strikethrough className="w-3 h-3 sm:w-4 sm:h-4" />
+                </ToolButton>
+              </div>
+              {/* Links/Images */}
+              <div
+                className="flex items-center gap-1 pr-2 border-r"
+                style={{ borderColor: "var(--border)" }}
+              >
+                <ToolButton onClick={formatLink} title="Link">
+                  <Link className="w-3 h-3 sm:w-4 sm:h-4" />
+                </ToolButton>
+                <ToolButton onClick={formatImage} title="Image">
+                  <Image className="w-3 h-3 sm:w-4 sm:h-4" />
+                </ToolButton>
+              </div>
+              {/* Lists */}
+              <div
+                className="flex items-center gap-1 pr-2 border-r"
+                style={{ borderColor: "var(--border)" }}
+              >
+                <ToolButton onClick={formatUnorderedList} title="Bullet List">
+                  <List className="w-3 h-3 sm:w-4 sm:h-4" />
+                </ToolButton>
+                <ToolButton onClick={formatOrderedList} title="Numbered List">
+                  <ListOrdered className="w-3 h-3 sm:w-4 sm:h-4" />
+                </ToolButton>
+              </div>
+              {/* Code/Quote */}
+              <div
+                className="flex items-center gap-1 pr-2 border-r"
+                style={{ borderColor: "var(--border)" }}
+              >
+                <ToolButton onClick={formatInlineCode} title="Inline Code">
+                  <Code className="w-3 h-3 sm:w-4 sm:h-4" />
+                </ToolButton>
+                <ToolButton onClick={formatCodeBlock} title="Code Block">
+                  <Code2 className="w-3 h-3 sm:w-4 sm:h-4" />
+                </ToolButton>
+                <ToolButton onClick={formatQuote} title="Quote">
+                  <Quote className="w-3 h-3 sm:w-4 sm:h-4" />
+                </ToolButton>
+              </div>
+              {/* Table/HR */}
+              <div className="flex items-center gap-1">
+                <ToolButton onClick={formatTable} title="Table">
+                  <Table className="w-3 h-3 sm:w-4 sm:h-4" />
+                </ToolButton>
+                <ToolButton
+                  onClick={formatHorizontalRule}
+                  title="Horizontal Rule"
+                >
+                  <Minus className="w-3 h-3 sm:w-4 sm:h-4" />
+                </ToolButton>
+              </div>
+            </div>
+          )}
         </div>
-        
-        <div className="flex items-center gap-2 flex-shrink-0">
-           <button type="button" onClick={toggleViewMode} className="flex items-center gap-1 px-2 py-1 rounded text-sm hover:bg-opacity-80 cursor-pointer" style={{ backgroundColor: "var(--accent)", color: "var(--accent-foreground)" }}>
-             {getViewModeIcon}
-             <span className="capitalize hidden sm:inline">{viewMode}</span>
-           </button>
-           <button type="button" onClick={toggleFullscreen} className="flex items-center gap-1 px-2 py-1 rounded text-sm hover:bg-opacity-80 cursor-pointer" style={{ backgroundColor: "var(--secondary)", color: "var(--secondary-foreground)" }}>
-             {isFullscreen ? <Minimize className="w-3 h-3 sm:w-4 sm:h-4" /> : <Maximize className="w-3 h-3 sm:w-4 sm:h-4" />}
-           </button>
+
+        <div className="flex items-center gap-2 shrink-0">
+          <button
+            type="button"
+            onClick={toggleViewMode}
+            className="flex items-center gap-1 px-2 py-1 rounded text-sm hover:bg-opacity-80 cursor-pointer"
+            style={{
+              backgroundColor: "var(--accent)",
+              color: "var(--accent-foreground)",
+            }}
+          >
+            {getViewModeIcon}
+            <span className="capitalize hidden sm:inline">{viewMode}</span>
+          </button>
+          <button
+            type="button"
+            onClick={toggleFullscreen}
+            className="flex items-center gap-1 px-2 py-1 rounded text-sm hover:bg-opacity-80 cursor-pointer"
+            style={{
+              backgroundColor: "var(--secondary)",
+              color: "var(--secondary-foreground)",
+            }}
+          >
+            {isFullscreen ? (
+              <Minimize className="w-3 h-3 sm:w-4 sm:h-4" />
+            ) : (
+              <Maximize className="w-3 h-3 sm:w-4 sm:h-4" />
+            )}
+          </button>
         </div>
       </div>
 
@@ -448,13 +508,9 @@ const BlogEditor = ({
 
           {/* Preview Panel */}
           {(viewMode === "preview" || viewMode === "split") && (
-            <div
-              className={`${
-                viewMode === "split" ? "w-1/2" : "w-full"
-              }`}
-            >
+            <div className={`${viewMode === "split" ? "w-1/2" : "w-full"}`}>
               <div className="h-full p-4">
-                 {/* Virtualized Preview handles its own scrolling */}
+                {/* Virtualized Preview handles its own scrolling */}
                 <VirtualizedMdPreview
                   content={previewContent || "*Preview will appear here...*"}
                 />
@@ -463,7 +519,6 @@ const BlogEditor = ({
           )}
         </div>
       </div>
-
 
       {/* Image Cropper Modal */}
       {showCropper && selectedImageForCrop && (

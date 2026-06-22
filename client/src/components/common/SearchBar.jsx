@@ -541,7 +541,7 @@ const SearchBar = React.memo(({ onResultClick } = {}) => {
                   : "hover:bg-accent/50"
               }`}
             >
-              <Clock className="h-4 w-4 text-muted-foreground flex-shrink-0" />
+              <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
               <span className="text-sm line-clamp-1">{query}</span>
             </button>
           ))}

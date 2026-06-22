@@ -181,7 +181,7 @@ const CategoryForm = () => {
       <h1 className="text-2xl font-bold mb-4 text-center">
         {isEditMode ? "Edit Category" : "Add New Category"}
       </h1>
-      <Card className="pt-5 max-w-screen-md mx-auto p-6">
+      <Card className="pt-5 max-w-3xl mx-auto p-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField
@@ -211,7 +211,7 @@ const CategoryForm = () => {
                   <FormControl>
                     <Textarea
                       placeholder="Enter category description"
-                      className="min-h-[80px]"
+                      className="min-h-20"
                       {...field}
                     />
                   </FormControl>

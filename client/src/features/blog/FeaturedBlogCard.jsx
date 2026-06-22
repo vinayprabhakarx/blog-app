@@ -1,12 +1,7 @@
 import React, { useMemo, useCallback } from "react";
 import { Link } from "react-router-dom";
-import { Calendar, User } from "lucide-react";
 import { cn } from "@/lib/utils";
-import {
-  Avatar,
-  AvatarFallback,
-  AvatarImage,
-} from "@/components/ui/avatar";
+
 
 const FeaturedBlogCard = React.memo(({ blog, className, ...props }) => {
   // Memoize utility functions

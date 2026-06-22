@@ -8,7 +8,7 @@ const MdRenderCardWrapper = ({ content, onDeleteImage, ...props }) => {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center min-h-[200px]">
+        <div className="flex items-center justify-center min-h-50">
           <LoadingSpinner size="md" message="Loading markdown renderer..." />
         </div>
       }

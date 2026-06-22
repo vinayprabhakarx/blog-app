@@ -54,7 +54,7 @@ const VerifyEmail = () => {
   if (status === "loading") {
     return (
       <section className="flex justify-center items-center min-h-screen w-full bg-background px-4">
-        <Card className="w-[440px] max-w-full p-8 bg-background text-foreground border shadow-lg">
+        <Card className="w-full max-w-full p-8 bg-background text-foreground border shadow-lg">
           <div className="text-center space-y-6">
             <div className="flex justify-center">
               <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center animate-pulse">
@@ -78,15 +78,15 @@ const VerifyEmail = () => {
   if (status === "success") {
     return (
       <section className="flex justify-center items-center min-h-screen w-full bg-background px-4">
-        <Card className="w-[440px] max-w-full p-8 bg-background text-foreground border shadow-lg">
+        <Card className="w-full max-w-full p-8 bg-background text-foreground border shadow-lg">
           <div className="text-center space-y-6">
             <div className="flex justify-center">
-              <div className="w-20 h-20 bg-green-500/10 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-10 h-10 text-green-500" />
+              <div className="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-10 h-10 text-success" />
               </div>
             </div>
             <div>
-              <h1 className="text-2xl font-bold mb-2 text-green-500">Email Verified!</h1>
+              <h1 className="text-2xl font-bold mb-2 text-success">Email Verified!</h1>
               <p className="text-muted-foreground">{message || "Your email has been verified successfully."}</p>
             </div>
             <Link to="/login" className="block">
@@ -105,11 +105,11 @@ const VerifyEmail = () => {
   if (status === "already") {
     return (
       <section className="flex justify-center items-center min-h-screen w-full bg-background px-4">
-        <Card className="w-[440px] max-w-full p-8 bg-background text-foreground border shadow-lg">
+        <Card className="w-full max-w-full p-8 bg-background text-foreground border shadow-lg">
           <div className="text-center space-y-6">
             <div className="flex justify-center">
-              <div className="w-20 h-20 bg-blue-500/10 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-10 h-10 text-blue-500" />
+              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
+                <CheckCircle className="w-10 h-10 text-primary" />
               </div>
             </div>
             <div>
@@ -132,15 +132,15 @@ const VerifyEmail = () => {
   if (status === "expired") {
     return (
       <section className="flex justify-center items-center min-h-screen w-full bg-background px-4">
-        <Card className="w-[440px] max-w-full p-8 bg-background text-foreground border shadow-lg">
+        <Card className="w-full max-w-full p-8 bg-background text-foreground border shadow-lg">
           <div className="text-center space-y-6">
             <div className="flex justify-center">
-              <div className="w-20 h-20 bg-yellow-500/10 rounded-full flex items-center justify-center">
-                <AlertTriangle className="w-10 h-10 text-yellow-500" />
+              <div className="w-20 h-20 bg-warning/10 rounded-full flex items-center justify-center">
+                <AlertTriangle className="w-10 h-10 text-warning" />
               </div>
             </div>
             <div>
-              <h1 className="text-2xl font-bold mb-2 text-yellow-500">Link Expired</h1>
+              <h1 className="text-2xl font-bold mb-2 text-warning">Link Expired</h1>
               <p className="text-muted-foreground">{message || "This verification link has expired. Please request a new one."}</p>
             </div>
             <div className="bg-muted/50 rounded-lg p-4 text-left">
@@ -170,7 +170,7 @@ const VerifyEmail = () => {
   // Invalid or error state (default)
   return (
     <section className="flex justify-center items-center min-h-screen w-full bg-background px-4">
-      <Card className="w-[440px] max-w-full p-8 bg-background text-foreground border shadow-lg">
+      <Card className="w-110 max-w-full p-8 bg-background text-foreground border shadow-lg">
         <div className="text-center space-y-6">
           <div className="flex justify-center">
             <div className="w-20 h-20 bg-destructive/10 rounded-full flex items-center justify-center">

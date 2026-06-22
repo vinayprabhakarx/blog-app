@@ -91,7 +91,7 @@ export const DesktopSidebar = React.memo(
             e.preventDefault();
             setOpen(!open);
           }}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-all z-[60] flex items-center justify-center cursor-pointer bg-transparent border-none outline-none"
+          className="absolute -right-3 top-1/2 -translate-y-1/2 p-1 text-muted-foreground hover:text-foreground transition-all z-60 flex items-center justify-center cursor-pointer bg-transparent border-none outline-none"
           title={open ? "Unpin sidebar" : "Pin sidebar"}
         >
           {open ? <IconPinnedOff size={16} /> : <IconPin size={16} />}
@@ -140,7 +140,7 @@ export const MobileSidebar = React.memo(({ className, children, ...props }) => {
       <Motion.aside
         ref={containerRef}
         className={cn(
-          "fixed left-0 top-16 bottom-0 z-40 px-4 py-4 flex flex-col bg-background border-r border-border w-[250px] md:hidden",
+          "fixed left-0 top-16 bottom-0 z-40 px-4 py-4 flex flex-col bg-background border-r border-border w-62.5 md:hidden",
           className
         )}
         initial={{ x: "-100%" }}
@@ -218,7 +218,7 @@ export const SidebarLink = React.memo(({ link, className, ...props }) => {
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           opacity: animate ? (open ? 1 : 0) : 1,
         }}
-        className="text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block !p-0 !m-0 md:inline-block"
+        className="text-sm group-hover/sidebar:translate-x-1 transition duration-150 whitespace-pre inline-block p-0! m-0! md:inline-block"
       >
         {link.label}
       </Motion.span>
@@ -311,7 +311,7 @@ const AppSidebar = React.memo(() => {
           label: item.title,
           href: item.path,
           icon: (
-            <IconComponent className="h-5 w-5 flex-shrink-0 min-w-[20px] min-h-[20px] text-foreground/80" />
+            <IconComponent className="h-5 w-5 shrink-0 min-w-5 min-h-5 text-foreground/80" />
           ),
         });
       });
@@ -326,7 +326,7 @@ const AppSidebar = React.memo(() => {
       label: "Profile Settings",
       href: "/profile",
       icon: (
-        <IconSettings className="h-5 w-5 flex-shrink-0 min-w-[20px] min-h-[20px] text-foreground/80" />
+        <IconSettings className="h-5 w-5 shrink-0 min-w-5 min-h-5 text-foreground/80" />
       ),
     }),
     []
@@ -368,7 +368,7 @@ const AppSidebar = React.memo(() => {
         </div>
 
         {/* Profile Section - Fixed at bottom for desktop */}
-        <div className="flex-shrink-0 h-auto min-h-[48px] pt-2 border-t border-border/10 bg-background">
+        <div className="shrink-0 h-auto min-h-12 pt-2 border-t border-border/10 bg-background">
           <SidebarLink link={profileLink} />
         </div>
       </div>
@@ -387,7 +387,7 @@ const AppSidebar = React.memo(() => {
         </nav>
 
         {/* Profile section - always at bottom */}
-        <div className="flex-shrink-0 pt-2 border-t border-border/10">
+        <div className="shrink-0 pt-2 border-t border-border/10">
           <SidebarLink link={profileLink} />
         </div>
       </div>
