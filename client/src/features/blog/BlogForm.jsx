@@ -93,10 +93,16 @@ const BlogForm = ({ existingBlog }) => {
 
   useEffect(() => {
     if (existingBlog) {
-      const categoryId =
-        typeof existingBlog.category === "object"
-          ? existingBlog.category._id
-          : existingBlog.category;
+      const categoryInfo = existingBlog.category || existingBlog.categories?.[0] || existingBlog.Category;
+      let categoryId = "";
+      if (categoryInfo) {
+        if (typeof categoryInfo === "object") {
+          categoryId = categoryInfo._id || categoryInfo.id || "";
+        } else {
+          categoryId = categoryInfo;
+        }
+      }
+      categoryId = categoryId ? String(categoryId) : "";
       setFormData({
         category: categoryId || "",
         title: existingBlog.title || "",
@@ -473,7 +479,8 @@ const BlogForm = ({ existingBlog }) => {
                 Category <span className="text-destructive">*</span>
               </label>
               <Select
-                value={formData.category}
+                key={`category-select-${categoryData.length}`}
+                value={formData.category || undefined}
                 onValueChange={(value) => handleInputChange("category", value)}
                 disabled={isEditing ? updateLoading : createLoading}
               >

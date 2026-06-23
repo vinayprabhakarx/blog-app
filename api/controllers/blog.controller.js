@@ -105,9 +105,7 @@ export const getAllBlogs = async (req, res, next) => {
   const isHomeFeed = !search && !category && !tag && !username;
   
   let query = {};
-  if (req.user?.role !== "admin") {
-    query.draft = false;
-  }
+  query.draft = false;
   let heroPost = null;
 
   // 1. If Home Feed, find the single latest featured post
