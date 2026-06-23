@@ -111,7 +111,7 @@ const SignUp = () => {
 
   return (
     <section className="flex justify-center items-center min-h-screen w-screen bg-background py-8">
-      <Card className="w-[400px] p-5 bg-background text-foreground">
+      <Card className="w-full max-w-sm p-5 bg-background text-foreground">
         <h1 className="text-2xl font-bold text-center mb-5">
           Create Your Account
         </h1>

@@ -18,7 +18,7 @@ import {
   selectCategoriesLoading,
   selectOperationLoading,
 } from "./categoriesSlice";
-import { Tag, FileText, RefreshCw, Star, Edit, Trash2, Plus } from "lucide-react";
+import { Tag, Star, Edit, Trash2, Plus } from "lucide-react";
 import { PageStats } from "@/components/common/PageStats";
 
 const CategoryManagement = () => {
@@ -189,7 +189,7 @@ const CategoryManagement = () => {
                       {/* Category Name */}
                       <td className="py-4 px-4">
                         <div className="flex items-center gap-3">
-                          <Tag className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors flex-shrink-0" />
+                          <Tag className="h-5 w-5 text-muted-foreground group-hover:text-primary transition-colors shrink-0" />
                           <Link
                             to={RouteCategoryView(category.slug)}
                             className="font-medium group-hover:text-primary transition-colors hover:underline"
@@ -270,7 +270,7 @@ const CategoryManagement = () => {
                 {/* Category Header */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3">
-                    <Tag className="h-5 w-5 text-muted-foreground flex-shrink-0" />
+                    <Tag className="h-5 w-5 text-muted-foreground shrink-0" />
                     <Link
                       to={RouteCategoryView(category.slug)}
                       className="font-medium text-lg hover:text-primary transition-colors hover:underline"
@@ -305,7 +305,7 @@ const CategoryManagement = () => {
                     variant="outline"
                     size="sm"
                     asChild
-                    className="px-2 py-1 h-7 min-w-[60px] flex items-center justify-center gap-1 text-xs transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
+                    className="px-2 py-1 h-7 min-w-15 flex items-center justify-center gap-1 text-xs transition-colors duration-200 hover:bg-primary hover:text-primary-foreground"
                     title="Edit category"
                   >
                     <Link to={RouteEditCategory(category._id, userRole)}>
@@ -318,7 +318,7 @@ const CategoryManagement = () => {
                     variant="outline"
                     size="sm"
                     disabled={operationLoading.delete}
-                    className="px-2 py-0.5 h-7 min-w-[60px] flex items-center justify-center gap-1 text-xs transition-colors duration-200 hover:text-destructive hover:border-destructive"
+                    className="px-2 py-0.5 h-7 min-w-15 flex items-center justify-center gap-1 text-xs transition-colors duration-200 hover:text-destructive hover:border-destructive"
                     title="Delete category"
                   >
                     <Trash2 className="h-3 w-3" />

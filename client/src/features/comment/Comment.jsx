@@ -18,7 +18,6 @@ import {
   AvatarImage,
   AvatarFallback,
 } from "@/components/ui/avatar";
-import { Button } from "@/components/ui/button";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -262,7 +261,7 @@ const Comment = React.memo(
       <article className={cn("group relative", getIndentClass(level))}>
         {/* Vertical line for replies - Instagram style */}
         {level > 0 && (
-          <div className="absolute left-[-12px] sm:left-[-16px] md:left-[-20px] top-0 bottom-0 w-px bg-border/40" />
+          <div className="absolute -left-3 sm:-left-4 md:-left-5 top-0 bottom-0 w-px bg-border/40" />
         )}
 
         {/* Main Comment Container */}
@@ -271,7 +270,7 @@ const Comment = React.memo(
           {comment.commented_by?.personal_info?.username ? (
             <Link
               to={`/${comment.commented_by.personal_info.username}`}
-              className="flex-shrink-0"
+              className="shrink-0"
             >
               <Avatar className="h-8 w-8 ring-1 ring-transparent transition-all duration-200 hover:ring-border/50 cursor-pointer">
                 <AvatarImage
@@ -282,7 +281,7 @@ const Comment = React.memo(
                     "User"
                   }
                 />
-                <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-muted to-muted/50 text-foreground">
+                <AvatarFallback className="text-xs font-medium bg-linear-to-br from-muted to-muted/50 text-foreground">
                   {getInitials(
                     comment.commented_by?.personal_info?.name ||
                       comment.commented_by?.personal_info?.username ||
@@ -292,7 +291,7 @@ const Comment = React.memo(
               </Avatar>
             </Link>
           ) : (
-            <Avatar className="h-8 w-8 flex-shrink-0 ring-1 ring-transparent transition-all duration-200 hover:ring-border/50">
+            <Avatar className="h-8 w-8 shrink-0 ring-1 ring-transparent transition-all duration-200 hover:ring-border/50">
               <AvatarImage
                 src={comment.commented_by?.personal_info?.profile_img}
                 alt={
@@ -301,7 +300,7 @@ const Comment = React.memo(
                   "User"
                 }
               />
-              <AvatarFallback className="text-xs font-medium bg-gradient-to-br from-muted to-muted/50 text-foreground">
+              <AvatarFallback className="text-xs font-medium bg-linear-to-br from-muted to-muted/50 text-foreground">
                 {getInitials(
                   comment.commented_by?.personal_info?.name ||
                     comment.commented_by?.personal_info?.username ||
@@ -351,7 +350,7 @@ const Comment = React.memo(
 
                     {/* Like Button - positioned on username line */}
                     {!computedState.isEditing && (
-                      <div className="flex-shrink-0 flex items-center">
+                      <div className="shrink-0 flex items-center">
                         <button
                           type="button"
                           onClick={handleLike}
@@ -376,7 +375,7 @@ const Comment = React.memo(
                   </div>
 
                   {/* Comment content on second line */}
-                  <div className="text-foreground break-words w-full">
+                  <div className="text-foreground wrap-break-word w-full">
                     {renderCommentContent(
                       comment.content,
                       comment.tagged_users
@@ -496,7 +495,7 @@ const Comment = React.memo(
             {/* Reply Form */}
             {computedState.isReplying && (
               <div className="mt-3 flex items-start gap-2">
-                <Avatar className="h-8 w-8 flex-shrink-0">
+                <Avatar className="h-8 w-8 shrink-0">
                   <AvatarImage
                     src={currentUser?.personal_info?.profile_img}
                     alt={currentUser?.personal_info?.name}

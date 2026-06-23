@@ -111,7 +111,7 @@ const BlogCard = React.memo(
           <Link to={`/blog/${blogSlug}`} className="block">
             <h3
               className={cn(
-                "font-bold text-foreground line-clamp-2 group-hover:text-primary transition-colors duration-200 cursor-pointer min-h-[3.5rem]",
+                "font-bold text-foreground line-clamp-2 group-hover:text-primary transition-colors duration-200 cursor-pointer min-h-14",
                 // Responsive text sizes
                 variant === "featured"
                   ? "text-lg sm:text-xl md:text-2xl lg:text-3xl"
@@ -148,7 +148,7 @@ const BlogCard = React.memo(
               </div>
 
               {/* Date */}
-              <div className="flex items-center gap-1 flex-shrink-0">
+              <div className="flex items-center gap-1 shrink-0">
                 <Calendar className="w-4 h-4 text-muted-foreground" />
                 <span className="text-base text-muted-foreground">
                   {formattedDate}

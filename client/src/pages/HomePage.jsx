@@ -219,7 +219,7 @@ const HomePage = React.memo(() => {
                 <div className="flex items-center space-x-2 max-w-full overflow-x-auto scrollbar-hide">
                   <button
                     onClick={() => handleCategorySelect("all")}
-                    className={`px-3 xl:px-4 py-2 text-sm font-medium whitespace-nowrap transition-all duration-200 relative focus:outline-none focus:ring-0 hover:bg-transparent active:bg-transparent cursor-pointer border-none shadow-none flex-shrink-0 touch-manipulation ${
+                    className={`px-3 xl:px-4 py-2 text-sm font-medium whitespace-nowrap transition-all duration-200 relative focus:outline-none focus:ring-0 hover:bg-transparent active:bg-transparent cursor-pointer border-none shadow-none shrink-0 touch-manipulation ${
                       selectedCategory === "all"
                         ? "text-foreground"
                         : "text-muted-foreground hover:text-foreground"
@@ -235,7 +235,7 @@ const HomePage = React.memo(() => {
                     <button
                       key={category._id}
                       onClick={() => handleCategorySelect(category.slug)}
-                      className={`px-3 xl:px-4 py-2 text-sm font-medium whitespace-nowrap transition-all duration-200 relative focus:outline-none focus:ring-0 hover:bg-transparent active:bg-transparent cursor-pointer flex-shrink-0 touch-manipulation ${
+                      className={`px-3 xl:px-4 py-2 text-sm font-medium whitespace-nowrap transition-all duration-200 relative focus:outline-none focus:ring-0 hover:bg-transparent active:bg-transparent cursor-pointer shrink-0 touch-manipulation ${
                         selectedCategory === category.slug
                           ? "text-foreground"
                           : "text-muted-foreground hover:text-foreground"

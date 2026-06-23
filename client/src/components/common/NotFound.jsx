@@ -44,7 +44,7 @@ const NotFound = ({
             <Button
               variant="default"
               onClick={() => navigate(-1)}
-              className="flex items-center gap-2 px-6 py-2 text-sm w-full sm:w-auto min-w-[150px]"
+              className="flex items-center gap-2 px-6 py-2 text-sm w-full sm:w-auto min-w-37.5"
             >
               <ArrowLeft className="w-4 h-4" />
               Go Back

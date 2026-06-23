@@ -15,7 +15,7 @@ const LikeButton = memo(
           onLike();
         }}
         disabled={isDisabled}
-        className={`flex items-center gap-2 flex-shrink-0 whitespace-nowrap transition-colors ${
+        className={`flex items-center gap-2 shrink-0 whitespace-nowrap transition-colors ${
           isDisabled
             ? "opacity-50 cursor-not-allowed"
             : "hover:text-red-500 cursor-pointer"

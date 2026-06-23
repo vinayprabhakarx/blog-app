@@ -303,7 +303,7 @@ const CommentForm = ({
             type="submit"
             disabled={!isValid}
             className={cn(
-              "p-1 sm:p-1.5 rounded-full transition-all touch-manipulation flex-shrink-0",
+              "p-1 sm:p-1.5 rounded-full transition-all touch-manipulation shrink-0",
               isValid
                 ? "text-primary hover:text-primary/80 hover:bg-primary/10 active:scale-95"
                 : "text-muted-foreground cursor-not-allowed"

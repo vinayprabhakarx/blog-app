@@ -22,7 +22,6 @@ import {
   FaLinkedin,
   FaGithub,
   FaYoutube,
-  FaFacebook,
   FaXTwitter,
   FaInstagram,
   FaArrowLeft,

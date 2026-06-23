@@ -2,7 +2,7 @@ import React, { useEffect, useCallback, useMemo } from "react";
 import { Link } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import {
   RouteAddCategory,
   RouteEditCategory,
@@ -19,12 +19,9 @@ import {
   selectOperationLoading,
 } from "./categoriesSlice";
 import {
-  FolderOpen,
   Plus,
-  Search,
   Edit,
   Trash2,
-  RefreshCw,
   Tag,
   Star,
 } from "lucide-react";

@@ -171,8 +171,8 @@ const ProfilePage = React.memo(() => {
     <div className="min-h-screen bg-background">
       {/* Decorative background pattern */}
       <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/5 to-primary/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-primary/5 to-primary/10 rounded-full blur-3xl"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-linear-to-br from-primary/5 to-primary/10 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-linear-to-tr from-primary/5 to-primary/10 rounded-full blur-3xl"></div>
       </div>
 
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-6 relative">
@@ -194,8 +194,8 @@ const ProfilePage = React.memo(() => {
         <div className="block sm:hidden">
           <div className="flex items-center gap-4 sm:gap-3 mb-3 sm:mb-4">
             {/* Avatar */}
-            <div className="relative flex-shrink-0">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 p-1">
+            <div className="relative shrink-0">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-linear-to-br from-primary/20 to-primary/40 p-1">
                 <Avatar className="w-full h-full border-2 border-background">
                   <AvatarImage
                     src={profile.personal_info?.profile_img || profile.avatar}
@@ -214,11 +214,11 @@ const ProfilePage = React.memo(() => {
             {/* User Info */}
             <div className="flex-1 min-w-0">
               <p className="text-lg text-muted-foreground mb-1">
-                <span className="inline-block break-words">
+                <span className="inline-block wrap-break-word">
                   {profile.personal_info?.username || profile.username}
                 </span>
               </p>
-              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-1 leading-tight break-words uppercase">
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-1 leading-tight wrap-break-word not-first:uppercase">
                 {profile.personal_info?.name || profile.name}
               </h1>
             </div>
@@ -268,21 +268,21 @@ const ProfilePage = React.memo(() => {
           <div className="space-y-3 sm:space-y-4 text-base sm:text-lg mb-6 sm:mb-8">
             {profile.personal_info?.education && (
               <div className="flex items-center gap-2 sm:gap-3 text-muted-foreground">
-                <FaGraduationCap className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <FaGraduationCap className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                 <span>{profile.personal_info.education}</span>
               </div>
             )}
 
             {profile.personal_info?.location && (
               <div className="flex items-center gap-2 sm:gap-3 text-muted-foreground">
-                <FaMapMarkerAlt className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <FaMapMarkerAlt className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                 <span>{profile.personal_info.location}</span>
               </div>
             )}
 
             {(profile.joinedAt || profile.createdAt) && (
               <div className="flex items-center gap-2 sm:gap-3 text-muted-foreground">
-                <FaCalendar className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                <FaCalendar className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                 <span>
                   Joined{" "}
                   {new Date(
@@ -323,7 +323,7 @@ const ProfilePage = React.memo(() => {
                         rel="noopener noreferrer"
                         className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors"
                       >
-                        <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                        <IconComponent className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                         <span className="text-base sm:text-lg truncate">{displayName}</span>
                       </a>
                     );
@@ -336,7 +336,7 @@ const ProfilePage = React.memo(() => {
           {/* About Section */}
           <section className="border-t pt-6 sm:pt-8" aria-label="About User">
             <div className="flex items-center mb-4 sm:mb-6">
-              <h2 className="text-base sm:text-lg sm:text-xl font-semibold">About</h2>
+              <h2 className="text-base sm:text-xl font-semibold">About</h2>
               <div className="ml-3 sm:ml-4 h-0.5 bg-primary w-6 sm:w-8"></div>
             </div>
 
@@ -361,8 +361,8 @@ const ProfilePage = React.memo(() => {
         <div className="hidden sm:block lg:hidden">
           <div className="flex items-center gap-4 mb-8">
             {/* Avatar */}
-            <div className="relative flex-shrink-0">
-              <div className="w-20 h-20 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 p-1">
+            <div className="relative shrink-0">
+              <div className="w-20 h-20 rounded-full bg-linear-to-br from-primary/20 to-primary/40 p-1">
                 <Avatar className="w-full h-full border-2 border-background">
                   <AvatarImage
                     src={profile.personal_info?.profile_img || profile.avatar}
@@ -385,7 +385,7 @@ const ProfilePage = React.memo(() => {
                   {profile.personal_info?.username || profile.username}
                 </span>
               </p>
-              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-2 leading-tight break-words uppercase">
+              <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-foreground mb-2 leading-tight wrap-break-word uppercase">
                 {profile.personal_info?.name || profile.name}
               </h1>
             </div>
@@ -435,21 +435,21 @@ const ProfilePage = React.memo(() => {
           <div className="space-y-4 text-lg mb-8">
             {profile.personal_info?.education && (
               <div className="flex items-center gap-3 text-muted-foreground">
-                <FaGraduationCap className="w-5 h-5 flex-shrink-0" />
+                <FaGraduationCap className="w-5 h-5 shrink-0" />
                 <span>{profile.personal_info.education}</span>
               </div>
             )}
 
             {profile.personal_info?.location && (
               <div className="flex items-center gap-3 text-muted-foreground">
-                <FaMapMarkerAlt className="w-5 h-5 flex-shrink-0" />
+                <FaMapMarkerAlt className="w-5 h-5 shrink-0" />
                 <span>{profile.personal_info.location}</span>
               </div>
             )}
 
             {(profile.joinedAt || profile.createdAt) && (
               <div className="flex items-center gap-3 text-muted-foreground">
-                <FaCalendar className="w-5 h-5 flex-shrink-0" />
+                <FaCalendar className="w-5 h-5 shrink-0" />
                 <span>
                   Joined{" "}
                   {new Date(
@@ -490,7 +490,7 @@ const ProfilePage = React.memo(() => {
                         rel="noopener noreferrer"
                         className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors"
                       >
-                        <IconComponent className="w-5 h-5 flex-shrink-0" />
+                        <IconComponent className="w-5 h-5 shrink-0" />
                         <span className="text-base truncate">{displayName}</span>
                       </a>
                     );
@@ -532,8 +532,8 @@ const ProfilePage = React.memo(() => {
               <div>
                 <div className="flex gap-6 mb-6">
                   {/* Avatar */}
-                  <div className="relative flex-shrink-0">
-                    <div className="w-48 h-48 rounded-full bg-gradient-to-br from-primary/20 to-primary/40 p-1">
+                  <div className="relative shrink-0">
+                    <div className="w-48 h-48 rounded-full bg-linear-to-br from-primary/20 to-primary/40 p-1">
                       <Avatar className="w-full h-full border-2 border-background">
                         <AvatarImage
                           src={
@@ -558,7 +558,7 @@ const ProfilePage = React.memo(() => {
                         {profile.personal_info?.username || profile.username}
                       </span>
                     </p>
-                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-2 leading-tight break-words uppercase">
+                    <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-foreground mb-2 leading-tight wrap-break-word uppercase">
                       {profile.personal_info?.name || profile.name}
                     </h1>
 
@@ -606,7 +606,7 @@ const ProfilePage = React.memo(() => {
                                 rel="noopener noreferrer"
                                 className="flex items-center gap-3 text-muted-foreground hover:text-foreground transition-colors"
                               >
-                                <IconComponent className="w-5 h-5 flex-shrink-0" />
+                                <IconComponent className="w-5 h-5 shrink-0" />
                                 <span className="text-lg truncate">
                                   {displayName}
                                 </span>
@@ -665,14 +665,14 @@ const ProfilePage = React.memo(() => {
                 <div className="space-y-4 text-lg">
                   {profile.personal_info?.education && (
                     <div className="flex items-start gap-3 text-muted-foreground">
-                      <FaGraduationCap className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                      <FaGraduationCap className="w-5 h-5 mt-0.5 shrink-0" />
                       <span>{profile.personal_info.education}</span>
                     </div>
                   )}
 
                   {profile.personal_info?.location && (
                     <div className="flex items-start gap-3 text-muted-foreground">
-                      <FaMapMarkerAlt className="w-5 h-5 mt-0.5 flex-shrink-0" />
+                      <FaMapMarkerAlt className="w-5 h-5 mt-0.5 shrink-0" />
                       <span>{profile.personal_info.location}</span>
                     </div>
                   )}

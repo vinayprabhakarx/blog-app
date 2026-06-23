@@ -98,9 +98,9 @@ const ImageCropper = ({ imageUrl, onClose, onCrop }) => {
 
   return (
     <Dialog open={true} onOpenChange={handleClose}>
-      <div className="fixed inset-0 z-[150] bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
+      <div className="fixed inset-0 z-150 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
       <DialogContent
-        className="max-w-4xl w-[92vw] sm:w-[90vw] max-h-[85vh] overflow-y-auto p-0 gap-0 z-[150] flex flex-col"
+        className="max-w-4xl w-[92vw] sm:w-[90vw] max-h-[85vh] overflow-y-auto p-0 gap-0 z-150 flex flex-col"
         showCloseButton={false}
       >
         <DialogHeader className="px-3 py-3 sm:px-5 sm:py-4 md:px-6 md:py-5 border-b relative">
@@ -136,7 +136,7 @@ const ImageCropper = ({ imageUrl, onClose, onCrop }) => {
 
         <div className="px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-3 space-y-2 sm:space-y-3 flex-1 overflow-y-auto">
           {/* Cropper Container */}
-          <div className="relative w-full h-72 sm:h-80 md:h-96 lg:h-[28rem] bg-muted rounded-md sm:rounded-lg overflow-hidden touch-none">
+          <div className="relative w-full h-72 sm:h-80 md:h-96 lg:h-112 bg-muted rounded-md sm:rounded-lg overflow-hidden touch-none">
             <Cropper
               image={imageUrl}
               crop={crop}
@@ -232,7 +232,7 @@ const ImageCropper = ({ imageUrl, onClose, onCrop }) => {
               onClick={handleCrop}
               disabled={isProcessing || !croppedAreaPixels}
               type="button"
-              className="w-full sm:w-auto min-w-[100px] sm:min-w-[120px] md:min-w-[140px] h-7 sm:h-8 md:h-9 text-[11px] sm:text-xs md:text-sm touch-manipulation py-0.5"
+              className="w-full sm:w-auto min-w-25 sm:min-w-30 md:min-w-35 h-7 sm:h-8 md:h-9 text-[11px] sm:text-xs md:text-sm touch-manipulation py-0.5"
             >
               {isProcessing ? "Processing..." : "Crop & Apply"}
             </Button>

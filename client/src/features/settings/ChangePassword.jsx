@@ -125,7 +125,7 @@ const ChangePassword = () => {
         {/* Conditional Content */}
         {user?.authProvider === "google" ? (
           // Google Auth Message - Centered
-          <div className="flex items-center justify-center min-h-[300px]">
+          <div className="flex items-center justify-center min-h-75">
             <div className="text-center max-w-md">
               <div className="mb-6">
                 <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">

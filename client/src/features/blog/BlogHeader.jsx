@@ -1,6 +1,6 @@
 import React, { useCallback, useMemo } from "react";
 import { useSelector } from "react-redux";
-import { MessageCircle, Heart, Clock, Pencil } from "lucide-react";
+import { MessageCircle, Clock, Pencil } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import LikeButton from "@/components/common/LikeButton";
@@ -155,7 +155,7 @@ const BlogHeader = ({ blog, onCommentClick }) => {
             <button
               type="button"
               onClick={handleCommentClick}
-              className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap hover:text-primary cursor-pointer transition-colors"
+              className="flex items-center gap-2 shrink-0 whitespace-nowrap hover:text-primary cursor-pointer transition-colors"
             >
               <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>{activityStats.totalComments}</span>
@@ -167,7 +167,7 @@ const BlogHeader = ({ blog, onCommentClick }) => {
               isDisabled={likeButtonState.isDisabled}
               onLike={likeButtonState.handleLike}
             />
-            <div className="flex items-center gap-2 flex-shrink-0 whitespace-nowrap">
+            <div className="flex items-center gap-2 shrink-0 whitespace-nowrap">
               <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
               <span>{readTimeTextMobile}</span>
             </div>
@@ -178,7 +178,7 @@ const BlogHeader = ({ blog, onCommentClick }) => {
                   className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors"
                   aria-label="Edit draft"
                 >
-                  <Pencil className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                  <Pencil className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                   <span className="hidden xs:inline">Edit</span>
                 </Link>
               ) : (
@@ -188,7 +188,7 @@ const BlogHeader = ({ blog, onCommentClick }) => {
                     className="flex items-center gap-1 hover:text-primary cursor-pointer transition-colors"
                     aria-label="Edit blog"
                   >
-                    <Pencil className="w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0" />
+                    <Pencil className="w-4 h-4 sm:w-5 sm:h-5 shrink-0" />
                     <span className="hidden xs:inline">Edit</span>
                   </Link>
                 )

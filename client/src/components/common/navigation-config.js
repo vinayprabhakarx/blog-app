@@ -12,7 +12,6 @@ import {
   IconPencil,
   IconChartBar,
   IconNotification,
-  IconPhoto,
 } from "@tabler/icons-react";
 
 // Navigation configuration

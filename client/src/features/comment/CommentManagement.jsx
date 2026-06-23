@@ -13,12 +13,8 @@ import {
   MessageSquare,
   Search as SearchIcon,
   Filter,
-  CheckCircle,
-  XCircle,
-  Trash2,
   Trash,
   RefreshCw,
-  AlertTriangle,
   CheckSquare,
   Flag,
 } from "lucide-react";
@@ -229,7 +225,7 @@ const CommentManagement = () => {
 
   if (!["admin", "author"].includes(user?.role)) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-100">
         <div className="text-center">
           <h2 className="text-xl font-semibold text-foreground mb-2">
             Access Denied
@@ -244,7 +240,7 @@ const CommentManagement = () => {
 
   if (isLoading) {
     return (
-      <div className="flex items-center justify-center min-h-[400px]">
+      <div className="flex items-center justify-center min-h-100">
         <LoadingSpinner />
       </div>
     );
@@ -377,7 +373,7 @@ const CommentManagement = () => {
                 <Checkbox
                   checked={selectAll}
                   onCheckedChange={handleSelectAll}
-                  className="cursor-pointer !w-4 !h-4 !min-w-[16px] !min-h-[16px] !max-w-[16px] !max-h-[16px] !text-base"
+                  className="cursor-pointer w-4! h-4! min-w-4! min-h-4! max-w-4! max-h-4! text-base!"
                 />
                 <span className="text-sm font-medium cursor-pointer">
                   Select All{" "}
@@ -517,11 +513,11 @@ const RowCard = ({ comment, selected, showCheckbox, onToggle, onRefresh }) => {
       <div className="flex flex-col sm:flex-row items-start gap-3 p-4">
         <div className="flex flex-row items-start gap-3 flex-1 min-w-0 w-full">
           {showCheckbox && (
-            <div className="pt-1 flex-shrink-0">
+            <div className="pt-1 shrink-0">
               <Checkbox
                 checked={selected}
                 onCheckedChange={onToggle}
-                className="cursor-pointer !w-4 !h-4 !min-w-[16px] !min-h-[16px] !max-w-[16px] !max-h-[16px] !text-base"
+                className="cursor-pointer w-4! h-4! min-w-4! min-h-4! max-w-4! max-h-4! text-base"
               />
             </div>
           )}
@@ -543,7 +539,7 @@ const RowCard = ({ comment, selected, showCheckbox, onToggle, onRefresh }) => {
           <div className="text-xs text-muted-foreground mb-3">
             <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
               <div className="flex items-center gap-1 min-w-0 max-w-full">
-                <span className="text-xs text-muted-foreground cursor-pointer font-medium flex-shrink-0">
+                <span className="text-xs text-muted-foreground cursor-pointer font-medium shrink-0">
                   on
                 </span>
                 <Link
@@ -553,7 +549,7 @@ const RowCard = ({ comment, selected, showCheckbox, onToggle, onRefresh }) => {
                   {comment.blogTitle}
                 </Link>
               </div>
-              <div className="text-xs text-muted-foreground font-medium flex-shrink-0 whitespace-nowrap">
+              <div className="text-xs text-muted-foreground font-medium shrink-0 whitespace-nowrap">
                 {new Date(
                   comment.created_at || comment.commentDate
                 ).toLocaleDateString("en-US", {
@@ -568,7 +564,7 @@ const RowCard = ({ comment, selected, showCheckbox, onToggle, onRefresh }) => {
         </div>
 
         {/* Action Buttons */}
-        <div className="flex flex-row sm:flex-col md:flex-row items-center justify-end gap-2 w-full sm:w-auto sm:ml-auto mt-3 sm:mt-0 flex-shrink-0">
+        <div className="flex flex-row sm:flex-col md:flex-row items-center justify-end gap-2 w-full sm:w-auto sm:ml-auto mt-3 sm:mt-0 hrink-0">
           <Button
             variant="ghost"
             size="sm"
