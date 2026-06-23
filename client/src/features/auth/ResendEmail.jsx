@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Card } from "@/components/ui/card";
+import AuthCard from "./AuthCard";
 import { Link } from "react-router-dom";
 import { RouteLogin, RouteSignUp } from "@/utils/RouteName";
 import { showToast } from "@/utils/showToast";
@@ -97,7 +97,7 @@ const ResendEmail = () => {
   if (emailSent) {
     return (
       <div className="flex justify-center items-center min-h-screen w-full px-4 bg-background">
-        <Card className="w-[400px] max-w-full p-6 bg-background text-foreground">
+        <AuthCard>
           <div className="text-center space-y-6">
             {/* Success Icon */}
             <div className="flex justify-center">
@@ -142,14 +142,14 @@ const ResendEmail = () => {
               </Link>
             </div>
           </div>
-        </Card>
+        </AuthCard>
       </div>
     );
   }
 
   return (
     <div className="flex justify-center items-center min-h-screen w-full px-4 bg-background">
-      <Card className="w-[400px] max-w-full p-6 bg-background text-foreground">
+      <AuthCard>
         {/* Header */}
         <div className="text-center mb-6">
           <div className="flex justify-center mb-4">
@@ -208,7 +208,7 @@ const ResendEmail = () => {
             </div>
           </div>
         </div>
-      </Card>
+      </AuthCard>
     </div>
   );
 };

@@ -10,7 +10,7 @@ import {
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Card } from "@/components/ui/card";
+import AuthCard from "./AuthCard";
 import { Link, useNavigate } from "react-router-dom";
 import { RouteSignIn } from "@/utils/RouteName";
 import { showToast } from "@/utils/showToast";
@@ -111,7 +111,7 @@ const SignUp = () => {
 
   return (
     <section className="flex justify-center items-center min-h-screen w-full px-4 bg-background py-8">
-      <Card className="w-[400px] max-w-full p-5 bg-background text-foreground">
+      <AuthCard>
         <h1 className="text-2xl font-bold text-center mb-5">
           Create Your Account
         </h1>
@@ -242,7 +242,7 @@ const SignUp = () => {
             </div>
           </form>
         </Form>
-      </Card>
+      </AuthCard>
     </section>
   );
 };

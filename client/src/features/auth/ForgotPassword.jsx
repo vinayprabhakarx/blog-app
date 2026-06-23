@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useNavigate, Link } from "react-router-dom";
-import { Card } from "@/components/ui/card";
+import AuthCard from "./AuthCard";
 import { RouteLogin } from "@/utils/RouteName";
 import { showToast } from "@/utils/showToast";
 import authService from "./authService";
@@ -88,7 +88,7 @@ const ForgotPassword = () => {
 
   return (
     <section className="flex justify-center items-start pt-32 w-full px-4 min-h-screen bg-background">
-      <Card className="w-[400px] max-w-full p-5 bg-background text-foreground">
+      <AuthCard>
         <h1 className="text-2xl font-bold text-center mb-6">
           Forgot your password?
         </h1>
@@ -139,7 +139,7 @@ const ForgotPassword = () => {
             </div>
           </form>
         </Form>
-      </Card>
+      </AuthCard>
     </section>
   );
 };

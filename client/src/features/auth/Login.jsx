@@ -10,7 +10,7 @@ import {
 } from "@/components/ui/form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Card } from "@/components/ui/card";
+import AuthCard from "./AuthCard";
 import { Link, useNavigate } from "react-router-dom";
 import { RouteSignUp, getRoleBasedRedirect } from "@/utils/RouteName";
 import { showToast } from "@/utils/showToast";
@@ -108,7 +108,7 @@ const Login = () => {
 
   return (
     <section className="flex justify-center items-center min-h-screen w-full px-4 bg-background">
-      <Card className="w-[400px] max-w-full p-5 bg-background text-foreground">
+      <AuthCard>
         <h1 className="text-2xl font-bold text-center mb-5">
           Login into Account
         </h1>
@@ -199,7 +199,7 @@ const Login = () => {
             </div>
           </form>
         </Form>
-      </Card>
+      </AuthCard>
     </section>
   );
 };
