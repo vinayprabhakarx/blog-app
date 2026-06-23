@@ -107,8 +107,8 @@ const Login = () => {
   }
 
   return (
-    <section className="flex justify-center items-center h-screen w-screen bg-background">
-      <Card className="w-full max-w-sm p-5 bg-background text-foreground">
+    <section className="flex justify-center items-center min-h-screen w-full px-4 bg-background">
+      <Card className="w-[400px] max-w-full p-5 bg-background text-foreground">
         <h1 className="text-2xl font-bold text-center mb-5">
           Login into Account
         </h1>

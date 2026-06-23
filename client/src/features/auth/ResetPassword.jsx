@@ -129,7 +129,7 @@ const ResetPassword = () => {
 
   if (isLoading) {
     return (
-      <section className="flex justify-center items-start pt-32 w-screen min-h-screen bg-background">
+      <section className="flex justify-center items-start pt-32 w-full px-4 min-h-screen bg-background">
         <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-primary"></div>
       </section>
     );
@@ -137,8 +137,8 @@ const ResetPassword = () => {
 
   if (!isValidToken) {
     return (
-      <section className="flex justify-center items-start pt-32 w-screen min-h-screen bg-background">
-        <Card className="w-full max-w-sm p-5 bg-background text-foreground">
+      <section className="flex justify-center items-start pt-32 w-full px-4 min-h-screen bg-background">
+        <Card className="w-[400px] max-w-full p-5 bg-background text-foreground">
           <div className="text-center">
             <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-destructive/10 mb-4">
               <FaCheck className="h-6 w-6 text-destructive" />
@@ -163,8 +163,8 @@ const ResetPassword = () => {
   }
 
   return (
-    <section className="flex justify-center items-start pt-32 w-screen min-h-screen bg-background">
-      <Card className="w-full max-w-sm p-5 bg-background text-foreground">
+    <section className="flex justify-center items-start pt-32 w-full px-4 min-h-screen bg-background">
+      <Card className="w-[400px] max-w-full p-5 bg-background text-foreground">
         <h1 className="text-2xl font-bold text-center mb-6">
           Reset Your Password
         </h1>

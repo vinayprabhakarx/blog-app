@@ -96,8 +96,8 @@ const ResendEmail = () => {
 
   if (emailSent) {
     return (
-      <div className="flex justify-center items-center h-screen w-screen bg-background">
-        <Card className="w-full max-w-sm p-6 bg-background text-foreground">
+      <div className="flex justify-center items-center min-h-screen w-full px-4 bg-background">
+        <Card className="w-[400px] max-w-full p-6 bg-background text-foreground">
           <div className="text-center space-y-6">
             {/* Success Icon */}
             <div className="flex justify-center">
@@ -148,8 +148,8 @@ const ResendEmail = () => {
   }
 
   return (
-    <div className="flex justify-center items-center h-screen w-screen bg-background">
-      <Card className="w-full max-w-sm p-6 bg-background text-foreground">
+    <div className="flex justify-center items-center min-h-screen w-full px-4 bg-background">
+      <Card className="w-[400px] max-w-full p-6 bg-background text-foreground">
         {/* Header */}
         <div className="text-center mb-6">
           <div className="flex justify-center mb-4">
