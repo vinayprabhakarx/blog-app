@@ -140,7 +140,7 @@ export const MobileSidebar = React.memo(({ className, children, ...props }) => {
       <Motion.aside
         ref={containerRef}
         className={cn(
-          "fixed left-0 top-16 bottom-0 z-40 px-4 py-4 flex flex-col bg-background border-r border-border w-[250px] md:hidden",
+          "fixed left-0 top-16 bottom-0 z-40 px-4 py-4 flex flex-col overflow-hidden bg-background border-r border-border w-[250px] md:hidden",
           className
         )}
         initial={{ x: "-100%" }}
@@ -149,7 +149,6 @@ export const MobileSidebar = React.memo(({ className, children, ...props }) => {
         style={{
           height: "calc(100vh - 64px)",
           maxHeight: "calc(100vh - 64px)",
-          overflowY: "auto",
         }}
         {...props}
       >
@@ -374,10 +373,10 @@ const AppSidebar = React.memo(() => {
       </div>
 
       {/* Mobile Layout */}
-      <div className="md:hidden flex flex-col h-full justify-between">
-        {/* Navigation items */}
+      <div className="md:hidden flex flex-col h-full min-h-0">
+        {/* Navigation items - scrollable */}
         <nav
-          className="flex flex-col gap-1 flex-1 overflow-y-auto py-1"
+          className="flex flex-col gap-1 flex-1 min-h-0 overflow-y-auto py-1"
           role="navigation"
           aria-label="Main navigation"
         >
@@ -386,8 +385,8 @@ const AppSidebar = React.memo(() => {
           ))}
         </nav>
 
-        {/* Profile section - always at bottom */}
-        <div className="flex-shrink-0 pt-2 border-t border-border/10">
+        {/* Profile section - pinned at bottom */}
+        <div className="shrink-0 pt-2 border-t border-border/10">
           <SidebarLink link={profileLink} />
         </div>
       </div>

@@ -2,8 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Bell,
-  MessageSquare,
-  CheckCircle,
   Trash2,
   Filter,
   RefreshCw,
@@ -256,159 +254,127 @@ const NotificationCard = ({ notification, onMarkAsRead }) => {
     const diffInHours = Math.floor(diffInMinutes / 60);
     const diffInDays = Math.floor(diffInHours / 24);
 
-    if (diffInSeconds < 60) {
-      return "Just now";
-    } else if (diffInMinutes < 60) {
-      return `${diffInMinutes}m ago`;
-    } else if (diffInHours < 24) {
-      return `${diffInHours}h ago`;
-    } else if (diffInDays < 7) {
-      return `${diffInDays}d ago`;
-    } else {
-      return timestamp.toLocaleDateString();
-    }
+    if (diffInSeconds < 60) return "Just now";
+    if (diffInMinutes < 60) return `${diffInMinutes}m`;
+    if (diffInHours < 24) return `${diffInHours}h`;
+    if (diffInDays < 7) return `${diffInDays}d`;
+    return timestamp.toLocaleDateString();
   };
 
-  const canReply = (notification) => {
-    const commentTypes = ["blog_comment", "comment_reply"];
-    const canReplyToType = commentTypes.includes(notification.type);
-    const hasCommentId = notification.comment_id?._id;
+  const username =
+    notification.triggered_by?.personal_info?.username ||
+    notification.triggered_by?.personal_info?.name ||
+    "User";
 
-    return canReplyToType && hasCommentId;
-  };
+  const actionText = {
+    comment_tag: "mentioned you in a comment",
+    blog_comment: "commented on your blog",
+    comment_reply: "replied to your comment",
+    comment_like: "liked your comment",
+    blog_like: "liked your blog",
+    comment_report: "reported on your comment",
+    report_resolved: "report resolved",
+    admin_notification: "sent you a message",
+  }[notification.type] || notification.title || "new notification";
+
+  const blogTitle = notification.blog_id?.title;
+  const blogSlug = notification.blog_id?.slug || notification.blog_id?._id;
+  const commentContent = notification.comment_id?.content;
+  const reportReason = notification.metadata?.reason;
+  const canReply = ["blog_comment", "comment_reply"].includes(notification.type) && notification.comment_id?._id;
 
   return (
     <div
       className={cn(
-        "group relative flex flex-col sm:flex-row items-start gap-4 p-5 transition-colors duration-200 cursor-default",
-        !notification.is_read ? "bg-muted/20 hover:bg-muted/30" : "bg-transparent hover:bg-muted/10"
+        "group px-5 py-3 transition-colors duration-150",
+        !notification.is_read ? "bg-muted/20 hover:bg-muted/30" : "hover:bg-muted/10"
       )}
     >
-      <div className="flex flex-col sm:flex-row items-start w-full">
-        {/* Main Content */}
-        <div className="flex-1 min-w-0 w-full space-y-1">
-          {/* Notification Message */}
-          <div className="text-sm leading-relaxed text-foreground">
-            <Link 
-              to={`/${notification.triggered_by?.personal_info?.username || ""}`}
-              className="font-semibold text-foreground hover:text-primary transition-colors cursor-pointer mr-1.5 align-baseline"
-            >
-              @{notification.triggered_by?.personal_info?.username ||
-                notification.triggered_by?.personal_info?.name ||
-                "User"}
-            </Link>
+      {/* Single-line notification */}
+      <div className="flex items-baseline gap-x-1.5 flex-wrap text-sm leading-relaxed">
+        <Link
+          to={`/${username}`}
+          className="font-semibold text-foreground hover:text-primary transition-colors shrink-0"
+        >
+          @{username}
+        </Link>
+        <span className="text-muted-foreground">{actionText}</span>
+        {blogTitle && (
+          <>
             <span className="text-muted-foreground">
-              {notification.type === "comment_tag" && "mentioned you in a comment"}
-              {notification.type === "blog_comment" && "commented on your blog"}
-              {notification.type === "comment_reply" && "replied to your comment"}
-              {notification.type === "comment_like" && "liked your comment"}
-              {notification.type === "blog_like" && "liked your blog"}
-              {notification.type === "comment_report" && "reported on your comment"}
-              {notification.type === "report_resolved" && "report resolved"}
-              {notification.type === "admin_notification" && !notification.comment_id?.content && "sent you a message"}
+              {notification.type === "comment_report" ? "of" : "on"}
             </span>
-            {notification.blog_id?.title && (
-              <span className="text-muted-foreground">
-                {notification.type === "comment_report" ? " of this blog " : " on "}
-                <Link
-                  to={`/blog/${notification.blog_id.slug || notification.blog_id._id}`}
-                  className="font-medium text-foreground hover:text-primary transition-colors cursor-pointer"
-                >
-                  "{notification.blog_id.title}"
-                </Link>
-              </span>
-            )}
-            {!notification.is_read && (
-              <span className="inline-block w-2 h-2 bg-primary rounded-full ml-2 align-middle" />
-            )}
-          </div>
-
-          {/* Comment Content Preview */}
-          {notification.comment_id?.content && (
-            <div className="mt-2.5 p-3.5 bg-muted/30 rounded-lg border border-border/40">
-              <p className="text-sm text-muted-foreground line-clamp-3">
-                "{notification.comment_id.content}"
-              </p>
-            </div>
-          )}
-
-            {/* Report Reason */}
-            {notification.metadata?.reason && (
-              <div className="mt-2 p-3 bg-destructive/10 border border-destructive/20 rounded-lg">
-                <p className="text-xs text-destructive font-semibold mb-1 uppercase tracking-wide">
-                  Report Reason
-                </p>
-                <p className="text-sm text-destructive/90">
-                  {notification.metadata.reason}
-                </p>
-              </div>
-            )}
-          {/* Footer Info & Actions */}
-          <div className="flex items-center justify-between mt-3">
-            <div className="text-xs text-muted-foreground font-medium">
-              {formatTimestamp(new Date(notification.created_at))}
-            </div>
-
-            <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-              {canReply(notification) && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setReplyingTo(
-                      replyingTo === notification._id ? null : notification._id
-                    );
-                  }}
-                  className={cn(
-                    "h-7 px-3 text-xs font-medium transition-colors cursor-pointer rounded-full",
-                    replyingTo === notification._id
-                      ? "bg-muted text-foreground"
-                      : "text-muted-foreground hover:text-foreground hover:bg-muted"
-                  )}
-                >
-                  <MessageSquare className="h-3 w-3 mr-1.5" />
-                  {replyingTo === notification._id ? "Cancel" : "Reply"}
-                </Button>
-              )}
-
-              {!notification.is_read && (
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onMarkAsRead(notification._id);
-                  }}
-                  className="h-7 px-3 text-xs font-medium text-muted-foreground hover:text-primary hover:bg-primary/10 cursor-pointer rounded-full"
-                >
-                  <CheckCircle className="h-3 w-3 mr-1.5" />
-                  Mark Read
-                </Button>
-              )}
-            </div>
-          </div>
-        </div>
+            <Link
+              to={`/blog/${blogSlug}`}
+              className="font-medium text-foreground hover:text-primary transition-colors truncate max-w-60"
+            >
+              "{blogTitle}"
+            </Link>
+          </>
+        )}
+        {!notification.is_read && (
+          <span className="inline-block w-1.5 h-1.5 bg-primary rounded-full shrink-0 translate-y-[-1px]" />
+        )}
+        <span className="text-xs text-muted-foreground/50 ml-auto shrink-0">
+          {formatTimestamp(new Date(notification.created_at))}
+        </span>
       </div>
 
-      {/* Inline Reply Form using existing CommentForm */}
+      {/* Comment preview (secondary line) */}
+      {commentContent && (
+        <p className="text-xs text-muted-foreground/70 mt-1 line-clamp-1 italic">
+          "{commentContent}"
+        </p>
+      )}
+
+      {/* Report reason (secondary line) */}
+      {reportReason && (
+        <p className="text-xs text-destructive/80 mt-1">
+          <span className="font-semibold uppercase tracking-wide">Reason:</span>{" "}
+          {reportReason}
+        </p>
+      )}
+
+      {/* Actions row — visible on hover */}
+      <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity h-0 group-hover:h-auto overflow-hidden">
+        {canReply && (
+          <button
+            onClick={() => setReplyingTo(replyingTo === notification._id ? null : notification._id)}
+            className="text-xs text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+          >
+            {replyingTo === notification._id ? "Cancel" : "Reply"}
+          </button>
+        )}
+        {!notification.is_read && (
+          <button
+            onClick={() => onMarkAsRead(notification._id)}
+            className="text-xs text-muted-foreground hover:text-primary transition-colors cursor-pointer"
+          >
+            Mark read
+          </button>
+        )}
+        {blogSlug && (
+          <Link
+            to={`/blog/${blogSlug}`}
+            className="text-xs text-muted-foreground hover:text-primary transition-colors"
+          >
+            View
+          </Link>
+        )}
+      </div>
+
+      {/* Inline Reply Form */}
       {replyingTo === notification._id && (
-        <div className="border-t border-border/20 bg-muted/20 px-4 py-3">
+        <div className="mt-2 pl-3 border-l-2 border-border/40">
           <CommentForm
             blogId={notification.blog_id?._id}
             parentId={notification.comment_id?._id}
             mode="reply"
-            placeholder={`Reply to ${
-              notification.triggered_by?.personal_info?.username ||
-              "this comment"
-            }...`}
+            placeholder={`Reply to @${username}...`}
             onCancel={() => setReplyingTo(null)}
             onSuccess={() => {
               setReplyingTo(null);
-              // Refresh notifications after successful reply
-              setTimeout(() => {
-                window.location.reload();
-              }, 1000);
+              setTimeout(() => window.location.reload(), 1000);
             }}
           />
         </div>
