@@ -93,10 +93,10 @@ const BlogForm = ({ existingBlog }) => {
 
   useEffect(() => {
     if (existingBlog) {
-      const categoryId =
-        typeof existingBlog.category === "object"
-          ? existingBlog.category._id
-          : existingBlog.category;
+      const categoryInfo = existingBlog.category || existingBlog.categories?.[0] || existingBlog.Category;
+      const categoryId = categoryInfo && typeof categoryInfo === "object"
+          ? categoryInfo._id
+          : categoryInfo;
       setFormData({
         category: categoryId || "",
         title: existingBlog.title || "",
