@@ -2,8 +2,8 @@ import { useEffect, useState } from "react";
 
 export const useTheme = () => {
   const [theme, setTheme] = useState(() => {
-    // Get from localStorage or default to 'light'
-    return localStorage.getItem("theme") || "light";
+    // Get from localStorage or default to 'dark'
+    return localStorage.getItem("theme") || "dark";
   });
 
   useEffect(() => {

@@ -6,35 +6,20 @@
   <link rel="icon" type="image/svg+xml" href="/logo.svg" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
-  <title>VinayPrabhakarX-Blog</title>
+  <title>Vinay Prabhakar | Personal Blog</title>
 
-  <!-- Google tag (gtag.js) -->
-  <script async src="https://www.googletagmanager.com/gtag/js?id=G-1CHFVDX0FV"></script>
-  <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag() { dataLayer.push(arguments); }
-    gtag('js', new Date());
-
-    gtag('config', 'G-1CHFVDX0FV');
-  </script>
 
   <!-- Prevent FOUC (Flash of Unstyled Content) by initializing theme immediately -->
   <script>
     (function () {
       try {
         const savedTheme = localStorage.getItem("theme");
-        const savedMode = localStorage.getItem("themeMode");
-        const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches;
         
-        let theme = "light";
+        // If no saved theme, default to dark
+        let theme = "dark";
         
         if (savedTheme) {
           theme = savedTheme;
-        } else if (savedMode === "time") {
-          const hour = new Date().getHours();
-          theme = (hour >= 19 || hour < 6) ? "dark" : "light";
-        } else {
-           theme = prefersDark ? "dark" : "light";
         }
 
         if (theme === "dark") {

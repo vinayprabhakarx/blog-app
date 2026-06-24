@@ -21,11 +21,10 @@ export const ThemeProvider = ({ children }) => {
 
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
-    const savedMode = localStorage.getItem("themeMode");
 
-    // If no saved theme, use system preference or time-based
+    // If no saved theme, default to dark
     if (!savedTheme) {
-      return savedMode === "time" ? getTimeBasedTheme() : getSystemTheme();
+      return "dark";
     }
     return savedTheme;
   });
