@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback, useMemo } from "react";
+import React, { useEffect, useCallback, useMemo } from "react";
 import Logo from "@/components/common/Logo";
 import { Link, useNavigate } from "react-router-dom";
 import { FiUser } from "react-icons/fi";
@@ -25,8 +25,6 @@ import NotificationDropdown from "@/features/notification/NotificationDropdown";
 import { useSidebar } from "./sidebar-hooks";
 
 const Topbar = React.memo(() => {
-  const [showMobileSearch, setShowMobileSearch] = useState(false);
-
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, getUserName, getUserEmail, getUserAvatar } =
@@ -52,44 +50,22 @@ const Topbar = React.memo(() => {
     showToast("success", "Logged out successfully");
   }, [dispatch, navigate]);
 
-  const openMobileSearch = useCallback(() => {
-    setShowMobileSearch(true);
-  }, []);
-
-  const closeMobileSearch = useCallback(() => {
-    setShowMobileSearch(false);
-  }, []);
-
-  // Listen for close mobile search event from SearchBar
+  // Handle closing mobile search from SearchBar
   useEffect(() => {
     const handleCloseMobileSearch = () => {
-      setShowMobileSearch(false);
+      // no-op if we are using the modal directly in SearchBar now
     };
+    
     window.addEventListener("closeMobileSearch", handleCloseMobileSearch);
     return () => window.removeEventListener("closeMobileSearch", handleCloseMobileSearch);
   }, []);
 
   return (
     <header className="fixed top-0 w-full z-100 bg-background/95 backdrop-blur-sm text-foreground border-b border-border/20 shadow-sm no-print">
-      <div className="mx-auto max-w-7xl w-full h-14 flex justify-between items-center px-4 md:px-6 lg:px-8">
-      {/* Mobile search mode - replaces entire navbar content like YouTube */}
-      {showMobileSearch ? (
-        <div className="flex items-center gap-2 w-full md:hidden pr-2">
-          <button
-            onClick={closeMobileSearch}
-            className="p-1.5 rounded-md hover:bg-accent/50 transition-colors shrink-0"
-            aria-label="Close search"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </button>
-          <div className="flex-1">
-            <SearchBar onResultClick={closeMobileSearch} />
-          </div>
-        </div>
-      ) : (
+      <div className="mx-auto max-w-7xl w-full h-14 flex items-center px-4 md:px-6 lg:px-8">
         <>
-          {/* Normal navbar content */}
-          <div className="flex items-center gap-6 sm:gap-8">
+          {/* Left Section: Menu & Logo */}
+          <div className="flex items-center gap-1 sm:gap-6 md:gap-8 flex-1">
             {isAuthenticated && (
               <button
                 className="md:hidden p-2 -ml-2 rounded-md hover:bg-accent/50 transition-colors"
@@ -105,37 +81,33 @@ const Topbar = React.memo(() => {
             )}
             <Link
               to={RouteIndex}
-              className="flex items-center hover:opacity-80 transition-opacity duration-200 rounded-lg"
+              className="flex items-center hover:opacity-80 transition-opacity duration-200 rounded-lg shrink-0"
             >
               <Logo svgClassName="w-8 h-8 text-foreground" />
             </Link>
-            
+          </div>
+
+          {/* Middle Section: Search Bar (Desktop) */}
+          <div className="flex items-center justify-center hidden md:flex shrink-0 px-4">
+            <div className="w-64 lg:w-96">
+              <SearchBar />
+            </div>
+          </div>
+
+          {/* Right Section: Docs, Mobile Search, Actions */}
+          <div className="flex items-center justify-end gap-1 sm:gap-4 flex-1">
             <a
               href="https://docs.vinayprabhakar.dev"
               target="_blank"
               rel="noopener noreferrer"
-              className="text-sm font-semibold text-foreground hover:text-primary transition-colors duration-200"
+              className={`text-sm font-semibold text-foreground hover:text-primary transition-colors duration-200 ${isAuthenticated ? "hidden md:block" : "block"}`}
             >
               Docs
             </a>
-          </div>
-
-
-          <div className="flex items-center gap-2 sm:gap-3">
-            {/* Desktop search bar */}
-            <div className="hidden md:block w-[30vw] lg:w-[25vw] mr-2">
-              <SearchBar />
+            {/* Mobile: just a search icon that opens the same modal */}
+            <div className="md:hidden">
+              <SearchBar iconOnly disableHotkey />
             </div>
-
-            {/* Mobile search icon */}
-            <button
-              onClick={openMobileSearch}
-              type="button"
-              className="md:hidden p-2 rounded-lg hover:bg-accent/80 transition-all duration-200 ease-in-out active:scale-95"
-              aria-label="Open search"
-            >
-              <Search className="w-5 h-5" />
-            </button>
 
 
             {isAuthenticated && <NotificationDropdown />}
@@ -202,7 +174,6 @@ const Topbar = React.memo(() => {
             )}
           </div>
         </>
-      )}
       </div>
     </header>
   );
