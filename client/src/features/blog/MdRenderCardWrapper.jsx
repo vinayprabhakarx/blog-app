@@ -2,7 +2,7 @@ import React, { Suspense } from "react";
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 // Lazy load the heavy markdown component
-const MdRenderCardLazy = React.lazy(() => import("./MdRenderCard"));
+const MdRenderCardLazy = React.lazy(() => import("@/features/blog/MdRenderCard"));
 
 const MdRenderCardWrapper = ({ content, onDeleteImage, ...props }) => {
   return (

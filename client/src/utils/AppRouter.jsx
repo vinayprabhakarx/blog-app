@@ -8,58 +8,31 @@ import AppLayout from "@/components/layout/AppLayout";
 import Loading from "@/components/common/Loading";
 import { useAuth } from "@/hooks/useAuth";
 
-// Lazy load components for better code splitting
-const HomePage = React.lazy(() => import("../pages/HomePage"));
-const Login = React.lazy(() => import("../features/auth/Login"));
-const Signup = React.lazy(() => import("../features/auth/Signup"));
-const ForgotPassword = React.lazy(() =>
-  import("../features/auth/ForgotPassword")
-);
-const ResetPassword = React.lazy(() =>
-  import("../features/auth/ResetPassword")
-);
-const VerifyEmail = React.lazy(() => import("../features/auth/VerifyEmail"));
-const ResendEmail = React.lazy(() => import("../features/auth/ResendEmail"));
-const ProfilePage = React.lazy(() => import("../pages/ProfilePage"));
-const EditProfile = React.lazy(() =>
-  import("../features/settings/EditProfile")
-);
-const ChangePassword = React.lazy(() =>
-  import("../features/settings/ChangePassword")
-);
-const Dashboard = React.lazy(() => import("../features/dashboard/Dashboard"));
-const CommentManagement = React.lazy(() =>
-  import("../features/comment/CommentManagement")
-);
-const NotificationCenter = React.lazy(() =>
-  import("../features/notification/NotificationCenter")
-);
+const HomePage = React.lazy(() => import("@/pages/HomePage"));
+const Login = React.lazy(() => import("@/features/auth/Login"));
+const Signup = React.lazy(() => import("@/features/auth/Signup"));
+const ForgotPassword = React.lazy(() => import("@/features/auth/ForgotPassword"));
+const ResetPassword = React.lazy(() => import("@/features/auth/ResetPassword"));
+const VerifyEmail = React.lazy(() => import("@/features/auth/VerifyEmail"));
+const ResendEmail = React.lazy(() => import("@/features/auth/ResendEmail"));
+const ProfilePage = React.lazy(() => import("@/pages/ProfilePage"));
+const EditProfile = React.lazy(() => import("@/features/settings/EditProfile"));
+const ChangePassword = React.lazy(() => import("@/features/settings/ChangePassword"));
+const Dashboard = React.lazy(() => import("@/features/dashboard/Dashboard"));
+const CommentManagement = React.lazy(() => import("@/features/comment/CommentManagement"));
+const NotificationCenter = React.lazy(() => import("@/features/notification/NotificationCenter"));
 
-const CategoryManagement = React.lazy(() =>
-  import("../features/category/CategoryManagement")
-);
-const PublicCategoriesView = React.lazy(() =>
-  import("../features/category/CategoryView")
-);
-const CategoryForm = React.lazy(() =>
-  import("../features/category/CategoryForm")
-);
-const BlogManagement = React.lazy(() => import("../features/blog/BlogManagement"));
-const BlogForm = React.lazy(() => import("../features/blog/BlogForm"));
-const BlogFormWrapper = React.lazy(() =>
-  import("../features/blog/BlogFormWrapper")
-);
-const BlogPage = React.lazy(() => import("../pages/BlogPage"));
-const NotFound = React.lazy(() => import("../components/common/NotFound"));
-const DashboardRedirect = React.lazy(() =>
-  import("../components/common/DashboardRedirect")
-);
-const UserManagement = React.lazy(() =>
-  import("../features/user_management/UserManagement")
-);
-const Analytics = React.lazy(() =>
-  import("../features/user_management/Analytics")
-);
+const CategoryManagement = React.lazy(() => import("@/features/category/CategoryManagement"));
+const PublicCategoriesView = React.lazy(() => import("@/features/category/CategoryView"));
+const CategoryForm = React.lazy(() => import("@/features/category/CategoryForm"));
+const BlogManagement = React.lazy(() => import("@/features/blog/BlogManagement"));
+const BlogForm = React.lazy(() => import("@/features/blog/BlogForm"));
+const BlogFormWrapper = React.lazy(() => import("@/features/blog/BlogFormWrapper"));
+const BlogPage = React.lazy(() => import("@/pages/BlogPage"));
+const NotFound = React.lazy(() => import("@/components/common/NotFound"));
+const DashboardRedirect = React.lazy(() => import("@/components/common/DashboardRedirect"));
+const UserManagement = React.lazy(() => import("@/features/user_management/UserManagement"));
+const Analytics = React.lazy(() => import("@/features/user_management/Analytics"));
 
 // ConditionalCategories component
 const ConditionalCategories = () => {

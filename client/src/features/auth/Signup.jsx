@@ -117,8 +117,8 @@ const SignUp = () => {
         </h1>
         <div className="">
           <GoogleAuth />
-          <div className="border my-5 flex justify-center items-center">
-            <span className="absolute bg-text text-sm">Or</span>
+          <div className="relative my-5 flex justify-center items-center border-t border-border">
+            <span className="absolute bg-background px-2 text-sm text-muted-foreground">Or</span>
           </div>
         </div>
 

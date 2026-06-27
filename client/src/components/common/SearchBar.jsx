@@ -453,7 +453,7 @@ const SearchBar = React.memo(({ onResultClick, iconOnly, disableHotkey } = {}) =
         <button
           onClick={openModal}
           type="button"
-          className="flex items-center gap-2 w-full h-9 px-3 rounded-full border border-border text-sm text-muted-foreground cursor-pointer"
+          className="flex items-center gap-2 w-full h-9 px-3 rounded-full border border-border bg-muted/50 text-sm text-muted-foreground cursor-pointer"
         >
           <Search className="h-4 w-4" />
           <span className="flex-1 text-left">Search</span>
