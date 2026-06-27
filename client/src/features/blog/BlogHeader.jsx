@@ -102,11 +102,7 @@ const BlogHeader = ({ blog, onCommentClick }) => {
     [onCommentClick]
   );
 
-  // Inline styles
-  const containerStyle = {
-    maxWidth: window.innerWidth < 768 ? "100%" : "800px",
-    margin: window.innerWidth < 768 ? 0 : "0 auto",
-  };
+  // Using .blog-content-responsive CSS class instead of inline styles for true CSS responsiveness
 
   // Image source with error handling
   const bannerImageSrc = !blogMetadata.banner
@@ -125,9 +121,9 @@ const BlogHeader = ({ blog, onCommentClick }) => {
       {/* 
         This container controls the centering of the header.
         - On mobile (<768px): 100% width, no margin.
-        - On desktop: Max width 800px, centered with margin: 0 auto.
+        - On desktop: Max width 50vw, centered via blog-content-responsive class.
       */}
-      <div className="w-full px-2 sm:px-4 md:px-0 pb-6" style={containerStyle}>
+      <div className="w-full px-2 sm:px-4 md:px-0 pb-6 blog-content-responsive">
         <header className="mb-6 border-b border-border pb-4">
           {/* Title */}
           <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-2 text-foreground">

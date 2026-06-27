@@ -128,3 +128,6 @@ ui-debug.log
 .env*.local
 deploy.md
 deploy.sh
+
+# Ignore sitemap
+client/dist/sitemap.xml

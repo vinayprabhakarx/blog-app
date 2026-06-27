@@ -248,7 +248,7 @@ const BlogPage = () => {
           {/* Main Blog Content - Centered by BlogDisplay internal styles */}
           {/* 
               LAYOUT EXPLANATION:
-              The BlogDisplay component inside handles its own centering (max-width: 800px, margin: 0 auto).
+              The BlogDisplay component inside handles its own centering (max-width: 50vw, margin: 0 auto).
               We avoid wrapping it in flex/grid here to prevent interfering with that centering logic.
           */}
           <div className="relative">

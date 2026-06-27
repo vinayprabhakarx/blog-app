@@ -12,9 +12,9 @@ export const ThemeToggle = () => {
       className="p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer"
     >
       {theme === "dark" ? (
-        <Sun className="w-5 h-5 text-yellow-500" />
+        <Sun className="w-5 h-5 text-foreground" />
       ) : (
-        <Moon className="w-5 h-5" />
+        <Moon className="w-5 h-5 text-foreground" />
       )}
     </button>
   );

@@ -450,3 +450,17 @@ body {
 .Toastify__close-button:hover {
   opacity: 1 !important;
 }
+
+/* Responsive Blog Display */
+.blog-content-responsive {
+  width: 100%;
+  max-width: 100%;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (min-width: 768px) {
+  .blog-content-responsive {
+    max-width: 50vw !important;
+  }
+}

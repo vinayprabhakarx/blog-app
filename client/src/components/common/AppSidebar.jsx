@@ -240,7 +240,7 @@ export const Logo = React.memo(() => {
         animate={{ opacity: 1 }}
         className="font-medium whitespace-pre text-foreground hidden md:inline-block"
       >
-        Acet Labs
+        Blog
       </Motion.span>
     </Link>
   );

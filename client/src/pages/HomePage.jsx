@@ -211,7 +211,7 @@ const HomePage = React.memo(() => {
   return (
     <div className="min-h-screen bg-background text-foreground">
       {/* Category Navigation Bar - Unified across breakpoints with horizontal scroll */}
-      <section className="sticky top-0 z-10 bg-background/95 backdrop-blur-sm border-b border-border/40">
+      <section className="border-b border-border/40">
         <div className="w-full">
           <div className="container mx-auto px-6 sm:px-6">
             <nav className="py-2 sm:py-3">

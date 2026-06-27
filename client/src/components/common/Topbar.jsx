@@ -1,6 +1,5 @@
 import React, { useState, useEffect, useCallback, useMemo } from "react";
-import logoLight from "@/assets/logo-light.png";
-import logoDark from "@/assets/logo-dark.png";
+import Logo from "@/components/common/Logo";
 import { Link, useNavigate } from "react-router-dom";
 import { FiUser } from "react-icons/fi";
 import SearchBar from "./SearchBar";
@@ -20,7 +19,6 @@ import ThemeToggle from "./ThemeToggle";
 import { logout } from "@/features/auth/authSlice";
 import { showToast } from "@/utils/showToast";
 import { RouteIndex, RouteProfile, RouteSignIn } from "@/utils/RouteName";
-import { useTheme } from "@/utils/ThemeContext";
 import { useAuth } from "@/hooks/useAuth";
 import { Search, Menu, X, ArrowLeft } from "lucide-react";
 import NotificationDropdown from "@/features/notification/NotificationDropdown";
@@ -28,12 +26,11 @@ import { useSidebar } from "./sidebar-hooks";
 
 const Topbar = React.memo(() => {
   const [showMobileSearch, setShowMobileSearch] = useState(false);
-  const [currentLogo, setCurrentLogo] = useState(logoLight);
+
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { isAuthenticated, getUserName, getUserEmail, getUserAvatar } =
     useAuth();
-  const { theme } = useTheme();
   const { open, setOpen } = useSidebar();
 
   // Memoize user data to prevent unnecessary re-renders
@@ -46,27 +43,7 @@ const Topbar = React.memo(() => {
     [getUserName, getUserEmail, getUserAvatar]
   );
 
-  // Memoize logo based on theme
-  const currentLogoMemo = useMemo(
-    () => (theme === "dark" ? logoDark : logoLight),
-    [theme]
-  );
 
-  // Memoize logo style to prevent recreation
-  const logoStyle = useMemo(
-    () => ({
-      height: "80px",
-      minHeight: "80px",
-      width: "auto",
-      minWidth: "auto",
-      maxWidth: "none",
-    }),
-    []
-  );
-
-  useEffect(() => {
-    setCurrentLogo(currentLogoMemo);
-  }, [currentLogoMemo]);
 
   // Memoize callback functions
   const handleLogout = useCallback(() => {
@@ -93,7 +70,8 @@ const Topbar = React.memo(() => {
   }, []);
 
   return (
-    <header className="flex justify-between items-center h-16 fixed w-full z-100 bg-background/95 backdrop-blur-sm text-foreground pl-4 pr-3 sm:pl-4 sm:pr-4 md:pl-4 md:pr-6 border-b border-border/20 shadow-sm no-print">
+    <header className="fixed top-0 w-full z-100 bg-background/95 backdrop-blur-sm text-foreground border-b border-border/20 shadow-sm no-print">
+      <div className="mx-auto max-w-7xl w-full h-14 flex justify-between items-center px-4 md:px-6 lg:px-8">
       {/* Mobile search mode - replaces entire navbar content like YouTube */}
       {showMobileSearch ? (
         <div className="flex items-center gap-2 w-full md:hidden pr-2">
@@ -111,7 +89,7 @@ const Topbar = React.memo(() => {
       ) : (
         <>
           {/* Normal navbar content */}
-          <div className="flex items-center gap-2 sm:gap-4">
+          <div className="flex items-center gap-6 sm:gap-8">
             {isAuthenticated && (
               <button
                 className="md:hidden p-2 -ml-2 rounded-md hover:bg-accent/50 transition-colors"
@@ -129,22 +107,26 @@ const Topbar = React.memo(() => {
               to={RouteIndex}
               className="flex items-center hover:opacity-80 transition-opacity duration-200 rounded-lg"
             >
-              <img
-                key={`logo-${theme}`}
-                src={currentLogo}
-                alt="Logo"
-                className="object-contain transition-opacity duration-300"
-                style={logoStyle}
-              />
+              <Logo svgClassName="w-8 h-8 text-foreground" />
             </Link>
+            
+            <a
+              href="https://docs.vinayprabhakar.dev"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-sm font-semibold text-foreground hover:text-primary transition-colors duration-200"
+            >
+              Docs
+            </a>
           </div>
 
-          {/* Desktop search bar */}
-          <div className="hidden md:block flex-1 max-w-xs sm:max-w-sm md:max-w-md lg:max-w-lg mx-4">
-            <SearchBar />
-          </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
+            {/* Desktop search bar */}
+            <div className="hidden md:block w-[30vw] lg:w-[25vw] mr-2">
+              <SearchBar />
+            </div>
+
             {/* Mobile search icon */}
             <button
               onClick={openMobileSearch}
@@ -154,6 +136,7 @@ const Topbar = React.memo(() => {
             >
               <Search className="w-5 h-5" />
             </button>
+
 
             {isAuthenticated && <NotificationDropdown />}
 
@@ -220,6 +203,7 @@ const Topbar = React.memo(() => {
           </div>
         </>
       )}
+      </div>
     </header>
   );
 });

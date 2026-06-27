@@ -17,13 +17,7 @@ const BlogPageSkeleton = () => {
 
         {/* Blog Header skeleton */}
         <div className="w-full overflow-hidden">
-          <div
-            className="w-full px-2 sm:px-4 md:px-0 pb-6"
-            style={{
-              maxWidth: window.innerWidth < 768 ? "100%" : "800px",
-              margin: window.innerWidth < 768 ? 0 : "0 auto",
-            }}
-          >
+          <div className="w-full px-2 sm:px-4 md:px-0 pb-6 blog-content-responsive">
             <header className="mb-6 border-b border-border pb-4">
               {/* Title */}
               <div className="space-y-3 mb-2">
@@ -64,13 +58,7 @@ const BlogPageSkeleton = () => {
 
         {/* Blog Content skeleton */}
         <div className="w-full">
-          <article
-            className="w-full px-2 sm:px-4 md:px-0"
-            style={{
-              maxWidth: window.innerWidth < 768 ? "100%" : "800px",
-              margin: window.innerWidth < 768 ? 0 : "0 auto",
-            }}
-          >
+          <article className="w-full px-2 sm:px-4 md:px-0 blog-content-responsive">
             <div className="w-full mt-8 space-y-6">
               {/* Paragraph blocks */}
               {[1, 2, 3, 4].map((block) => (
