@@ -2,13 +2,7 @@ import React, { useState, useCallback } from "react";
 import Cropper from "react-easy-crop";
 import Slider from "@mui/material/Slider";
 import { Button } from "@/components/ui/button";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
+import { CustomDialog } from "@/components/common/CustomDialog";
 import { Badge } from "@/components/ui/badge";
 
 const getCroppedImg = (imageSrc, pixelCrop) => {
@@ -63,7 +57,6 @@ const ImageCropper = ({ imageUrl, onClose, onCrop }) => {
     { label: "4:3", value: 4 / 3 },
     { label: "3:4", value: 3 / 4 },
     { label: "16:9", value: 16 / 9 },
-    { label: "Free", value: null },
   ];
 
   const onCropComplete = useCallback((croppedArea, croppedAreaPixels) => {
@@ -97,46 +90,17 @@ const ImageCropper = ({ imageUrl, onClose, onCrop }) => {
   }, []);
 
   return (
-    <Dialog open={true} onOpenChange={handleClose}>
-      <div className="fixed inset-0 z-150 bg-black/80 data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0" />
-      <DialogContent
-        className="max-w-4xl w-[92vw] sm:w-[90vw] max-h-[85vh] overflow-y-auto p-0 gap-0 z-150 flex flex-col"
-        showCloseButton={false}
-      >
-        <DialogHeader className="px-3 py-3 sm:px-5 sm:py-4 md:px-6 md:py-5 border-b relative">
-          <DialogTitle className="text-sm sm:text-base md:text-lg pr-8 sm:pr-10">
-            Crop Image
-          </DialogTitle>
-          <DialogDescription className="sr-only">
-            Adjust the crop area, zoom level, and aspect ratio for your image
-          </DialogDescription>
-          <button
-            onClick={handleClose}
-            disabled={isProcessing}
-            className="absolute top-1 right-1.5 sm:top-2 sm:right-3 md:top-2.5 md:right-3.5 p-1.5 rounded-sm opacity-70 hover:opacity-100 transition-opacity disabled:pointer-events-none cursor-pointer"
-            aria-label="Close"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="18"
-              height="18"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="sm:w-5 sm:h-5"
-            >
-              <line x1="18" y1="6" x2="6" y2="18"></line>
-              <line x1="6" y1="6" x2="18" y2="18"></line>
-            </svg>
-          </button>
-        </DialogHeader>
+    <CustomDialog
+      isOpen={true}
+      onClose={handleClose}
+      title="Crop Image"
+      description="Adjust the crop area, zoom level, and aspect ratio for your image"
+      maxWidth="48rem"
+    >
 
-        <div className="px-3 py-2 sm:px-4 sm:py-3 md:px-5 md:py-3 space-y-2 sm:space-y-3 flex-1 overflow-y-auto">
+        <div className="space-y-2 sm:space-y-3">
           {/* Cropper Container */}
-          <div className="relative w-full h-72 sm:h-80 md:h-96 lg:h-112 bg-muted rounded-md sm:rounded-lg overflow-hidden touch-none">
+          <div className="relative w-full h-64 sm:h-72 md:h-80 lg:h-96 bg-muted rounded-md sm:rounded-lg overflow-hidden touch-none">
             <Cropper
               image={imageUrl}
               crop={crop}
@@ -148,6 +112,7 @@ const ImageCropper = ({ imageUrl, onClose, onCrop }) => {
               showGrid={true}
               cropShape="rect"
               objectFit="contain"
+              zoomWithScroll={false}
               style={{
                 containerStyle: {
                   width: "100%",
@@ -166,7 +131,7 @@ const ImageCropper = ({ imageUrl, onClose, onCrop }) => {
               </label>
               <Badge
                 variant="secondary"
-                className="text-[10px] sm:text-xs tabular-nums px-1.5 sm:px-2"
+                className="text-micro sm:text-xs tabular-nums px-1.5 sm:px-2"
               >
                 {zoom.toFixed(1)}x
               </Badge>
@@ -211,13 +176,13 @@ const ImageCropper = ({ imageUrl, onClose, onCrop }) => {
             <label className="text-xs sm:text-sm font-medium text-foreground block">
               Aspect Ratio
             </label>
-            <div className="grid grid-cols-3 sm:grid-cols-5 md:grid-cols-9 gap-1.5 sm:gap-2">
+            <div className="grid grid-cols-4 gap-1.5 sm:gap-2">
               {aspectOptions.map((option) => (
                 <Button
                   key={option.label}
                   variant={aspect === option.value ? "default" : "outline"}
                   onClick={() => handleAspectChange(option.value)}
-                  className="text-[9px] sm:text-[10px] md:text-xs h-5 sm:h-6 md:h-7 touch-manipulation px-0.5 sm:px-1 md:px-2 py-0.5 rounded-md"
+                  className="text-tiny sm:text-micro md:text-xs h-5 sm:h-6 md:h-7 touch-manipulation px-0.5 sm:px-1 md:px-2 py-0.5 rounded-md"
                   type="button"
                 >
                   {option.label}
@@ -232,14 +197,13 @@ const ImageCropper = ({ imageUrl, onClose, onCrop }) => {
               onClick={handleCrop}
               disabled={isProcessing || !croppedAreaPixels}
               type="button"
-              className="w-full sm:w-auto min-w-25 sm:min-w-30 md:min-w-35 h-7 sm:h-8 md:h-9 text-[11px] sm:text-xs md:text-sm touch-manipulation py-0.5"
+              className="w-full sm:w-auto min-w-25 sm:min-w-30 md:min-w-35 h-7 sm:h-8 md:h-9 text-xs sm:text-xs md:text-sm touch-manipulation py-0.5"
             >
               {isProcessing ? "Processing..." : "Crop & Apply"}
             </Button>
           </div>
         </div>
-      </DialogContent>
-    </Dialog>
+      </CustomDialog>
   );
 };
 

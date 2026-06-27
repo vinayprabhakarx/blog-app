@@ -49,12 +49,7 @@ const InputBox = ({
         disabled={disabled}
         className={`${Icon ? "pl-10" : ""} ${
           shouldShowPasswordToggle ? "pr-10" : ""
-        } ${className}`}
-        style={{
-          backgroundColor: "var(--background)",
-          color: "var(--foreground)",
-          border: "1px solid var(--border)",
-        }}
+        } bg-background text-foreground border border-border ${className}`}
         {...props}
       />
       {shouldShowPasswordToggle && (
@@ -63,7 +58,6 @@ const InputBox = ({
           onClick={handlePasswordToggle}
           tabIndex={-1}
           className="absolute right-3 top-1/2 transform -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors cursor-pointer"
-          style={{ color: "var(--muted-foreground)" }}
         >
           {showPassword ? <FaEyeSlash size={18} /> : <FaEye size={18} />}
         </button>

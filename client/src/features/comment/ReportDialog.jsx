@@ -1,12 +1,6 @@
 import React, { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogFooter,
-} from "@/components/ui/dialog";
+import { CustomDialog, CustomDialogFooter } from "@/components/common/CustomDialog";
 import { Button } from "@/components/ui/button";
 import {
   Select,
@@ -73,13 +67,12 @@ const ReportDialog = ({
   };
 
   return (
-    <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="w-[90vw] sm:w-100 sm:max-w-none px-4 sm:px-6 rounded-lg">
-        <DialogHeader>
-          <DialogTitle className="text-foreground text-lg">
-            Report Comment
-          </DialogTitle>
-        </DialogHeader>
+    <CustomDialog
+      isOpen={open}
+      onClose={handleClose}
+      title="Report Comment"
+      maxWidth="28rem"
+    >
 
         <div className="space-y-4">
           {hasReported ? (
@@ -152,7 +145,7 @@ const ReportDialog = ({
           )}
         </div>
 
-        <DialogFooter className="gap-2 sm:gap-0">
+        <CustomDialogFooter className="gap-2 sm:gap-0">
           <Button
             onClick={handleClose}
             variant="ghost"
@@ -170,9 +163,8 @@ const ReportDialog = ({
               {isSubmitting ? "Reporting..." : "Report Comment"}
             </Button>
           )}
-        </DialogFooter>
-      </DialogContent>
-    </Dialog>
+        </CustomDialogFooter>
+    </CustomDialog>
   );
 };
 

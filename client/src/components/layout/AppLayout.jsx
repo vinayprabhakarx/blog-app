@@ -50,13 +50,13 @@ const AppLayout = () => {
           <div id="main-scroll-container" className="flex-1 overflow-auto min-h-0">
             <main className="mx-auto w-full">
               {isAuth ? (
-                <div className="flex items-center justify-center min-h-[calc(100vh-64px)] py-4 px-4">
+                <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] py-4 px-4">
                   <div className="w-full max-w-100">
                     <Outlet />
                   </div>
                 </div>
               ) : (
-                <div className="w-full min-h-[calc(100vh-64px)] pt-4 pb-8 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mx-auto max-w-500">
+                <div className="w-full min-h-[calc(100vh-4rem)] pt-4 pb-8 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mx-auto max-w-500">
                   <div className="w-full max-w-full mx-auto">
                     <Outlet />
                   </div>

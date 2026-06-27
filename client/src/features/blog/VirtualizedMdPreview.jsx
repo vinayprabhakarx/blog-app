@@ -32,7 +32,7 @@ const VirtualizedMdPreview = ({ content }) => {
 
   return (
     <Virtuoso
-      style={{ height: '100%', width: '100%' }}
+      className="h-full w-full"
       data={chunks}
       // Overscan ensures smooth scrolling by rendering a bit outside current view
       overscan={500} 

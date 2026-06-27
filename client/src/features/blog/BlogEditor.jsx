@@ -36,11 +36,7 @@ const ToolButton = React.memo(({ onClick, title, children }) => (
   <button
     type="button"
     onClick={onClick}
-    className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center rounded hover:bg-opacity-80 transition-colors cursor-pointer"
-    style={{
-      backgroundColor: "var(--muted)",
-      color: "var(--foreground)",
-    }}
+    className="w-6 h-6 sm:w-8 sm:h-8 flex items-center justify-center rounded hover:bg-opacity-80 transition-colors cursor-pointer bg-muted text-foreground"
     title={title}
   >
     {children}
@@ -334,13 +330,7 @@ const BlogEditor = ({
 
       {/* ... Toolbar ... */}
       <div
-        className="flex items-center justify-between p-2 border-b sticky top-0 gap-2"
-        style={{
-          borderColor: "var(--border)",
-          backgroundColor: "var(--muted)",
-          zIndex: 10,
-          overflowX: "auto",
-        }}
+        className="flex items-center justify-between p-2 border-b border-border bg-muted sticky top-0 gap-2 overflow-x-auto z-10"
       >
         {/* ... Toolbar content same as before ... */}
         <div className="flex items-center gap-2 flex-1 min-w-0 overflow-x-auto">
@@ -348,8 +338,7 @@ const BlogEditor = ({
             <div className="flex items-center gap-1 flex-1 min-w-0">
               {/* Headings */}
               <div
-                className="flex items-center gap-1 pr-2 border-r"
-                style={{ borderColor: "var(--border)" }}
+                className="flex items-center gap-1 pr-2 border-r border-border"
               >
                 <ToolButton onClick={formatH1} title="Heading 1">
                   <Heading1 className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -363,8 +352,7 @@ const BlogEditor = ({
               </div>
               {/* Text Formatting */}
               <div
-                className="flex items-center gap-1 pr-2 border-r"
-                style={{ borderColor: "var(--border)" }}
+                className="flex items-center gap-1 pr-2 border-r border-border"
               >
                 <ToolButton onClick={formatBold} title="Bold">
                   <Bold className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -378,8 +366,7 @@ const BlogEditor = ({
               </div>
               {/* Links/Images */}
               <div
-                className="flex items-center gap-1 pr-2 border-r"
-                style={{ borderColor: "var(--border)" }}
+                className="flex items-center gap-1 pr-2 border-r border-border"
               >
                 <ToolButton onClick={formatLink} title="Link">
                   <Link className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -390,8 +377,7 @@ const BlogEditor = ({
               </div>
               {/* Lists */}
               <div
-                className="flex items-center gap-1 pr-2 border-r"
-                style={{ borderColor: "var(--border)" }}
+                className="flex items-center gap-1 pr-2 border-r border-border"
               >
                 <ToolButton onClick={formatUnorderedList} title="Bullet List">
                   <List className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -402,8 +388,7 @@ const BlogEditor = ({
               </div>
               {/* Code/Quote */}
               <div
-                className="flex items-center gap-1 pr-2 border-r"
-                style={{ borderColor: "var(--border)" }}
+                className="flex items-center gap-1 pr-2 border-r border-border"
               >
                 <ToolButton onClick={formatInlineCode} title="Inline Code">
                   <Code className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -435,11 +420,7 @@ const BlogEditor = ({
           <button
             type="button"
             onClick={toggleViewMode}
-            className="flex items-center gap-1 px-2 py-1 rounded text-sm hover:bg-opacity-80 cursor-pointer"
-            style={{
-              backgroundColor: "var(--accent)",
-              color: "var(--accent-foreground)",
-            }}
+            className="flex items-center gap-1 px-2 py-1 rounded text-sm hover:bg-opacity-80 cursor-pointer bg-accent text-accent-foreground"
           >
             {getViewModeIcon}
             <span className="capitalize hidden sm:inline">{viewMode}</span>
@@ -447,11 +428,7 @@ const BlogEditor = ({
           <button
             type="button"
             onClick={toggleFullscreen}
-            className="flex items-center gap-1 px-2 py-1 rounded text-sm hover:bg-opacity-80 cursor-pointer"
-            style={{
-              backgroundColor: "var(--secondary)",
-              color: "var(--secondary-foreground)",
-            }}
+            className="flex items-center gap-1 px-2 py-1 rounded text-sm hover:bg-opacity-80 cursor-pointer bg-secondary text-secondary-foreground"
           >
             {isFullscreen ? (
               <Minimize className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -467,8 +444,8 @@ const BlogEditor = ({
         className="flex gap-2"
         style={{
           height: isFullscreen
-            ? "calc(100vh - 48px)"
-            : `calc(${height}px - 48px)`,
+            ? "calc(100vh - 3rem)"
+            : `calc(${height}px - 3rem)`,
         }}
       >
         {/* Main Editor and Preview Area */}
@@ -485,15 +462,7 @@ const BlogEditor = ({
                 value={value}
                 onChange={handleChange}
                 placeholder={placeholder}
-                className="w-full h-full p-4 resize-none focus:outline-none"
-                style={{
-                  backgroundColor: "var(--card)",
-                  color: "var(--foreground)",
-                  fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
-                  fontSize: "14px",
-                  lineHeight: "1.6",
-                  border: "none",
-                }}
+                className="w-full h-full p-4 resize-none focus:outline-none bg-card text-foreground font-mono text-sm leading-relaxed border-none"
               />
             </div>
           )}
@@ -501,8 +470,7 @@ const BlogEditor = ({
           {/* Divider */}
           {viewMode === "split" && (
             <div
-              className="w-px"
-              style={{ backgroundColor: "var(--border)" }}
+              className="w-px bg-border"
             />
           )}
 

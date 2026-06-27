@@ -1,9 +1,10 @@
 import React, { useState, useCallback, useRef, useEffect, useMemo } from "react";
-import ReactDOM from "react-dom";
+
 import { Input } from "@/components/ui/input";
 import { Search, X, Loader2, Clock } from "lucide-react";
 import { useNavigate, useLocation } from "react-router-dom";
 import blogService from "@/features/blog/blogsService";
+import { CustomDialog } from "@/components/common/CustomDialog";
 
 // Custom event for closing mobile search from SearchBar
 const CLOSE_MOBILE_SEARCH_EVENT = "closeMobileSearch";
@@ -419,12 +420,6 @@ const SearchBar = React.memo(({ onResultClick, iconOnly, disableHotkey } = {}) =
     }
   }, [openModal, disableHotkey]);
 
-  // Click outside handler for modal overlay
-  const handleOverlayClick = useCallback((e) => {
-    if (e.target.dataset.searchOverlay === "true") {
-      closeModal();
-    }
-  }, [closeModal]);
 
   // Cleanup on unmount
   useEffect(() => cleanup, [cleanup]);
@@ -458,143 +453,135 @@ const SearchBar = React.memo(({ onResultClick, iconOnly, disableHotkey } = {}) =
           <Search className="h-4 w-4" />
           <span className="flex-1 text-left">Search</span>
           <span className="hidden sm:inline-flex items-center gap-1">
-            <kbd className="inline-flex items-center justify-center px-1.5 h-5 min-w-[1.5rem] rounded border border-border bg-muted text-[0.625rem] font-mono font-medium text-muted-foreground">Ctrl</kbd>
-            <kbd className="inline-flex items-center justify-center px-1.5 h-5 min-w-[1.5rem] rounded border border-border bg-muted text-[0.625rem] font-mono font-medium text-muted-foreground">K</kbd>
+            <kbd className="inline-flex items-center justify-center px-1.5 h-5 min-w-6 rounded border border-border bg-muted text-micro font-mono font-medium text-muted-foreground">Ctrl</kbd>
+            <kbd className="inline-flex items-center justify-center px-1.5 h-5 min-w-6 rounded border border-border bg-muted text-micro font-mono font-medium text-muted-foreground">K</kbd>
           </span>
         </button>
       )}
 
       {/* Modal Overlay */}
-      {isModalOpen && ReactDOM.createPortal(
-        <div 
-          className="fixed inset-0 z-[200] flex items-start justify-center pt-[15vh] sm:pt-[20vh] px-4"
-          style={{ backgroundColor: 'var(--overlay)', backdropFilter: 'blur(0.5rem)', WebkitBackdropFilter: 'blur(0.5rem)', animation: 'searchFadeIn 150ms ease-out' }}
-          data-search-overlay="true"
-          onClick={handleOverlayClick}
-        >
-          <style>{`
-            @keyframes searchFadeIn { from { opacity: 0; } to { opacity: 1; } }
-            @keyframes searchScaleIn { from { opacity: 0; transform: scale(0.96); } to { opacity: 1; transform: scale(1); } }
-          `}</style>
-          {/* Modal Container - unified rounded box like Fumadocs */}
-          <div className="w-full bg-popover border border-border rounded-xl shadow-2xl overflow-hidden flex flex-col" style={{ maxWidth: '30rem', animation: 'searchScaleIn 150ms ease-out' }}>
-            {/* Search input at top */}
-            <form onSubmit={handleFormSubmit} className="relative border-b border-border">
-              {isSearching ? (
-                <Loader2 className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground animate-spin" />
-              ) : (
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
-              )}
-              <Input
-                ref={inputRef}
-                placeholder="Search"
-                value={searchQuery}
-                onChange={handleInputChange}
-                onKeyDown={handleKeyDown}
-                className="h-12 pl-12 pr-16 w-full bg-transparent border-0 rounded-none text-base shadow-none outline-none ring-0 focus:outline-none focus:ring-0 focus:border-transparent focus-visible:ring-0 focus-visible:border-transparent focus-visible:outline-none"
-                autoComplete="off"
-                spellCheck="false"
-              />
-              {searchQuery ? (
-                <button
-                  type="button"
-                  onClick={handleClearSearch}
-                  className="absolute right-4 top-1/2 transform -translate-y-1/2 p-1 rounded text-muted-foreground hover:text-foreground transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              ) : (
-                <div className="absolute right-4 top-1/2 transform -translate-y-1/2 px-2 h-6 rounded border border-border bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground">
-                  ESC
-                </div>
-              )}
-            </form>
+      <CustomDialog
+        isOpen={isModalOpen}
+        onClose={closeModal}
+        showCloseButton={false}
+        maxWidth="32rem"
+        align="top"
+        className="p-0 gap-0 overflow-hidden"
+      >
+        {/* Search input at top */}
+        <form onSubmit={handleFormSubmit} className="relative border-b border-border">
+          {isSearching ? (
+            <Loader2 className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground animate-spin" />
+          ) : (
+            <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+          )}
+          <Input
+            ref={inputRef}
+            placeholder="Search"
+            value={searchQuery}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            className="h-12 pl-12 pr-16 w-full bg-transparent border-0 rounded-none text-base shadow-none outline-none ring-0 focus:outline-none focus:ring-0 focus:border-transparent focus-visible:ring-0 focus-visible:border-transparent focus-visible:outline-none"
+            autoComplete="off"
+            spellCheck="false"
+          />
+          {searchQuery ? (
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              className="absolute right-4 top-1/2 transform -translate-y-1/2 p-1 rounded text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          ) : (
+            <div className="absolute right-4 top-1/2 transform -translate-y-1/2 px-2 h-6 rounded border border-border bg-muted flex items-center justify-center text-xs font-medium text-muted-foreground">
+              ESC
+            </div>
+          )}
+        </form>
 
-            {/* Results area directly below search */}
-            <div className="max-h-[50vh] overflow-y-auto">
-              {/* Recent Searches */}
-              {showRecent && recentSearches.length > 0 && (
-                <div ref={resultsRef} className="py-2">
-                  <div className="flex items-center justify-between px-4 py-2">
-                    <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                      Recent
-                    </span>
-                    <button
-                      onClick={clearRecentSearches}
-                      className="text-xs text-muted-foreground hover:text-foreground transition-colors"
-                    >
-                      Clear
-                    </button>
+        {/* Results area directly below search */}
+        <div className="max-h-[50vh] overflow-y-auto">
+          {/* Recent Searches */}
+          {showRecent && recentSearches.length > 0 && (
+            <div ref={resultsRef} className="py-2">
+              <div className="flex items-center justify-between px-4 py-2">
+                <span className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                  Recent
+                </span>
+                <button
+                  onClick={clearRecentSearches}
+                  className="text-xs text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  Clear
+                </button>
+              </div>
+              {recentSearches.map((query, index) => (
+                <button
+                  key={query}
+                  onClick={() => handleRecentClick(query)}
+                  className={`w-full px-4 py-3 text-left transition-colors cursor-pointer flex items-center gap-3 ${
+                    index === selectedIndex
+                      ? "bg-accent text-accent-foreground"
+                      : "text-foreground hover:bg-accent/50"
+                  }`}
+                >
+                  <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
+                  <span className="text-sm line-clamp-1">{query}</span>
+                </button>
+              ))}
+            </div>
+          )}
+
+          {/* Search Results */}
+          {showResults && searchQuery.trim().length >= CONFIG.MIN_SEARCH_LENGTH && (
+            <div ref={resultsRef} className="py-2">
+              {isSearching && searchResults.length === 0 ? (
+                <div className="p-6 text-center text-muted-foreground">
+                  <Loader2 className="h-6 w-6 animate-spin mx-auto mb-3" />
+                  <span className="text-sm">Searching blogs...</span>
+                </div>
+              ) : searchResults.length === 0 ? (
+                <div className="p-8 text-center text-muted-foreground">
+                  <Search className="h-10 w-10 mx-auto mb-4 opacity-20" />
+                  <p className="text-sm font-medium">No results found.</p>
+                  <p className="text-xs mt-1">Try a different search term.</p>
+                </div>
+              ) : (
+                <>
+                  <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                    Blogs
                   </div>
-                  {recentSearches.map((query, index) => (
+                  {searchResults.map((blog, index) => (
                     <button
-                      key={query}
-                      onClick={() => handleRecentClick(query)}
-                      className={`w-full px-4 py-3 text-left transition-colors cursor-pointer flex items-center gap-3 ${
+                      key={blog._id}
+                      onClick={() => handleResultClick(blog)}
+                      className={`w-full px-4 py-3 text-left transition-colors cursor-pointer flex flex-col gap-1 ${
                         index === selectedIndex
-                          ? "bg-accent text-accent-foreground"
-                          : "text-foreground hover:bg-accent/50"
+                          ? "bg-accent"
+                          : "hover:bg-accent/50"
                       }`}
                     >
-                      <Clock className="h-4 w-4 text-muted-foreground shrink-0" />
-                      <span className="text-sm line-clamp-1">{query}</span>
+                      <span className={`text-sm font-medium line-clamp-1 ${index === selectedIndex ? "text-accent-foreground" : "text-foreground"}`}>
+                        {blog.title}
+                      </span>
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-muted-foreground">
+                          {blog.category?.name || "Uncategorized"}
+                        </span>
+                        <span className="text-xs text-muted-foreground">•</span>
+                        <span className="text-xs text-muted-foreground">
+                          {new Date(blog.createdAt).toLocaleDateString()}
+                        </span>
+                      </div>
                     </button>
                   ))}
-                </div>
-              )}
-
-              {/* Search Results */}
-              {showResults && searchQuery.trim().length >= CONFIG.MIN_SEARCH_LENGTH && (
-                <div ref={resultsRef} className="py-2">
-                  {isSearching && searchResults.length === 0 ? (
-                    <div className="p-6 text-center text-muted-foreground">
-                      <Loader2 className="h-6 w-6 animate-spin mx-auto mb-3" />
-                      <span className="text-sm">Searching blogs...</span>
-                    </div>
-                  ) : searchResults.length === 0 ? (
-                    <div className="p-8 text-center text-muted-foreground">
-                      <Search className="h-10 w-10 mx-auto mb-4 opacity-20" />
-                      <p className="text-sm font-medium">No results found.</p>
-                      <p className="text-xs mt-1">Try a different search term.</p>
-                    </div>
-                  ) : (
-                    <>
-                      <div className="px-4 py-2 text-xs font-semibold text-muted-foreground uppercase tracking-wider">
-                        Blogs
-                      </div>
-                      {searchResults.map((blog, index) => (
-                        <button
-                          key={blog._id}
-                          onClick={() => handleResultClick(blog)}
-                          className={`w-full px-4 py-3 text-left transition-colors cursor-pointer flex flex-col gap-1 ${
-                            index === selectedIndex
-                              ? "bg-accent"
-                              : "hover:bg-accent/50"
-                          }`}
-                        >
-                          <span className={`text-sm font-medium line-clamp-1 ${index === selectedIndex ? "text-accent-foreground" : "text-foreground"}`}>
-                            {blog.title}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-muted-foreground">
-                              {blog.category?.name || "Uncategorized"}
-                            </span>
-                            <span className="text-xs text-muted-foreground">•</span>
-                            <span className="text-xs text-muted-foreground">
-                              {new Date(blog.createdAt).toLocaleDateString()}
-                            </span>
-                          </div>
-                        </button>
-                      ))}
-                    </>
-                  )}
-                </div>
+                </>
               )}
             </div>
-          </div>
-        </div>,
-        document.body
-      )}
+          )}
+        </div>
+      </CustomDialog>
     </>
   );
 });

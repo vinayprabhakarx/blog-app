@@ -103,7 +103,7 @@ const ChangePassword = () => {
 
   return (
     <section className="min-h-screen w-full px-4 py-6 sm:px-6 sm:py-8">
-      <div className="max-w-4xl mx-auto">
+      <div className="max-w-4xl mx-auto w-full">
         {/* Header - Outside Card */}
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center mb-4">
@@ -123,8 +123,8 @@ const ChangePassword = () => {
           </div>
         </div>
 
-        <div className="mx-auto" style={{ width: '100%', maxWidth: '28rem' }}>
-          <AuthCard className="w-full !max-w-full mx-0">
+        <div className="w-full mx-auto mt-6" style={{ maxWidth: "448px" }}>
+          <AuthCard className="w-full max-w-full! mx-0">
             {/* Conditional Content */}
             {user?.authProvider === "google" ? (
             // Google Auth Message - Centered

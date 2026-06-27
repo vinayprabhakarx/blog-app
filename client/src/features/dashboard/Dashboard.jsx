@@ -403,7 +403,7 @@ const Dashboard = () => {
                       <div className="flex items-center shrink-0">
                         <Badge
                           variant={blog.draft ? "secondary" : "outline"}
-                          className="text-[10px] font-normal"
+                          className="text-micro font-normal"
                         >
                           {blog.draft ? "Draft" : "Published"}
                         </Badge>

@@ -9,10 +9,10 @@
 
 /* Map CSS variables to Tailwind's theme object */
 @theme inline {
-  --radius-sm: calc(var(--radius) - 4px);
-  --radius-md: calc(var(--radius) - 2px);
+  --radius-sm: calc(var(--radius) - 0.25rem);
+  --radius-md: calc(var(--radius) - 0.125rem);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) + 4px);
+  --radius-xl: calc(var(--radius) + 0.25rem);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --color-card: var(--card);
@@ -35,6 +35,25 @@
   --color-success: var(--success);
   --color-warning: var(--warning);
   --color-info: var(--info);
+  
+  --font-size-micro: 0.625rem;
+  --font-size-tiny: 0.5625rem;
+
+  --width-modal: 90vw;
+  --width-sidebar: 15.625rem;
+
+  --animate-search-fade-in: searchFadeIn 150ms ease-out;
+  --animate-search-scale-in: searchScaleIn 150ms ease-out;
+}
+
+@keyframes searchFadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes searchScaleIn {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
 /* CSS Custom Properties for semantic colors */
@@ -241,15 +260,16 @@ body {
 
   /* Prevent zoom on input focus */
   input,
+  optgroup,
   select,
   textarea {
-    font-size: 16px;
+    font-size: 1rem;
   }
 
-  /* Better button spacing for mobile */
+  /* Better button tap targets on mobile */
   button {
-    min-height: 44px;
-    min-width: 44px;
+    min-height: 2.75rem;
+    min-width: 2.75rem;
   }
 
   /* Improve dropdown menu touch interaction */
@@ -257,9 +277,9 @@ body {
     z-index: 9999 !important;
   }
 
-  /* Ensure dropdown menu items are touch-friendly */
+  /* Improve dropdown items touch targets */
   [role="menuitem"] {
-    min-height: 44px;
+    min-height: 2.75rem;
     display: flex;
     align-items: center;
     padding: 0.75rem 1rem;

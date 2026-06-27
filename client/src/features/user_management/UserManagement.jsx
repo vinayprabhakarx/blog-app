@@ -29,26 +29,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from "@/components/ui/alert-dialog";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { CustomDialog, CustomDialogFooter } from "@/components/common/CustomDialog";
 import {
   Avatar,
   AvatarFallback,
@@ -98,6 +79,7 @@ const UserManagement = () => {
 
   const [roleChangeUser, setRoleChangeUser] = useState(null);
   const [newRole, setNewRole] = useState("");
+  const [deleteUserObj, setDeleteUserObj] = useState(null);
 
   useEffect(() => {
     const params = {
@@ -532,118 +514,30 @@ const UserManagement = () => {
                       <TableCell className="py-4 px-4 text-center">
                         <div className="flex justify-center gap-2">
                           {canChangeRole(user) && (
-                            <Dialog
-                              open={roleChangeUser?._id === user._id}
-                              onOpenChange={(isOpen) => {
-                                if (!isOpen) {
-                                  setRoleChangeUser(null);
-                                } else {
-                                  setRoleChangeUser(user);
-                                  setNewRole(user.role);
-                                }
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="transition-colors duration-200 hover:bg-primary hover:text-primary-foreground cursor-pointer"
+                              title="Change Role"
+                              onClick={() => {
+                                setRoleChangeUser(user);
+                                setNewRole(user.role);
                               }}
                             >
-                              <DialogTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="transition-colors duration-200 hover:bg-primary hover:text-primary-foreground cursor-pointer"
-                                  title="Change Role"
-                                  onClick={() => {
-                                    if (roleChangeUser?._id !== user._id) {
-                                      setRoleChangeUser(user);
-                                      setNewRole(user.role);
-                                    }
-                                  }}
-                                >
-                                  <UserCog className="h-4 w-4" />
-                                </Button>
-                              </DialogTrigger>
-                              <DialogContent className="w-[90vw] sm:max-w-sm sm:w-full">
-                                <DialogHeader>
-                                  <DialogTitle>Change User Role</DialogTitle>
-                                  <DialogDescription>
-                                    Change the role for{" "}
-                                    {user.personal_info?.name || "this user"}
-                                  </DialogDescription>
-                                </DialogHeader>
-                                <div className="py-4">
-                                  <Select
-                                    value={newRole}
-                                    onValueChange={setNewRole}
-                                  >
-                                    <SelectTrigger className="cursor-pointer">
-                                      <SelectValue />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="user">User</SelectItem>
-                                      <SelectItem value="author">
-                                        Author
-                                      </SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                </div>
-                                <DialogFooter>
-                                  <Button
-                                    variant="outline"
-                                    onClick={() => {
-                                      setRoleChangeUser(null);
-                                      setNewRole("");
-                                    }}
-                                    className="cursor-pointer"
-                                  >
-                                    Cancel
-                                  </Button>
-                                  <Button
-                                    onClick={handleRoleChange}
-                                    disabled={loading || newRole === user.role}
-                                    className="cursor-pointer disabled:cursor-not-allowed"
-                                  >
-                                    Change Role
-                                  </Button>
-                                </DialogFooter>
-                              </DialogContent>
-                            </Dialog>
+                              <UserCog className="h-4 w-4" />
+                            </Button>
                           )}
 
                           {canDeleteUser(user) && (
-                            <AlertDialog>
-                              <AlertDialogTrigger asChild>
-                                <Button
-                                  variant="outline"
-                                  size="sm"
-                                  className="transition-colors duration-200 hover:text-destructive hover:border-destructive cursor-pointer"
-                                  title="Delete User"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </AlertDialogTrigger>
-                              <AlertDialogContent className="w-[90vw] sm:max-w-sm sm:w-full">
-                                <AlertDialogHeader>
-                                  <AlertDialogTitle>
-                                    Delete User
-                                  </AlertDialogTitle>
-                                  <AlertDialogDescription>
-                                    Are you sure you want to delete{" "}
-                                    {user.personal_info?.name || "this user"}?
-                                    This action cannot be undone and will
-                                    permanently remove their account and all
-                                    associated data.
-                                  </AlertDialogDescription>
-                                </AlertDialogHeader>
-                                <AlertDialogFooter>
-                                  <AlertDialogCancel className="cursor-pointer">
-                                    Cancel
-                                  </AlertDialogCancel>
-                                  <AlertDialogAction
-                                    onClick={() => handleDeleteUser(user._id)}
-                                    className="bg-destructive hover:bg-destructive/80 cursor-pointer"
-                                  >
-                                    Delete User
-                                  </AlertDialogAction>
-                                </AlertDialogFooter>
-                              </AlertDialogContent>
-                            </AlertDialog>
+                            <Button
+                              variant="outline"
+                              size="sm"
+                              className="transition-colors duration-200 hover:text-destructive hover:border-destructive cursor-pointer"
+                              title="Delete User"
+                              onClick={() => setDeleteUserObj(user)}
+                            >
+                              <Trash2 className="h-4 w-4" />
+                            </Button>
                           )}
                         </div>
                       </TableCell>
@@ -723,112 +617,32 @@ const UserManagement = () => {
 
                 <div className="flex justify-center gap-2 pt-2 border-t">
                   {canChangeRole(user) && (
-                    <Dialog
-                      open={roleChangeUser?._id === user._id}
-                      onOpenChange={(isOpen) => {
-                        if (!isOpen) {
-                          setRoleChangeUser(null);
-                        } else {
-                          setRoleChangeUser(user);
-                          setNewRole(user.role);
-                        }
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="px-3 py-1 h-8 text-xs transition-colors duration-200 hover:bg-primary hover:text-primary-foreground cursor-pointer"
+                      title="Change Role"
+                      onClick={() => {
+                        setRoleChangeUser(user);
+                        setNewRole(user.role);
                       }}
                     >
-                      <DialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="px-3 py-1 h-8 text-xs transition-colors duration-200 hover:bg-primary hover:text-primary-foreground cursor-pointer"
-                          title="Change Role"
-                          onClick={() => {
-                            if (roleChangeUser?._id !== user._id) {
-                              setRoleChangeUser(user);
-                              setNewRole(user.role);
-                            }
-                          }}
-                        >
-                          <UserCog className="h-3 w-3 mr-1" />
-                          Role
-                        </Button>
-                      </DialogTrigger>
-                      <DialogContent className="w-[90vw] sm:max-w-sm sm:w-full">
-                        <DialogHeader>
-                          <DialogTitle>Change User Role</DialogTitle>
-                          <DialogDescription>
-                            Change the role for{" "}
-                            {user.personal_info?.name || "this user"}
-                          </DialogDescription>
-                        </DialogHeader>
-                        <div className="py-4">
-                          <Select value={newRole} onValueChange={setNewRole}>
-                            <SelectTrigger className="cursor-pointer">
-                              <SelectValue />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="user">User</SelectItem>
-                              <SelectItem value="author">Author</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        <DialogFooter>
-                          <Button
-                            variant="outline"
-                            onClick={() => {
-                              setRoleChangeUser(null);
-                              setNewRole("");
-                            }}
-                            className="cursor-pointer"
-                          >
-                            Cancel
-                          </Button>
-                          <Button
-                            onClick={handleRoleChange}
-                            disabled={loading || newRole === user.role}
-                            className="cursor-pointer disabled:cursor-not-allowed"
-                          >
-                            Change Role
-                          </Button>
-                        </DialogFooter>
-                      </DialogContent>
-                    </Dialog>
+                      <UserCog className="h-3 w-3 mr-1" />
+                      Role
+                    </Button>
                   )}
 
                   {canDeleteUser(user) && (
-                    <AlertDialog>
-                      <AlertDialogTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="sm"
-                          className="px-3 py-1 h-8 text-xs transition-colors duration-200 hover:text-destructive hover:border-destructive cursor-pointer"
-                          title="Delete User"
-                        >
-                          <Trash2 className="h-3 w-3 mr-1" />
-                          Delete
-                        </Button>
-                      </AlertDialogTrigger>
-                      <AlertDialogContent className="w-[90vw] sm:max-w-sm sm:w-full">
-                        <AlertDialogHeader>
-                          <AlertDialogTitle>Delete User</AlertDialogTitle>
-                          <AlertDialogDescription>
-                            Are you sure you want to delete{" "}
-                            {user.personal_info?.name || "this user"}? This
-                            action cannot be undone and will permanently remove
-                            their account and all associated data.
-                          </AlertDialogDescription>
-                        </AlertDialogHeader>
-                        <AlertDialogFooter>
-                          <AlertDialogCancel className="cursor-pointer">
-                            Cancel
-                          </AlertDialogCancel>
-                          <AlertDialogAction
-                            onClick={() => handleDeleteUser(user._id)}
-                            className="bg-destructive hover:bg-destructive/80 cursor-pointer"
-                          >
-                            Delete User
-                          </AlertDialogAction>
-                        </AlertDialogFooter>
-                      </AlertDialogContent>
-                    </AlertDialog>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="px-3 py-1 h-8 text-xs transition-colors duration-200 hover:text-destructive hover:border-destructive cursor-pointer"
+                      title="Delete User"
+                      onClick={() => setDeleteUserObj(user)}
+                    >
+                      <Trash2 className="h-3 w-3 mr-1" />
+                      Delete
+                    </Button>
                   )}
                 </div>
               </div>
@@ -867,6 +681,67 @@ const UserManagement = () => {
           </CardContent>
         </Card>
       )}
+      {/* Change Role Dialog */}
+      <CustomDialog
+        isOpen={!!roleChangeUser}
+        onClose={() => { setRoleChangeUser(null); setNewRole(""); }}
+        title="Change User Role"
+        description={roleChangeUser ? `Change the role for ${roleChangeUser.personal_info?.name || "this user"}` : ""}
+        maxWidth="28rem"
+      >
+        <div className="py-4">
+          <Select value={newRole} onValueChange={setNewRole}>
+            <SelectTrigger className="cursor-pointer w-full">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              <SelectItem value="user">User</SelectItem>
+              <SelectItem value="author">Author</SelectItem>
+            </SelectContent>
+          </Select>
+        </div>
+        <CustomDialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => { setRoleChangeUser(null); setNewRole(""); }}
+            className="cursor-pointer"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={handleRoleChange}
+            disabled={loading || (roleChangeUser && newRole === roleChangeUser.role)}
+            className="cursor-pointer disabled:cursor-not-allowed"
+          >
+            Change Role
+          </Button>
+        </CustomDialogFooter>
+      </CustomDialog>
+
+      {/* Delete User Dialog */}
+      <CustomDialog
+        isOpen={!!deleteUserObj}
+        onClose={() => setDeleteUserObj(null)}
+        title="Delete User"
+        description={deleteUserObj ? `Are you sure you want to delete ${deleteUserObj.personal_info?.name || "this user"}? This action cannot be undone and will permanently remove their account and all associated data.` : ""}
+        maxWidth="28rem"
+      >
+        <CustomDialogFooter>
+          <Button
+            variant="outline"
+            onClick={() => setDeleteUserObj(null)}
+            className="cursor-pointer"
+          >
+            Cancel
+          </Button>
+          <Button
+            onClick={() => { handleDeleteUser(deleteUserObj._id); setDeleteUserObj(null); }}
+            className="bg-destructive hover:bg-destructive/80 cursor-pointer text-destructive-foreground"
+          >
+            Delete User
+          </Button>
+        </CustomDialogFooter>
+      </CustomDialog>
     </section>
   );
 };

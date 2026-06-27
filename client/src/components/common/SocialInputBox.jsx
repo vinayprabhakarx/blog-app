@@ -39,17 +39,12 @@ const SocialInputBox = ({
       )}
 
       <div
-        className={`flex items-center flex-nowrap overflow-x-auto border rounded-lg transition-all duration-200 focus-within:ring-2 focus-within:ring-offset-2 ${
+        className={`flex items-center flex-nowrap overflow-x-auto border rounded-lg transition-all duration-200 focus-within:ring-2 focus-within:ring-offset-2 bg-background border-border ${
           Icon ? "pl-10" : ""
         } ${className}`}
-        style={{
-          backgroundColor: "var(--background)",
-          border: "1px solid var(--border)",
-        }}
       >
         <span
-          className="pl-3 pr-0 py-3 text-sm select-none whitespace-nowrap"
-          style={{ color: "var(--foreground)" }}
+          className="pl-3 pr-0 py-3 text-sm select-none whitespace-nowrap text-foreground"
         >
           {prefix}
         </span>
@@ -65,10 +60,7 @@ const SocialInputBox = ({
           placeholder={isFocused ? "" : placeholder}
           required={required}
           disabled={disabled}
-          className="flex-1 min-w-0 pl-0 pr-3 py-3 bg-transparent outline-none text-sm placeholder:text-muted-foreground"
-          style={{
-            color: "var(--foreground)",
-          }}
+          className="flex-1 min-w-0 pl-0 pr-3 py-3 bg-transparent outline-none text-sm placeholder:text-muted-foreground text-foreground"
           {...props}
         />
       </div>

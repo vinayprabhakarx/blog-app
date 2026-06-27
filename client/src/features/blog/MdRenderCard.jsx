@@ -100,7 +100,7 @@ const MarkdownImage = React.memo(({ src, alt, onDeleteImage, ...props }) => {
   const imageStyle = useMemo(
     () => ({
       maxWidth: "100%",
-      maxHeight: onDeleteImage ? "300px" : "none",
+      maxHeight: onDeleteImage ? "18.75rem" : "none",
       width: "auto",
       height: "auto",
       display: "block",

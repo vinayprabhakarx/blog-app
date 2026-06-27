@@ -433,11 +433,7 @@ const EditProfile = () => {
 
   return (
     <section
-      className="min-h-screen w-full px-4 py-6 sm:px-6 sm:py-8"
-      style={{
-        backgroundColor: "var(--background)",
-        color: "var(--foreground)",
-      }}
+      className="min-h-screen w-full px-4 py-6 sm:px-6 sm:py-8 bg-background text-foreground"
     >
       <div className="max-w-4xl mx-auto">
         {/* Header */}
@@ -454,8 +450,7 @@ const EditProfile = () => {
           </div>
           <div className="text-center">
             <h1
-              className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2"
-              style={{ color: "var(--foreground)" }}
+              className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2 text-foreground"
             >
               Edit Profile
             </h1>
@@ -464,11 +459,7 @@ const EditProfile = () => {
           {/* Error Display */}
           {profileUpdateError && (
             <div
-              className="mt-4 p-3 rounded-lg text-sm text-center"
-              style={{
-                backgroundColor: "var(--destructive)",
-                color: "var(--destructive-foreground)",
-              }}
+              className="mt-4 p-3 rounded-lg text-sm text-center bg-destructive text-destructive-foreground"
             >
               {profileUpdateError}
             </div>
@@ -482,8 +473,7 @@ const EditProfile = () => {
             <div className="w-full lg:w-auto flex flex-col items-center">
               <label
                 htmlFor="uploadImg"
-                className="relative block w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full overflow-hidden cursor-pointer border-4 border-dashed transition-all duration-200 hover:border-opacity-100"
-                style={{ borderColor: "var(--border)" }}
+                className="relative block w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full overflow-hidden cursor-pointer border-4 border-dashed transition-all duration-200 hover:border-opacity-100 border-border"
               >
                 <div className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-primary-foreground opacity-0 hover:opacity-100 transition-opacity duration-200 rounded-full bg-background/60 backdrop-blur-sm">
                   <span className="text-center">
@@ -499,8 +489,7 @@ const EditProfile = () => {
                   />
                 ) : (
                   <div
-                    className="w-full h-full flex items-center justify-center"
-                    style={{ backgroundColor: "var(--muted)" }}
+                    className="w-full h-full flex items-center justify-center bg-muted"
                   >
                     <FaPlus className="w-8 h-8 text-muted-foreground" />
                   </div>
@@ -761,8 +750,7 @@ const EditProfile = () => {
                   </div>
                   {emailChanged && (
                     <p
-                      className="text-xs mt-2"
-                      style={{ color: "var(--muted-foreground)" }}
+                      className="text-xs mt-2 text-muted-foreground"
                     >
                       You will be logged out after changing your email and must
                       verify the new email.
@@ -770,8 +758,7 @@ const EditProfile = () => {
                   )}
                   {!!emailChangeMessage && (
                     <p
-                      className="text-xs mt-1"
-                      style={{ color: "var(--foreground)" }}
+                      className="text-xs mt-1 text-foreground"
                     >
                       {emailChangeMessage}
                     </p>
@@ -790,8 +777,7 @@ const EditProfile = () => {
                   icon={FaAt}
                 />
                 <p
-                  className="text-sm mt-2"
-                  style={{ color: "var(--muted-foreground)" }}
+                  className="text-sm mt-2 text-muted-foreground"
                 >
                   Username will be used to search for users and will be visible
                   to the public. Must be 3-20 characters, letters, numbers, and
@@ -806,18 +792,11 @@ const EditProfile = () => {
                   value={formData.bio}
                   onChange={handleInputChange}
                   maxLength={bioLimit}
-                  className="w-full p-4 rounded-lg resize-none leading-7 transition-all duration-200 focus:outline-none focus:ring-2"
-                  style={{
-                    backgroundColor: "var(--background)",
-                    color: "var(--foreground)",
-                    border: "1px solid var(--border)",
-                    minHeight: "160px",
-                  }}
+                  className="w-full p-4 rounded-lg resize-none leading-7 transition-all duration-200 focus:outline-none focus:ring-2 bg-background text-foreground border border-border min-h-[10rem]"
                   placeholder="Tell us about yourself..."
                 />
                 <p
-                  className="text-sm mt-2 text-right"
-                  style={{ color: "var(--muted-foreground)" }}
+                  className="text-sm mt-2 text-right text-muted-foreground"
                 >
                   {characterLeft} characters left
                 </p>
@@ -826,8 +805,7 @@ const EditProfile = () => {
               {/* Social Links */}
               <div>
                 <p
-                  className="text-base sm:text-lg font-medium mb-3 sm:mb-4"
-                  style={{ color: "var(--foreground)" }}
+                  className="text-base sm:text-lg font-medium mb-3 sm:mb-4 text-foreground"
                 >
                   Social Links
                 </p>
@@ -835,8 +813,7 @@ const EditProfile = () => {
                   {Object.entries(formData.social_links).map(([key, value]) => (
                     <div key={key}>
                       <label
-                        className="block text-sm font-medium mb-2"
-                        style={{ color: "var(--foreground)" }}
+                        className="block text-sm font-medium mb-2 text-foreground"
                       >
                         {key === "website"
                           ? "Website"
@@ -907,11 +884,7 @@ const EditProfile = () => {
         {/* Success Message */}
         {profileUpdateSuccess && (
           <div
-            className="mt-6 p-4 rounded-lg text-center"
-            style={{
-              backgroundColor: "var(--success)",
-              color: "var(--success-foreground)",
-            }}
+            className="mt-6 p-4 rounded-lg text-center bg-success text-success-foreground"
           >
             <p className="font-medium">Profile updated successfully!</p>
             <p className="text-sm mt-1">Your changes have been saved.</p>

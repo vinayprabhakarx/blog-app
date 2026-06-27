@@ -61,7 +61,7 @@ const Topbar = React.memo(() => {
   }, []);
 
   return (
-    <header className="fixed top-0 w-full z-100 bg-background/95 backdrop-blur-sm text-foreground border-b border-border/20 shadow-sm no-print">
+    <header className="fixed top-0 w-full z-30 bg-background/95 backdrop-blur-sm text-foreground border-b border-border/20 shadow-sm no-print">
       <div className="mx-auto max-w-7xl w-full h-14 flex items-center px-4 md:px-6 lg:px-8">
         <>
           {/* Left Section: Menu & Logo */}
@@ -143,7 +143,7 @@ const Topbar = React.memo(() => {
                   </DropdownMenuTrigger>
                   <DropdownMenuContent
                     align="end"
-                    className="w-56 md:w-64 max-w-[90vw] mr-2 sm:mr-4"
+                    className="w-56 md:w-64 max-w-modal mr-2 sm:mr-4"
                     sideOffset={8}
                     alignOffset={-4}
                   >

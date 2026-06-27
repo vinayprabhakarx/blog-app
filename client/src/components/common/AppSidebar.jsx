@@ -78,8 +78,8 @@ export const DesktopSidebar = React.memo(
           width: animate ? (open ? "16rem" : "4rem") : "16rem",
         }}
         style={{
-          height: "calc(100vh - 64px)",
-          maxHeight: "calc(100vh - 64px)",
+          height: "calc(100vh - 4rem)",
+          maxHeight: "calc(100vh - 4rem)",
         }}
         {...props}
       >
@@ -140,15 +140,15 @@ export const MobileSidebar = React.memo(({ className, children, ...props }) => {
       <Motion.aside
         ref={containerRef}
         className={cn(
-          "fixed left-0 top-16 bottom-0 z-40 px-4 py-4 flex flex-col overflow-hidden bg-background border-r border-border w-[250px] md:hidden",
+          "fixed left-0 top-16 bottom-0 z-40 px-4 py-4 flex flex-col overflow-hidden bg-background border-r border-border w-sidebar md:hidden",
           className
         )}
         initial={{ x: "-100%" }}
         animate={{ x: open ? 0 : "-100%" }}
         transition={{ type: "tween", duration: 0.2 }}
         style={{
-          height: "calc(100vh - 64px)",
-          maxHeight: "calc(100vh - 64px)",
+          height: "calc(100vh - 4rem)",
+          maxHeight: "calc(100vh - 4rem)",
         }}
         {...props}
       >

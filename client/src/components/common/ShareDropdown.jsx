@@ -56,12 +56,7 @@ const ShareDropdown = ({ isOpen, url, title, onMouseEnter, onMouseLeave }) => {
       data-share-dropdown
       onMouseEnter={onMouseEnter}
       onMouseLeave={onMouseLeave}
-      className="absolute top-full left-0 mt-2 bg-popover rounded-lg shadow-lg border p-3 z-50 min-w-max"
-      style={{
-        backgroundColor: "var(--card)",
-        borderColor: "var(--border)",
-        color: "var(--card-foreground)",
-      }}
+      className="absolute top-full left-0 mt-2 bg-card text-card-foreground rounded-lg shadow-lg border border-border p-3 z-50 min-w-max"
     >
       <div className="flex flex-col gap-2">
         {shareOptions.map((option) => {
@@ -70,13 +65,11 @@ const ShareDropdown = ({ isOpen, url, title, onMouseEnter, onMouseLeave }) => {
             <button
               key={option.platform}
               onClick={() => handleShare(option.platform)}
-              className="flex items-center justify-center p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer"
+              className="flex items-center justify-center p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer border border-border"
               title={option.name}
-              style={{ border: "1px solid var(--border)" }}
             >
               <IconComponent
-                className="w-5 h-5"
-                style={{ color: "var(--muted-foreground)" }}
+                className="w-5 h-5 text-muted-foreground"
               />
             </button>
           );
@@ -84,19 +77,14 @@ const ShareDropdown = ({ isOpen, url, title, onMouseEnter, onMouseLeave }) => {
 
         <button
           onClick={copyToClipboard}
-          className="flex items-center justify-center p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer"
+          className="flex items-center justify-center p-2 rounded-lg hover:bg-accent transition-colors cursor-pointer text-foreground border border-border"
           title={copied ? "Copied!" : "Copy Link"}
-          style={{
-            color: "var(--foreground)",
-            border: "1px solid var(--border)",
-          }}
         >
           {copied ? (
             <Check className="w-5 h-5 text-success" />
           ) : (
             <Copy
-              className="w-5 h-5"
-              style={{ color: "var(--muted-foreground)" }}
+              className="w-5 h-5 text-muted-foreground"
             />
           )}
         </button>

@@ -163,7 +163,7 @@ const VerifyEmail = () => {
 
   return (
     <section className="flex justify-center items-center min-h-[80vh] w-full bg-background px-4">
-      <div style={{ maxWidth: "24rem", width: "100%", margin: "0 auto" }}>
+      <div className="w-full max-w-sm mx-auto">
         {renderContent()}
       </div>
     </section>

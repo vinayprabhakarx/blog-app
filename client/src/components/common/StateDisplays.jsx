@@ -13,8 +13,8 @@ export const EmptyState = ({
   className = "",
 }) => {
   const containerClasses = variant === "compact" 
-    ? "min-h-[200px] p-6" 
-    : "min-h-[300px] sm:min-h-[400px] p-8 sm:p-12";
+    ? "min-h-[12.5rem] p-6" 
+    : "min-h-[18.75rem] sm:min-h-[25rem] p-8 sm:p-12";
     
   const iconClasses = variant === "compact"
     ? "mb-4"
@@ -53,8 +53,8 @@ export const ErrorState = ({
   className = "",
 }) => {
   const containerClasses = variant === "compact" 
-    ? "min-h-[200px] p-6" 
-    : "min-h-[300px] sm:min-h-[400px] p-8 sm:p-12";
+    ? "min-h-[12.5rem] p-6" 
+    : "min-h-[18.75rem] sm:min-h-[25rem] p-8 sm:p-12";
     
   const iconClasses = variant === "compact"
     ? "mb-4"
@@ -92,8 +92,8 @@ export const ErrorState = ({
 
 export const LoadingState = ({ message = "Loading...", variant = "full", className = "" }) => {
   const containerClasses = variant === "compact" 
-    ? "min-h-[200px] p-6" 
-    : "min-h-[300px] sm:min-h-[400px] p-8";
+    ? "min-h-[12.5rem] p-6" 
+    : "min-h-[18.75rem] sm:min-h-[25rem] p-8";
 
   return (
     <motion.div
