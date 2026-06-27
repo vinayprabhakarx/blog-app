@@ -22,11 +22,10 @@ export const ThemeProvider = ({ children }) => {
   const [theme, setTheme] = useState(() => {
     const savedTheme = localStorage.getItem("theme");
 
-    // If no saved theme, default to dark
-    if (!savedTheme) {
-      return "dark";
+    if (savedTheme) {
+      return savedTheme;
     }
-    return savedTheme;
+    return getSystemTheme();
   });
 
   useEffect(() => {

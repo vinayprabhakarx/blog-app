@@ -15,11 +15,12 @@
       try {
         const savedTheme = localStorage.getItem("theme");
         
-        // If no saved theme, default to dark
-        let theme = "dark";
+        let theme = "light";
         
         if (savedTheme) {
           theme = savedTheme;
+        } else if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          theme = "dark";
         }
 
         if (theme === "dark") {
