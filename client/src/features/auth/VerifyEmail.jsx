@@ -1,6 +1,5 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams, Link } from "react-router-dom";
-import { Card } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { CheckCircle, AlertTriangle, XCircle, ArrowRight, Mail, RefreshCw } from "lucide-react";
 import authService from "./authService";
@@ -50,159 +49,123 @@ const VerifyEmail = () => {
     }
   }, [token, statusParam]);
 
-  // Loading state
-  if (status === "loading") {
-    return (
-      <section className="flex justify-center items-center min-h-screen w-full bg-background px-4">
-        <Card className="w-full max-w-full p-8 bg-background text-foreground border shadow-lg">
-          <div className="text-center space-y-6">
-            <div className="flex justify-center">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center animate-pulse">
-                <Mail className="w-10 h-10 text-primary" />
-              </div>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold mb-2">Verifying Your Email</h1>
-              <p className="text-muted-foreground">Please wait while we verify your email address...</p>
-            </div>
-            <div className="flex justify-center">
-              <LoadingSpinner />
-            </div>
-          </div>
-        </Card>
-      </section>
-    );
-  }
-
-  // Success state
-  if (status === "success") {
-    return (
-      <section className="flex justify-center items-center min-h-screen w-full bg-background px-4">
-        <Card className="w-full max-w-full p-8 bg-background text-foreground border shadow-lg">
-          <div className="text-center space-y-6">
-            <div className="flex justify-center">
-              <div className="w-20 h-20 bg-success/10 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-10 h-10 text-success" />
-              </div>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold mb-2 text-success">Email Verified!</h1>
-              <p className="text-muted-foreground">{message || "Your email has been verified successfully."}</p>
-            </div>
-            <Link to="/login" className="block">
-              <Button className="w-full">
-                Continue to Sign In
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </div>
-        </Card>
-      </section>
-    );
-  }
-
-  // Already verified state
-  if (status === "already") {
-    return (
-      <section className="flex justify-center items-center min-h-screen w-full bg-background px-4">
-        <Card className="w-full max-w-full p-8 bg-background text-foreground border shadow-lg">
-          <div className="text-center space-y-6">
-            <div className="flex justify-center">
-              <div className="w-20 h-20 bg-primary/10 rounded-full flex items-center justify-center">
-                <CheckCircle className="w-10 h-10 text-primary" />
-              </div>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold mb-2">Already Verified</h1>
-              <p className="text-muted-foreground">{message || "Your email is already verified. You can proceed to sign in."}</p>
-            </div>
-            <Link to="/login" className="block">
-              <Button className="w-full">
-                Go to Sign In
-                <ArrowRight className="w-4 h-4 ml-2" />
-              </Button>
-            </Link>
-          </div>
-        </Card>
-      </section>
-    );
-  }
-
-  // Expired state
-  if (status === "expired") {
-    return (
-      <section className="flex justify-center items-center min-h-screen w-full bg-background px-4">
-        <Card className="w-full max-w-full p-8 bg-background text-foreground border shadow-lg">
-          <div className="text-center space-y-6">
-            <div className="flex justify-center">
-              <div className="w-20 h-20 bg-warning/10 rounded-full flex items-center justify-center">
-                <AlertTriangle className="w-10 h-10 text-warning" />
-              </div>
-            </div>
-            <div>
-              <h1 className="text-2xl font-bold mb-2 text-warning">Link Expired</h1>
-              <p className="text-muted-foreground">{message || "This verification link has expired. Please request a new one."}</p>
-            </div>
-            <div className="bg-muted/50 rounded-lg p-4 text-left">
-              <p className="text-sm text-muted-foreground">
-                Verification links expire after 24 hours for security reasons. Request a new link to continue.
+  const renderContent = () => {
+    switch (status) {
+      case "loading":
+        return (
+          <div className="flex flex-col items-center text-center space-y-6">
+            <Mail className="w-12 h-12 text-muted-foreground" strokeWidth={1.5} />
+            <div className="space-y-2">
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground">Verifying Email</h1>
+              <p className="text-muted-foreground text-sm">
+                Please wait a moment while we verify your link.
               </p>
             </div>
-            <div className="space-y-3">
-              <Link to="/resend-email" className="block">
-                <Button className="w-full">
+            <LoadingSpinner />
+          </div>
+        );
+
+      case "success":
+        return (
+          <div className="flex flex-col items-center text-center space-y-6">
+            <CheckCircle className="w-12 h-12 text-success" strokeWidth={1.5} />
+            <div className="space-y-2">
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground">Email Verified</h1>
+              <p className="text-muted-foreground text-sm">
+                {message || "Your email has been verified successfully. Welcome aboard!"}
+              </p>
+            </div>
+            <div className="pt-4">
+              <Link to="/login">
+                <Button size="lg" className="px-8">
+                  Continue to Sign In
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        );
+
+      case "already":
+        return (
+          <div className="flex flex-col items-center text-center space-y-6">
+            <CheckCircle className="w-12 h-12 text-foreground" strokeWidth={1.5} />
+            <div className="space-y-2">
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground">Already Verified</h1>
+              <p className="text-muted-foreground text-sm">
+                {message || "Your email is already verified. You can proceed to sign in."}
+              </p>
+            </div>
+            <div className="pt-4">
+              <Link to="/login">
+                <Button size="lg" className="px-8">
+                  Go to Sign In
+                  <ArrowRight className="w-4 h-4 ml-2" />
+                </Button>
+              </Link>
+            </div>
+          </div>
+        );
+
+      case "expired":
+        return (
+          <div className="flex flex-col items-center text-center space-y-6">
+            <AlertTriangle className="w-12 h-12 text-warning" strokeWidth={1.5} />
+            <div className="space-y-2">
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground">Link Expired</h1>
+              <p className="text-muted-foreground text-sm">
+                {message || "This verification link has expired. Please request a new one."}
+              </p>
+            </div>
+            <div className="pt-4 flex flex-col items-center space-y-3">
+              <Link to="/resend-email">
+                <Button size="lg" className="px-8">
                   <RefreshCw className="w-4 h-4 mr-2" />
                   Request New Link
                 </Button>
               </Link>
-              <Link to="/login" className="block">
-                <Button variant="outline" className="w-full">
+              <Link to="/login">
+                <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
                   Back to Sign In
                 </Button>
               </Link>
             </div>
           </div>
-        </Card>
-      </section>
-    );
-  }
+        );
 
-  // Invalid or error state (default)
-  return (
-    <section className="flex justify-center items-center min-h-screen w-full bg-background px-4">
-      <Card className="w-110 max-w-full p-8 bg-background text-foreground border shadow-lg">
-        <div className="text-center space-y-6">
-          <div className="flex justify-center">
-            <div className="w-20 h-20 bg-destructive/10 rounded-full flex items-center justify-center">
-              <XCircle className="w-10 h-10 text-destructive" />
+      default: // invalid
+        return (
+          <div className="flex flex-col items-center text-center space-y-6">
+            <XCircle className="w-12 h-12 text-destructive" strokeWidth={1.5} />
+            <div className="space-y-2">
+              <h1 className="text-2xl font-semibold tracking-tight text-foreground">Verification Failed</h1>
+              <p className="text-muted-foreground text-sm">
+                {message || "This verification link is invalid or has already been used."}
+              </p>
+            </div>
+            <div className="pt-4 flex flex-col items-center space-y-3">
+              <Link to="/resend-email">
+                <Button size="lg" className="px-8">
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Request New Link
+                </Button>
+              </Link>
+              <Link to="/login">
+                <Button variant="ghost" className="text-muted-foreground hover:text-foreground">
+                  Back to Sign In
+                </Button>
+              </Link>
             </div>
           </div>
-          <div>
-            <h1 className="text-2xl font-bold mb-2 text-destructive">Verification Failed</h1>
-            <p className="text-muted-foreground">
-              {message || "This verification link is invalid or has been used."}
-            </p>
-          </div>
-          <div className="bg-muted/50 rounded-lg p-4 text-left">
-            <p className="text-sm text-muted-foreground">
-              If you continue to experience issues, please try requesting a new verification link.
-            </p>
-          </div>
-          <div className="space-y-3">
-            <Link to="/resend-email" className="block">
-              <Button className="w-full">
-                <RefreshCw className="w-4 h-4 mr-2" />
-                Request New Link
-              </Button>
-            </Link>
-            <Link to="/login" className="block">
-              <Button variant="outline" className="w-full">
-                Back to Sign In
-              </Button>
-            </Link>
-          </div>
-        </div>
-      </Card>
+        );
+    }
+  };
+
+  return (
+    <section className="flex justify-center items-center min-h-[80vh] w-full bg-background px-4">
+      <div style={{ maxWidth: "24rem", width: "100%", margin: "0 auto" }}>
+        {renderContent()}
+      </div>
     </section>
   );
 };

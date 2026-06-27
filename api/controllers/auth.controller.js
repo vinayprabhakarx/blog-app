@@ -240,6 +240,17 @@ export const login = async (req, res, next) => {
     return next(authError("Invalid login credentials."));
   }
 
+  // Verify password FIRST to prevent account enumeration
+  const isMatch = await bcrypt.compare(password, user.personal_info.password);
+  
+  if (!isMatch) {
+    // Increment login attempts on failed login
+    if (user.incLoginAttempts) {
+      await user.incLoginAttempts();
+    }
+    return next(authError("Invalid login credentials."));
+  }
+
   // Check if account is locked
   if (user.isLocked && user.isLocked()) {
     return next(
@@ -264,15 +275,6 @@ export const login = async (req, res, next) => {
         "Email not verified. Please check your inbox for the verification link."
       )
     );
-  }
-
-  const isMatch = await bcrypt.compare(password, user.personal_info.password);
-  if (!isMatch) {
-    // Increment login attempts on failed login
-    if (user.incLoginAttempts) {
-      await user.incLoginAttempts();
-    }
-    return next(authError("Invalid login credentials."));
   }
 
   // Reset login attempts on successful login
@@ -676,7 +678,7 @@ export const changePassword = async (req, res, next) => {
       user.personal_info.password
     );
     if (!isCurrentPasswordValid) {
-      return next(authError("Current password is incorrect"));
+      return next(authError("Failed to change password. Please check your current credentials."));
     }
 
     // Check if new password is same as current

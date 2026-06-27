@@ -18,6 +18,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { changePassword, clearPasswordChangeStatus } from "./settingsSlice";
 import { showToast } from "@/utils/showToast";
 import { FaLock, FaUnlock, FaArrowLeft } from "react-icons/fa6";
+import AuthCard from "@/features/auth/AuthCard";
 
 // Password change validation schema
 const passwordChangeSchema = z
@@ -102,8 +103,8 @@ const ChangePassword = () => {
 
   return (
     <section className="min-h-screen w-full px-4 py-6 sm:px-6 sm:py-8">
-      <div className="max-w-md mx-auto">
-        {/* Header */}
+      <div className="max-w-4xl mx-auto">
+        {/* Header - Outside Card */}
         <div className="mb-6 sm:mb-8">
           <div className="flex items-center mb-4">
             <Link
@@ -116,108 +117,112 @@ const ChangePassword = () => {
             </Link>
           </div>
           <div className="text-center">
-            <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold mb-2">
+            <h1 className="text-2xl sm:text-3xl font-bold mb-2">
               Change Password
             </h1>
           </div>
         </div>
 
-        {/* Conditional Content */}
-        {user?.authProvider === "google" ? (
-          // Google Auth Message - Centered
-          <div className="flex items-center justify-center min-h-75">
-            <div className="text-center max-w-md">
-              <div className="mb-6">
-                <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted/50 flex items-center justify-center">
-                  <FaLock className="w-8 h-8 text-muted-foreground" />
+        <div className="mx-auto" style={{ width: '100%', maxWidth: '28rem' }}>
+          <AuthCard className="w-full !max-w-full mx-0">
+            {/* Conditional Content */}
+            {user?.authProvider === "google" ? (
+            // Google Auth Message - Centered
+            <div className="flex items-center justify-center py-8">
+              <div className="text-center">
+                <div className="mb-6">
+                  <div className="w-16 h-16 mx-auto mb-4 rounded-full bg-muted flex items-center justify-center">
+                    <FaLock className="w-8 h-8 text-muted-foreground" />
+                  </div>
+                  <h2 className="text-xl font-semibold mb-2">
+                    Password Change Not Available
+                  </h2>
+                  <p className="text-muted-foreground text-sm leading-relaxed">
+                    Google authenticated users cannot change their password.
+                  </p>
                 </div>
-                <h2 className="text-xl font-semibold mb-2">
-                  Password Change Not Available
-                </h2>
-                <p className="text-muted-foreground text-sm leading-relaxed">
-                  Google authenticated users cannot change their password.
-                </p>
               </div>
             </div>
-          </div>
-        ) : (
-          // Password Change Form for non-Google users
-          <Form {...form}>
-            <form
-              onSubmit={form.handleSubmit(onSubmit)}
-              className="space-y-4 sm:space-y-6"
-            >
-              <FormField
-                control={form.control}
-                name="currentPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Current Password</FormLabel>
-                    <FormControl>
-                      <InputBox
-                        type="password"
-                        placeholder="Enter your current password"
-                        icon={FaUnlock}
-                        showPasswordToggle={true}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="newPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>New Password</FormLabel>
-                    <FormControl>
-                      <InputBox
-                        type="password"
-                        placeholder="Enter your new password"
-                        icon={FaLock}
-                        showPasswordToggle={true}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              <FormField
-                control={form.control}
-                name="confirmPassword"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Confirm New Password</FormLabel>
-                    <FormControl>
-                      <InputBox
-                        type="password"
-                        placeholder="Confirm your new password"
-                        icon={FaLock}
-                        showPasswordToggle={true}
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-
-              {/* Submit Button */}
-              <LoadingButton
-                type="submit"
-                isLoading={passwordChangeLoading}
-                className="w-full px-6 py-2 sm:py-3 text-sm sm:text-base"
+          ) : (
+            // Password Change Form for non-Google users
+            <Form {...form}>
+              <form
+                onSubmit={form.handleSubmit(onSubmit)}
+                className="space-y-4 sm:space-y-6"
               >
-                Change Password
-              </LoadingButton>
-            </form>
-          </Form>
-        )}
+                <FormField
+                  control={form.control}
+                  name="currentPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Current Password</FormLabel>
+                      <FormControl>
+                        <InputBox
+                          type="password"
+                          placeholder="Enter your current password"
+                          icon={FaUnlock}
+                          showPasswordToggle={true}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="newPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>New Password</FormLabel>
+                      <FormControl>
+                        <InputBox
+                          type="password"
+                          placeholder="Enter your new password"
+                          icon={FaLock}
+                          showPasswordToggle={true}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <FormField
+                  control={form.control}
+                  name="confirmPassword"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Confirm New Password</FormLabel>
+                      <FormControl>
+                        <InputBox
+                          type="password"
+                          placeholder="Confirm your new password"
+                          icon={FaLock}
+                          showPasswordToggle={true}
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                {/* Submit Button */}
+                <LoadingButton
+                  type="submit"
+                  isLoading={passwordChangeLoading}
+                  className="w-full px-6 py-2 sm:py-3 text-sm sm:text-base"
+                >
+                  Change Password
+                </LoadingButton>
+              </form>
+            </Form>
+          )}
+        </AuthCard>
+        </div>
       </div>
     </section>
   );

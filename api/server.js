@@ -4,7 +4,10 @@ import dotenv from "dotenv";
 import cookieParser from "cookie-parser";
 import mongoose from "mongoose";
 import { testCloudinaryConnection } from "./config/cloudinary.js";
-
+import helmet from "helmet";
+import mongoSanitize from "express-mongo-sanitize";
+import hpp from "hpp";
+import rateLimit from "express-rate-limit";
 // Import routes
 import authRoutes from "./routes/auth.route.js";
 import userRoutes from "./routes/user.route.js";
@@ -57,6 +60,36 @@ app.use(cors(corsOptions));
 app.use(express.json({ limit: "16kb" }));
 app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
+
+// Security Middlewares
+app.use(helmet());
+app.use((req, res, next) => {
+  if (req.body) mongoSanitize.sanitize(req.body, { replaceWith: '_' });
+  if (req.query) mongoSanitize.sanitize(req.query, { replaceWith: '_' });
+  if (req.params) mongoSanitize.sanitize(req.params, { replaceWith: '_' });
+  next();
+});
+app.use(hpp());
+
+// Global Rate Limiting
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 500, // Increased to 500 to prevent 429 errors during normal SPA usage
+  message: "Too many requests, please try again after 15 minutes",
+});
+app.use("/api", limiter);
+
+// Stricter Rate Limiting for Auth
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // Limit each IP to 10 auth requests per windowMs
+  message: "Too many login attempts, please try again after 15 minutes",
+});
+// Only apply auth limiter to sensitive endpoints, not logout/verify
+app.use("/api/auth/login", authLimiter);
+app.use("/api/auth/register", authLimiter);
+app.use("/api/auth/forgot-password", authLimiter);
+app.use("/api/auth/reset-password", authLimiter);
 
 // Database Connection
 const connectDB = async () => {

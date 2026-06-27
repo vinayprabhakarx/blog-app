@@ -169,12 +169,6 @@ const ProfilePage = React.memo(() => {
 
   return (
     <div className="min-h-screen bg-background">
-      {/* Decorative background pattern */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-linear-to-br from-primary/5 to-primary/10 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-linear-to-tr from-primary/5 to-primary/10 rounded-full blur-3xl"></div>
-      </div>
-
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 pt-0 pb-6 relative">
         {/* Back Button */}
         {isPublicProfile && (
@@ -195,8 +189,8 @@ const ProfilePage = React.memo(() => {
           <div className="flex items-center gap-4 sm:gap-3 mb-3 sm:mb-4">
             {/* Avatar */}
             <div className="relative shrink-0">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-linear-to-br from-primary/20 to-primary/40 p-1">
-                <Avatar className="w-full h-full border-2 border-background">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border border-border">
+                <Avatar className="w-full h-full">
                   <AvatarImage
                     src={profile.personal_info?.profile_img || profile.avatar}
                     alt={profile.personal_info?.name || profile.name}
@@ -362,8 +356,8 @@ const ProfilePage = React.memo(() => {
           <div className="flex items-center gap-4 mb-8">
             {/* Avatar */}
             <div className="relative shrink-0">
-              <div className="w-20 h-20 rounded-full bg-linear-to-br from-primary/20 to-primary/40 p-1">
-                <Avatar className="w-full h-full border-2 border-background">
+              <div className="w-20 h-20 rounded-full border border-border">
+                <Avatar className="w-full h-full">
                   <AvatarImage
                     src={profile.personal_info?.profile_img || profile.avatar}
                     alt={profile.personal_info?.name || profile.name}
@@ -533,8 +527,8 @@ const ProfilePage = React.memo(() => {
                 <div className="flex gap-6 mb-6">
                   {/* Avatar */}
                   <div className="relative shrink-0">
-                    <div className="w-48 h-48 rounded-full bg-linear-to-br from-primary/20 to-primary/40 p-1">
-                      <Avatar className="w-full h-full border-2 border-background">
+                    <div className="w-48 h-48 rounded-full border border-border">
+                      <Avatar className="w-full h-full">
                         <AvatarImage
                           src={
                             profile.personal_info?.profile_img || profile.avatar

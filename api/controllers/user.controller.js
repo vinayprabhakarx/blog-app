@@ -326,7 +326,7 @@ export const changePassword = async (req, res, next) => {
   );
   if (!isMatch) {
     return next(
-      handleError(400, "Old password is incorrect. Please try again.")
+      handleError(400, "Failed to change password. Please check your current credentials.")
     );
   }
 

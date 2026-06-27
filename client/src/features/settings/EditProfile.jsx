@@ -183,41 +183,13 @@ const EditProfile = () => {
       setIsLoading(false);
     }, 5000);
 
-    if (access_token && user?.personal_info?.username) {
-      userService
-        .getPublicProfile(user.personal_info.username)
-        .then(({ user: profileData }) => {
-          clearTimeout(timeoutId);
-          setFormData({
-            name: profileData.personal_info?.name || "",
-            username: profileData.personal_info?.username || "",
-            email: profileData.personal_info?.email || "",
-            bio: profileData.personal_info?.bio || "",
-            social_links: {
-              website: profileData.social_links?.website ?? "",
-              facebook: profileData.social_links?.facebook ?? "",
-              twitter: profileData.social_links?.twitter ?? "",
-              instagram: profileData.social_links?.instagram ?? "",
-              linkedin: profileData.social_links?.linkedin ?? "",
-              github: profileData.social_links?.github ?? "",
-              youtube: profileData.social_links?.youtube ?? "",
-            },
-          });
-          setImagePreview(profileData.personal_info?.profile_img || "");
-          setIsLoading(false);
-        })
-        .catch((error) => {
-          clearTimeout(timeoutId);
-          console.error("Error fetching profile:", error);
-          setIsLoading(false);
-        });
-    } else if (access_token && user) {
+    if (user) {
       clearTimeout(timeoutId);
       setFormData({
         name: user.name || user.personal_info?.name || "",
-        username: user.personal_info?.username || "",
+        username: user.username || user.personal_info?.username || "",
         email: user.email || user.personal_info?.email || "",
-        bio: user.personal_info?.bio || "",
+        bio: user.bio || user.personal_info?.bio || "",
         social_links: {
           website: user.social_links?.website ?? "",
           facebook: user.social_links?.facebook ?? "",
@@ -228,7 +200,7 @@ const EditProfile = () => {
           youtube: user.social_links?.youtube ?? "",
         },
       });
-      setImagePreview(user.avatar || user.personal_info?.profile_img || "");
+      setImagePreview(user.profile_img || user.avatar || user.personal_info?.profile_img || "");
       setIsLoading(false);
     } else if (!access_token) {
       clearTimeout(timeoutId);

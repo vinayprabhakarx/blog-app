@@ -81,7 +81,11 @@ const SignUp = () => {
     debounceTimerRef.current = setTimeout(() => {
       // Revalidate fields that have errors
       Object.keys(errors).forEach((fieldName) => {
-        form.trigger(fieldName);
+        if (watchedValues[fieldName] === "" && !form.formState.isSubmitted) {
+          form.clearErrors(fieldName);
+        } else {
+          form.trigger(fieldName);
+        }
       });
     }, 500);
 
@@ -136,6 +140,13 @@ const SignUp = () => {
                         placeholder="Enter your name"
                         icon={FaUser}
                         {...field}
+                        onBlur={(e) => {
+                          if (field.value === "" && !form.formState.isSubmitted) {
+                            form.clearErrors(field.name);
+                          } else {
+                            field.onBlur(e);
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -155,6 +166,13 @@ const SignUp = () => {
                         placeholder="Enter your username"
                         icon={FaAt}
                         {...field}
+                        onBlur={(e) => {
+                          if (field.value === "" && !form.formState.isSubmitted) {
+                            form.clearErrors(field.name);
+                          } else {
+                            field.onBlur(e);
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -174,6 +192,13 @@ const SignUp = () => {
                         placeholder="Enter your email address"
                         icon={FaEnvelope}
                         {...field}
+                        onBlur={(e) => {
+                          if (field.value === "" && !form.formState.isSubmitted) {
+                            form.clearErrors(field.name);
+                          } else {
+                            field.onBlur(e);
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -195,6 +220,13 @@ const SignUp = () => {
                         icon={FaLock}
                         showPasswordToggle={true}
                         {...field}
+                        onBlur={(e) => {
+                          if (field.value === "" && !form.formState.isSubmitted) {
+                            form.clearErrors(field.name);
+                          } else {
+                            field.onBlur(e);
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -216,6 +248,13 @@ const SignUp = () => {
                         icon={FaLock}
                         showPasswordToggle={true}
                         {...field}
+                        onBlur={(e) => {
+                          if (field.value === "" && !form.formState.isSubmitted) {
+                            form.clearErrors(field.name);
+                          } else {
+                            field.onBlur(e);
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />

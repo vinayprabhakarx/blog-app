@@ -63,7 +63,11 @@ const Login = () => {
     debounceTimerRef.current = setTimeout(() => {
       // Revalidate fields that have errors
       Object.keys(errors).forEach((fieldName) => {
-        form.trigger(fieldName);
+        if (watchedValues[fieldName] === "" && !form.formState.isSubmitted) {
+          form.clearErrors(fieldName);
+        } else {
+          form.trigger(fieldName);
+        }
       });
     }, 500);
 
@@ -102,7 +106,13 @@ const Login = () => {
           : error?.message ||
             error?.error ||
             "Login failed. Please check your credentials.";
-      showToast("error", errorMessage);
+            
+      if (errorMessage.toLowerCase().includes("email not verified")) {
+        showToast("error", errorMessage);
+        navigate("/resend-email", { state: { email: values.email } });
+      } else {
+        showToast("error", errorMessage);
+      }
     }
   }
 
@@ -132,6 +142,13 @@ const Login = () => {
                         placeholder="Enter your Email"
                         icon={FaEnvelope}
                         {...field}
+                        onBlur={(e) => {
+                          if (field.value === "" && !form.formState.isSubmitted) {
+                            form.clearErrors(field.name);
+                          } else {
+                            field.onBlur(e);
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -153,6 +170,13 @@ const Login = () => {
                         icon={FaLock}
                         showPasswordToggle={true}
                         {...field}
+                        onBlur={(e) => {
+                          if (field.value === "" && !form.formState.isSubmitted) {
+                            form.clearErrors(field.name);
+                          } else {
+                            field.onBlur(e);
+                          }
+                        }}
                       />
                     </FormControl>
                     <FormMessage />
@@ -179,16 +203,6 @@ const Login = () => {
               >
                 Sign In
               </LoadingButton>
-
-              <div className="mt-3 text-sm text-muted-foreground flex justify-between items-center">
-                <span>Didn't get verification email?</span>
-                <Link
-                  to="/resend-email"
-                  className="text-primary hover:underline"
-                >
-                  Resend
-                </Link>
-              </div>
 
               <div className="mt-5 text-sm text-muted-foreground flex justify-center items-center gap-2">
                 <p>Don&apos;t have account?</p>

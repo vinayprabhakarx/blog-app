@@ -11,7 +11,7 @@ import {
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import AuthCard from "./AuthCard";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { RouteLogin, RouteSignUp } from "@/utils/RouteName";
 import { showToast } from "@/utils/showToast";
 import authService from "./authService";
@@ -26,6 +26,7 @@ const formSchema = z.object({
 });
 
 const ResendEmail = () => {
+  const location = useLocation();
   const [isLoading, setIsLoading] = useState(false);
   const [emailSent, setEmailSent] = useState(false);
   const [sentEmail, setSentEmail] = useState("");
@@ -35,7 +36,7 @@ const ResendEmail = () => {
     resolver: zodResolver(formSchema),
     mode: "onBlur", // Show errors when user leaves field
     defaultValues: {
-      email: "",
+      email: location.state?.email || "",
     },
   });
 
@@ -58,7 +59,11 @@ const ResendEmail = () => {
     debounceTimerRef.current = setTimeout(() => {
       // Revalidate fields that have errors
       Object.keys(errors).forEach((fieldName) => {
-        form.trigger(fieldName);
+        if (watchedValues[fieldName] === "" && !form.formState.isSubmitted) {
+          form.clearErrors(fieldName);
+        } else {
+          form.trigger(fieldName);
+        }
       });
     }, 500);
 
@@ -171,6 +176,13 @@ const ResendEmail = () => {
                       placeholder="Enter your email"
                       icon={FaEnvelope}
                       {...field}
+                      onBlur={(e) => {
+                        if (field.value === "" && !form.formState.isSubmitted) {
+                          form.clearErrors(field.name);
+                        } else {
+                          field.onBlur(e);
+                        }
+                      }}
                     />
                   </FormControl>
                   <FormMessage />

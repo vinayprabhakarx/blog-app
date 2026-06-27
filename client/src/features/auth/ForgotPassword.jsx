@@ -54,7 +54,11 @@ const ForgotPassword = () => {
     debounceTimerRef.current = setTimeout(() => {
       // Revalidate fields that have errors
       Object.keys(errors).forEach((fieldName) => {
-        form.trigger(fieldName);
+        if (watchedValues[fieldName] === "" && !form.formState.isSubmitted) {
+          form.clearErrors(fieldName);
+        } else {
+          form.trigger(fieldName);
+        }
       });
     }, 500);
 
@@ -111,6 +115,13 @@ const ForgotPassword = () => {
                           placeholder="Enter your email"
                           className="w-full pl-10 pr-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-primary focus:border-transparent bg-background text-foreground"
                           disabled={isLoading}
+                          onBlur={(e) => {
+                            if (field.value === "" && !form.formState.isSubmitted) {
+                              form.clearErrors(field.name);
+                            } else {
+                              field.onBlur(e);
+                            }
+                          }}
                         />
                       </div>
                     </FormControl>
