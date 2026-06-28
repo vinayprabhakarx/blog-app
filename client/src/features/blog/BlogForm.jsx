@@ -596,10 +596,10 @@ const BlogForm = ({ existingBlog }) => {
                 Featured Image (Optional)
               </label>
               <div
-                className={`group cursor-pointer relative w-36 h-28 border-2 border-dashed rounded flex justify-center items-center ${
+                className={`group cursor-pointer relative w-36 h-28 border-2 border-dashed rounded flex justify-center items-center transition-all duration-300 ${
                   (isEditing ? updateLoading : createLoading)
                     ? "opacity-50 cursor-not-allowed"
-                    : ""
+                    : "hover:border-primary hover:bg-accent/30"
                 } border-border`}
               >
                 <input

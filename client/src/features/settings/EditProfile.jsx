@@ -25,8 +25,8 @@ import {
   FaXTwitter,
   FaInstagram,
   FaArrowLeft,
-  FaPlus,
 } from "react-icons/fa6";
+import { IoCameraOutline } from "react-icons/io5";
 
 import LoadingSpinner from "@/components/common/LoadingSpinner";
 import userService from "@/features/user_management/usersService";
@@ -473,25 +473,23 @@ const EditProfile = () => {
             <div className="w-full lg:w-auto flex flex-col items-center">
               <label
                 htmlFor="uploadImg"
-                className="relative block w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full overflow-hidden cursor-pointer border-4 border-dashed transition-all duration-200 hover:border-opacity-100 border-border"
+                className="group relative flex flex-col justify-center items-center w-32 h-32 sm:w-40 sm:h-40 md:w-48 md:h-48 rounded-full overflow-hidden cursor-pointer border-2 border-dashed transition-all duration-300 border-border hover:border-primary hover:bg-accent/30"
               >
-                <div className="w-full h-full absolute top-0 left-0 flex items-center justify-center text-primary-foreground opacity-0 hover:opacity-100 transition-opacity duration-200 rounded-full bg-background/60 backdrop-blur-sm">
-                  <span className="text-center">
-                    <FaPlus className="w-8 h-8 mb-2 mx-auto block" />
-                    Upload Image
-                  </span>
-                </div>
                 {imagePreview ? (
-                  <img
-                    src={imagePreview}
-                    alt="Profile"
-                    className="w-full h-full object-cover"
-                  />
+                  <>
+                    <img
+                      src={imagePreview}
+                      alt="Profile"
+                      className="w-full h-full object-cover"
+                    />
+                    <div className="absolute inset-0 bg-foreground/30 rounded-full hidden group-hover:flex justify-center items-center">
+                      <IoCameraOutline className="text-background text-3xl" />
+                    </div>
+                  </>
                 ) : (
-                  <div
-                    className="w-full h-full flex items-center justify-center bg-muted"
-                  >
-                    <FaPlus className="w-8 h-8 text-muted-foreground" />
+                  <div className="flex flex-col items-center justify-center text-muted-foreground">
+                    <IoCameraOutline className="text-3xl mb-1" />
+                    <span className="text-xs font-medium">Upload Image</span>
                   </div>
                 )}
               </label>
