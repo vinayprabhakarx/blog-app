@@ -5,6 +5,7 @@ import Topbar from "@/components/common/Topbar";
 import React, { useState, useEffect } from "react";
 import { Outlet, useLocation } from "react-router-dom";
 import { useAuth } from "@/hooks/useAuth";
+import ScrollToTopButton from "@/components/common/ScrollToTopButton";
 
 const AppLayout = () => {
   const location = useLocation();
@@ -51,12 +52,12 @@ const AppLayout = () => {
             <main className="mx-auto w-full">
               {isAuth ? (
                 <div className="flex items-center justify-center min-h-[calc(100vh-4rem)] py-4 px-4">
-                  <div className="w-full max-w-100">
+                  <div className="w-full max-w-md">
                     <Outlet />
                   </div>
                 </div>
               ) : (
-                <div className="w-full min-h-[calc(100vh-4rem)] pt-4 pb-8 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mx-auto max-w-500">
+                <div className="w-full min-h-[calc(100vh-4rem)] pt-4 pb-8 px-4 sm:px-6 md:px-8 lg:px-10 xl:px-12 mx-auto max-w-7xl">
                   <div className="w-full max-w-full mx-auto">
                     <Outlet />
                   </div>
@@ -64,6 +65,7 @@ const AppLayout = () => {
               )}
             </main>
             <Footer className="border-t border-border mt-auto" />
+            <ScrollToTopButton />
           </div>
         </div>
       </div>

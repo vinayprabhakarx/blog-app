@@ -307,63 +307,8 @@ const BlogPage = () => {
         </div>
       )}
 
-      {/* Back to Top Button */}
-      <BackToTopButton />
     </div>
   );
 };
-
-// Back to Top Button Component
-const BackToTopButton = React.memo(() => {
-  const [showButton, setShowButton] = useState(false);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      setShowButton(window.scrollY > 400);
-    };
-
-    window.addEventListener("scroll", handleScroll);
-    return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
-
-  const scrollToTop = useCallback(() => {
-    window.scrollTo({
-      top: 0,
-      behavior: "smooth",
-    });
-  }, []);
-
-  if (!showButton) return null;
-
-  return (
-    <button
-      onClick={scrollToTop}
-      className={cn(
-        "fixed bottom-6 right-6 z-50 p-3 rounded-full shadow-lg transition-all duration-300",
-        "bg-primary text-primary-foreground hover:bg-primary/90",
-        "hover:scale-110 active:scale-95 touch-manipulation",
-        "border border-border/20 backdrop-blur-sm cursor-pointer"
-      )}
-      aria-label="Back to top"
-    >
-      <svg
-        className="w-5 h-5"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-        xmlns="http://www.w3.org/2000/svg"
-      >
-        <path
-          strokeLinecap="round"
-          strokeLinejoin="round"
-          strokeWidth={2}
-          d="M5 10l7-7m0 0l7 7m-7-7v18"
-        />
-      </svg>
-    </button>
-  );
-});
-
-BackToTopButton.displayName = "BackToTopButton";
 
 export default BlogPage;

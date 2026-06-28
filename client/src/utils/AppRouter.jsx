@@ -7,6 +7,7 @@ import AuthorRoute from "./AuthorRoute";
 import AppLayout from "@/components/layout/AppLayout";
 import Loading from "@/components/common/Loading";
 import { useAuth } from "@/hooks/useAuth";
+import ScrollToTop from "@/components/common/ScrollToTop";
 
 const HomePage = React.lazy(() => import("@/pages/HomePage"));
 const Login = React.lazy(() => import("@/features/auth/Login"));
@@ -48,6 +49,7 @@ const ConditionalCategories = () => {
 const AppRouter = () => {
   return (
     <Router>
+      <ScrollToTop />
       <Suspense fallback={<Loading />}>
         <Routes>
           <Route path="/" element={<AppLayout />}>

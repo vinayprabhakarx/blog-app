@@ -21,7 +21,7 @@ import { buildVerifyNewEmail } from "../templates/email/verificationTemplates.js
 // Build verification link for email
 const buildEmailVerificationLink = (token) => {
   const baseUrl =
-    process.env.CLIENT_URL || "http://localhost:5173";
+    process.env.CLIENT_URL;
   return `${baseUrl}/verify-email?token=${encodeURIComponent(token)}`;
 };
 

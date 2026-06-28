@@ -57,8 +57,8 @@ const sendTokenResponse = async (
   };
 
   try {
-    const accessTokenExpire = process.env.JWT_ACCESS_EXPIRE || "15m";
-    const refreshTokenExpire = process.env.JWT_REFRESH_EXPIRE || "7d";
+    const accessTokenExpire = process.env.JWT_ACCESS_EXPIRE;
+    const refreshTokenExpire = process.env.JWT_REFRESH_EXPIRE;
     
     const accessToken = await signJwt(payload, process.env.JWT_SECRET, {
       expiresIn: accessTokenExpire,
@@ -117,7 +117,7 @@ const generateUniqueUsername = async (email) => {
 
 // Build verification link for email (direct to client)
 const buildEmailVerificationLink = (token) => {
-  const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
+  const clientUrl = process.env.CLIENT_URL;
   
   // Clean the client URL
   let cleanClientUrl = clientUrl.replace(/\/$/, "");
@@ -337,7 +337,7 @@ export const verifyEmail = async (req, res, next) => {
 export const verifyEmailLink = async (req, res, next) => {
   // Helper to get clean client URL
   const getClientUrl = () => {
-    const clientBase = process.env.CLIENT_URL || "http://localhost:5173";
+    const clientBase = process.env.CLIENT_URL;
     let cleanUrl = clientBase.replace(/\/api.*$/, "").replace(/\/$/, "");
     if (!cleanUrl.startsWith("http://") && !cleanUrl.startsWith("https://")) {
       cleanUrl = `https://${cleanUrl}`;
@@ -607,7 +607,7 @@ export const refreshToken = async (req, res, next) => {
       role: user.role,
     };
 
-    const accessTokenExpire = process.env.JWT_ACCESS_EXPIRE || "15m";
+    const accessTokenExpire = process.env.JWT_ACCESS_EXPIRE;
     const accessToken = await signJwt(payload, process.env.JWT_SECRET, {
       expiresIn: accessTokenExpire,
     });
@@ -756,7 +756,7 @@ export const forgotPassword = async (req, res, next) => {
 
     // Generate reset URL
     const resetUrl = `${
-      process.env.CLIENT_URL || "http://localhost:5173"
+      process.env.CLIENT_URL
     }/reset-password?token=${resetToken}`;
 
     // Send email with reset link

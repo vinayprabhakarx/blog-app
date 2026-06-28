@@ -1,8 +1,10 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 
 const ThemeContext = createContext();
 
 export const ThemeProvider = ({ children }) => {
+  const isInitialMount = useRef(true);
+
   // Helper function to get system preference
   const getSystemTheme = () => {
     if (typeof window !== "undefined" && window.matchMedia) {
@@ -34,8 +36,21 @@ export const ThemeProvider = ({ children }) => {
       document.documentElement.classList.toggle("dark", theme === "dark");
     };
 
+    if (isInitialMount.current) {
+      applyTheme();
+      isInitialMount.current = false;
+      return;
+    }
+
     if (document.startViewTransition) {
-      document.startViewTransition(applyTheme);
+      try {
+        const transition = document.startViewTransition(applyTheme);
+        if (transition.ready) transition.ready.catch(() => {});
+        if (transition.finished) transition.finished.catch(() => {});
+        if (transition.updateCallbackDone) transition.updateCallbackDone.catch(() => {});
+      } catch (e) {
+        applyTheme();
+      }
     } else {
       document.documentElement.classList.add("theme-transition");
       // Force a reflow so the browser registers the transition class before applying the theme
