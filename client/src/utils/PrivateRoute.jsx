@@ -1,7 +1,7 @@
 import React from "react";
 import { useSelector } from "react-redux";
 import { Navigate, Outlet } from "react-router-dom";
-import Loading from "@/components/common/Loading";
+import FullScreenLoader from "@/components/common/FullScreenLoader";
 
 // Route guard for protected routes
 const PrivateRoute = () => {
@@ -9,7 +9,7 @@ const PrivateRoute = () => {
 
   // Wait for initial auth check to complete
   if (initializing) {
-    return <Loading />;
+    return <FullScreenLoader />;
   }
 
   if (isAuthenticated) {

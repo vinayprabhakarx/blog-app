@@ -184,17 +184,20 @@ const BlogForm = ({ existingBlog }) => {
     }
   }, [formData.title, isEditing]);
 
-  const handleInputChange = (name, value) => {
+  const handleInputChange = useCallback((name, value) => {
     if (name === "excerpt" && value.length > 500) {
       value = value.substring(0, 500);
     }
 
     setFormData((prev) => ({ ...prev, [name]: value }));
 
-    if (formErrors[name]) {
-      setFormErrors((prev) => ({ ...prev, [name]: "" }));
-    }
-  };
+    setFormErrors((prev) => {
+      if (prev[name]) {
+        return { ...prev, [name]: "" };
+      }
+      return prev;
+    });
+  }, []);
 
   const handleToggleDraft = () => {
     setFormData((prev) => ({ ...prev, draft: !prev.draft }));

@@ -188,7 +188,7 @@ root/
 - DELETE `/:commentId` – Delete comment (author/admin only)
 - GET `/search-users/:query` – Search users for @mentions (limit 3)
 
-#### Categories (`/api/categories`)
+#### Categories (`/api/category`)
 
 - GET `/` – List all categories
 - POST `/` – Create category (admin only)

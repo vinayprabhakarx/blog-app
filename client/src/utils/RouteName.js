@@ -21,11 +21,11 @@ export const RouteAuthorDashboard = "/dashboard";
 
 // Role-based Category routes
 export const RouteAddCategory = () => {
-  return "/categories/add";
+  return "/category/add";
 };
 
 export const RouteEditCategory = (id) => {
-  return `/categories/edit/${id}`;
+  return `/category/edit/${id}`;
 };
 
 // Role-based Blog routes

@@ -50,10 +50,6 @@ const staticStyles = {
   code: { whiteSpace: "pre-wrap", wordBreak: "break-all", overflowWrap: "break-word" }
 };
 
-// Markdown components (React.memo removed because `children` always changes reference on re-parse)
-const MarkdownCode = ({ children = [], className }) => (
-  <code className={className}>{children}</code>
-);
 
 const MarkdownHeading = ({ level, children, ...props }) => {
   const Tag = `h${level}`;
@@ -137,7 +133,8 @@ const MarkdownImage = ({ src, alt, onDeleteImage, ...props }) => {
   );
 };
 
-const MdRenderCard = React.memo(({ content = "", onDeleteImage }) => {
+// Memoized full renderer
+const MarkdownRenderer = React.memo(({ content = "", onDeleteImage }) => {
   const { theme } = useTheme();
 
   // Memoize plugins arrays
@@ -188,7 +185,6 @@ const MdRenderCard = React.memo(({ content = "", onDeleteImage }) => {
   const imageComponent = useCallback((props) => <MarkdownImage {...props} onDeleteImage={onDeleteImage} />, [onDeleteImage]);
 
   const components = useMemo(() => ({
-    code: MarkdownCode,
     h1: (props) => <MarkdownHeading level={1} {...props} />,
     h2: (props) => <MarkdownHeading level={2} {...props} />,
     h3: (props) => <MarkdownHeading level={3} {...props} />,
@@ -233,7 +229,7 @@ const MdRenderCard = React.memo(({ content = "", onDeleteImage }) => {
     },
     code: ({ inline, children, ...props }) =>
       inline ? (
-        <MarkdownCode {...props}>{children}</MarkdownCode>
+        <code className={props.className}>{children}</code>
       ) : (
         <code {...props} style={staticStyles.code}>
           {children}
@@ -259,4 +255,4 @@ const MdRenderCard = React.memo(({ content = "", onDeleteImage }) => {
   );
 });
 
-export default MdRenderCard;
+export default MarkdownRenderer;

@@ -5,7 +5,7 @@ import PublicRoute from "./PublicRoute";
 import AdminRoute from "./AdminRoute";
 import AuthorRoute from "./AuthorRoute";
 import AppLayout from "@/components/layout/AppLayout";
-import Loading from "@/components/common/Loading";
+import FullScreenLoader from "@/components/common/FullScreenLoader";
 import { useAuth } from "@/hooks/useAuth";
 import ScrollToTop from "@/components/common/ScrollToTop";
 
@@ -37,7 +37,9 @@ const Analytics = React.lazy(() => import("@/features/user_management/Analytics"
 
 // ConditionalCategories component
 const ConditionalCategories = () => {
-  const { isAdmin, isAuthor } = useAuth();
+  const { isAdmin, isAuthor, authLoading } = useAuth();
+
+  if (authLoading) return <FullScreenLoader />;
 
   if (isAdmin || isAuthor) {
     return <CategoryManagement />;
@@ -50,7 +52,7 @@ const AppRouter = () => {
   return (
     <Router>
       <ScrollToTop />
-      <Suspense fallback={<Loading />}>
+      <Suspense fallback={<FullScreenLoader />}>
         <Routes>
           <Route path="/" element={<AppLayout />}>
             {/* Auth Routes */}
@@ -86,8 +88,8 @@ const AppRouter = () => {
             <Route element={<PrivateRoute />}>
               <Route path="dashboard" element={<Dashboard />} />
               <Route path="notifications" element={<NotificationCenter />} />
-              <Route path="categories/add" element={<CategoryForm />} />
-              <Route path="categories/edit/:id" element={<CategoryForm />} />
+              <Route path="category/add" element={<CategoryForm />} />
+              <Route path="category/edit/:id" element={<CategoryForm />} />
               <Route path="profile" element={<ProfilePage />} />
               <Route path="edit-profile" element={<EditProfile />} />
               <Route path="change-password" element={<ChangePassword />} />

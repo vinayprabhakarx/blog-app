@@ -134,11 +134,9 @@ const CategoryForm = () => {
           : "Category created successfully!";
         showToast("success", successMessage);
 
-        if (!isEditMode) {
-          // Redirect to category display page after creation
-          navigate("/category");
-          return;
-        }
+        // Redirect to category display page after creation or edit
+        navigate("/category");
+        return;
       } else {
         const errorMessage = isEditMode
           ? "Failed to update category"
@@ -177,11 +175,11 @@ const CategoryForm = () => {
   }
 
   return (
-    <div>
-      <h1 className="text-2xl font-bold mb-4 text-center">
+    <div className="w-full md:w-1/2 mx-auto pt-4 pb-8 px-4 sm:px-6">
+      <h1 className="text-2xl font-bold mb-6 text-center">
         {isEditMode ? "Edit Category" : "Add New Category"}
       </h1>
-      <Card className="pt-5 max-w-3xl mx-auto p-6">
+      <Card className="p-6">
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
             <FormField

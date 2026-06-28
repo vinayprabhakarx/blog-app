@@ -48,7 +48,7 @@ export const ThemeProvider = ({ children }) => {
         if (transition.ready) transition.ready.catch(() => {});
         if (transition.finished) transition.finished.catch(() => {});
         if (transition.updateCallbackDone) transition.updateCallbackDone.catch(() => {});
-      } catch (e) {
+      } catch {
         applyTheme();
       }
     } else {

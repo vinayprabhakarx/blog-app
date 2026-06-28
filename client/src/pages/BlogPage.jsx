@@ -1,7 +1,6 @@
 import React, { useEffect, useState, useCallback } from "react";
 import { useParams, Link } from "react-router-dom";
 import { useSelector, useDispatch } from "react-redux";
-import { cn } from "@/lib/utils";
 // Redux and hooks
 import { useBlog } from "@/hooks/useRedux";
 import { fetchBlogBySlug, fetchBlogById, clearCurrentBlog } from "@/features/blog/blogSlice";

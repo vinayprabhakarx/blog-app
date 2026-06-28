@@ -1,6 +1,6 @@
 import React, { useEffect, useCallback, useRef } from "react";
 
-import MdRenderCardWrapper from "./MdRenderCardWrapper";
+import MarkdownRendererWrapper from "./MarkdownRendererWrapper";
 
 const BlogDisplay = ({ blog }) => {
   const content = blog?.content || "";
@@ -60,7 +60,7 @@ const BlogDisplay = ({ blog }) => {
         className="w-full px-2 sm:px-4 md:px-0 blog-content-responsive"
       >
         <div className="w-full">
-          <MdRenderCardWrapper content={content} />
+          <MarkdownRendererWrapper content={content} />
         </div>
 
         <footer

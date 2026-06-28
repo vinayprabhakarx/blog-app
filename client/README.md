@@ -45,7 +45,7 @@ client/
 │   ├── features/                  # Feature-based modules
 │   │   ├── auth/                  # Authentication (slices, services, forms)
 │   │   ├── blog/                  # Blog system (editor, list, markdown renderer)
-│   │   ├── categories/            # Category management
+│   │   ├── category/              # Category management
 │   │   ├── comments/              # Comment system
 │   │   ├── dashboard/             # User/Admin dashboard
 │   │   ├── likes/                 # Like/reaction system
@@ -147,7 +147,7 @@ The app uses **React Router v6** with a centralized `RouteName.js` for route con
 /register → Signup page
 /blog/:slug → Individual blog post (by slug)
 /category/:slug → Blog list filtered by category
-/categories → Category list (public or role-based)
+/category → Category list (public or role-based)
 /:username → User profile
 /:username/blogs → User's blog listing
 
@@ -163,8 +163,8 @@ The app uses **React Router v6** with a centralized `RouteName.js` for route con
 /blogs/edit/:slug → Edit a blog
 /my-blogs → User's blogs
 /notifications → User notifications
-/categories/add → Create new category
-/categories/edit/:id→ Edit existing category
+/category/add → Create new category
+/category/edit/:id→ Edit existing category
 /profile → Authenticated user's profile
 /edit-profile → Edit profile
 /change-password → Change password

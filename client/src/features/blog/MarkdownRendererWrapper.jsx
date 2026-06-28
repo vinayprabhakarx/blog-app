@@ -1,9 +1,9 @@
 import React, { Suspense } from "react";
 
 // Lazy load the heavy markdown component
-const MdRenderCardLazy = React.lazy(() => import("@/features/blog/MdRenderCard"));
+const MarkdownRendererLazy = React.lazy(() => import("@/features/blog/MarkdownRenderer"));
 
-const MdRenderCardWrapper = ({ content, onDeleteImage, ...props }) => {
+const MarkdownRendererWrapper = ({ content, onDeleteImage, ...props }) => {
   return (
     <Suspense
       fallback={
@@ -25,7 +25,7 @@ const MdRenderCardWrapper = ({ content, onDeleteImage, ...props }) => {
         </div>
       }
     >
-      <MdRenderCardLazy
+      <MarkdownRendererLazy
         content={content}
         onDeleteImage={onDeleteImage}
         {...props}
@@ -34,4 +34,4 @@ const MdRenderCardWrapper = ({ content, onDeleteImage, ...props }) => {
   );
 };
 
-export default MdRenderCardWrapper;
+export default MarkdownRendererWrapper;

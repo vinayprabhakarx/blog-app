@@ -31,7 +31,9 @@ import VirtualizedMdPreview from "./VirtualizedMdPreview";
 import { useTheme } from "@/utils/ThemeContext";
 import ImageCropper from "@/components/common/ImageCropper";
 import { showToast } from "@/utils/showToast";
-
+import { CustomDialog, CustomDialogFooter } from "@/components/common/CustomDialog";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 const ToolButton = React.memo(({ onClick, title, children }) => (
   <button
     type="button"
@@ -56,6 +58,8 @@ const BlogEditor = ({
   const [showCropper, setShowCropper] = useState(false);
   const [selectedImageForCrop, setSelectedImageForCrop] = useState(null);
   const [selectedFile, setSelectedFile] = useState(null);
+  const [linkDialogState, setLinkDialogState] = useState({ isOpen: false, url: "", selectionStart: 0, selectionEnd: 0 });
+  const [codeDialogState, setCodeDialogState] = useState({ isOpen: false, language: "", selectionStart: 0, selectionEnd: 0 });
   const textareaRef = useRef(null);
 
   const handleChange = useCallback(
@@ -75,15 +79,16 @@ const BlogEditor = ({
 
       const start = textarea.selectionStart;
       const end = textarea.selectionEnd;
-      const selectedText = value.substring(start, end);
+      const currentValue = textarea.value; // Read latest value directly from DOM
+      const selectedText = currentValue.substring(start, end);
       const textToInsert = selectedText || placeholder;
 
       const newValue =
-        value.substring(0, start) +
+        currentValue.substring(0, start) +
         before +
         textToInsert +
         after +
-        value.substring(end);
+        currentValue.substring(end);
 
       if (onChange) {
         onChange(newValue);
@@ -96,7 +101,7 @@ const BlogEditor = ({
         textarea.focus();
       }, 0);
     },
-    [value, onChange],
+    [onChange],
   );
 
   // Formatting functions (memoized)
@@ -146,13 +151,31 @@ const BlogEditor = ({
   );
 
   const formatLink = useCallback(() => {
-    const url = prompt("Enter URL:");
-    if (url) {
-      insertAtCursor("[", `](${url})`, "link text");
+    const textarea = textareaRef.current;
+    if (textarea) {
+      setLinkDialogState({
+        isOpen: true,
+        url: "",
+        selectionStart: textarea.selectionStart,
+        selectionEnd: textarea.selectionEnd
+      });
     }
-  }, [insertAtCursor]);
+  }, []);
 
-  const formatImage = () => {
+  const handleInsertLink = useCallback(() => {
+    const { url, selectionStart, selectionEnd } = linkDialogState;
+    if (url) {
+      const textarea = textareaRef.current;
+      if (textarea) {
+        textarea.focus();
+        textarea.setSelectionRange(selectionStart, selectionEnd);
+        insertAtCursor("[", `](${url})`, "link text");
+      }
+    }
+    setLinkDialogState(prev => ({ ...prev, isOpen: false }));
+  }, [linkDialogState, insertAtCursor]);
+
+  const formatImage = useCallback(() => {
     // Create a file input element
     const input = document.createElement("input");
     input.type = "file";
@@ -173,7 +196,7 @@ const BlogEditor = ({
     };
 
     input.click();
-  };
+  }, []);
 
   const handleCropComplete = async (croppedImageUrl) => {
     setShowCropper(false);
@@ -257,9 +280,27 @@ const BlogEditor = ({
   };
 
   const formatCodeBlock = useCallback(() => {
-    const language = prompt("Enter language (optional):") || "";
-    insertAtCursor("\n```" + language + "\n", "\n```\n", "Your code here");
-  }, [insertAtCursor]);
+    const textarea = textareaRef.current;
+    if (textarea) {
+      setCodeDialogState({
+        isOpen: true,
+        language: "",
+        selectionStart: textarea.selectionStart,
+        selectionEnd: textarea.selectionEnd
+      });
+    }
+  }, []);
+
+  const handleInsertCodeBlock = useCallback(() => {
+    const { language, selectionStart, selectionEnd } = codeDialogState;
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.focus();
+      textarea.setSelectionRange(selectionStart, selectionEnd);
+      insertAtCursor("\n```" + language + "\n", "\n```\n", "Your code here");
+    }
+    setCodeDialogState(prev => ({ ...prev, isOpen: false }));
+  }, [codeDialogState, insertAtCursor]);
 
   const formatTable = useCallback(() => {
     const tableTemplate =
@@ -500,6 +541,68 @@ const BlogEditor = ({
           onCrop={handleCropComplete}
         />
       )}
+
+      {/* Link URL Modal */}
+      <CustomDialog
+        isOpen={linkDialogState.isOpen}
+        onClose={() => setLinkDialogState(prev => ({ ...prev, isOpen: false }))}
+        title="Insert Link"
+        description="Enter the URL for your link."
+        maxWidth="24rem"
+      >
+        <div className="py-2">
+          <Input
+            type="url"
+            placeholder="https://example.com"
+            value={linkDialogState.url}
+            onChange={(e) => setLinkDialogState(prev => ({ ...prev, url: e.target.value }))}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleInsertLink();
+              }
+            }}
+            autoFocus
+          />
+        </div>
+        <CustomDialogFooter>
+          <Button variant="outline" onClick={() => setLinkDialogState(prev => ({ ...prev, isOpen: false }))}>
+            Cancel
+          </Button>
+          <Button onClick={handleInsertLink}>Insert</Button>
+        </CustomDialogFooter>
+      </CustomDialog>
+
+      {/* Code Block Modal */}
+      <CustomDialog
+        isOpen={codeDialogState.isOpen}
+        onClose={() => setCodeDialogState(prev => ({ ...prev, isOpen: false }))}
+        title="Insert Code Block"
+        description="Enter the language for syntax highlighting (optional)."
+        maxWidth="24rem"
+      >
+        <div className="py-2">
+          <Input
+            type="text"
+            placeholder="e.g. javascript, python, css"
+            value={codeDialogState.language}
+            onChange={(e) => setCodeDialogState(prev => ({ ...prev, language: e.target.value }))}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') {
+                e.preventDefault();
+                handleInsertCodeBlock();
+              }
+            }}
+            autoFocus
+          />
+        </div>
+        <CustomDialogFooter>
+          <Button variant="outline" onClick={() => setCodeDialogState(prev => ({ ...prev, isOpen: false }))}>
+            Cancel
+          </Button>
+          <Button onClick={handleInsertCodeBlock}>Insert</Button>
+        </CustomDialogFooter>
+      </CustomDialog>
     </div>
   );
 };

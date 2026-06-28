@@ -72,9 +72,9 @@ async function fetchAllBlogs(apiBaseUrl) {
 
 // Fetch categories from API
 async function fetchCategories(apiBaseUrl) {
-  console.log(`fetching categories from: ${apiBaseUrl}/api/categories`);
+  console.log(`fetching categories from: ${apiBaseUrl}/api/category`);
   try {
-    const res = await fetch(`${apiBaseUrl}/api/categories`);
+    const res = await fetch(`${apiBaseUrl}/api/category`);
     if (!res.ok) {
       throw new Error(`HTTP error ${res.status}`);
     }

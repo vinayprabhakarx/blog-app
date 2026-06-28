@@ -24,6 +24,7 @@ dotenv.config();
 
 // Initialize Express app
 const app = express();
+app.set("trust proxy", 1); // Trust reverse proxy for rate limiters (fixes 429 errors in prod)
 const PORT = process.env.PORT || 5000;
 
 // Middleware
@@ -125,9 +126,9 @@ checkCloudinary();
 // API Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/users", userRoutes);
-app.use("/api/categories", categoryRoutes);
+app.use("/api/category", categoryRoutes);
 app.use("/api/blogs", blogRoutes);
-app.use("/api/categories/:categoryId/blogs", blogRoutes);
+app.use("/api/category/:categoryId/blogs", blogRoutes);
 app.use("/api/comments", commentRoutes);
 app.use("/api/likes", blogLikeRoutes);
 app.use("/api/notifications", notificationRoutes);

@@ -25,7 +25,7 @@ api.interceptors.request.use(
     const publicGetRoutes = [
       "/blogs?",
       "/blogs/author",
-      "/categories",
+      "/category",
       "/auth/verify-email",
       "/auth/forgot-password",
       "/auth/reset-password",

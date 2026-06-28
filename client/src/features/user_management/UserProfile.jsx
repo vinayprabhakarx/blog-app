@@ -22,11 +22,11 @@ import { setUser } from "@/redux/user/user.slice";
 import { useDispatch, useSelector } from "react-redux";
 import { Card, CardContent } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
-import Loading from "@/components/Loading";
+import FullScreenLoader from "@/components/common/FullScreenLoader";
 import { IoCameraOutline } from "react-icons/io5";
-import LoadingButton from "@/components/LoadingButton";
+import LoadingButton from "@/components/common/LoadingButton";
 import Dropzone from "react-dropzone";
-import ImageCropper from "@/components/ImageCropper";
+import ImageCropper from "@/components/common/ImageCropper";
 import userService from "./usersService";
 
 const Profile = () => {
@@ -213,7 +213,7 @@ const Profile = () => {
     };
   }, [selectedImage, filePreview]);
 
-  if (loading) return <Loading />;
+  if (loading) return <FullScreenLoader />;
 
   return (
     <Card className="max-w-3xl mx-auto">

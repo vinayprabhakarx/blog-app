@@ -1,6 +1,6 @@
 import React, { useMemo } from 'react';
 import { Virtuoso } from 'react-virtuoso';
-import MdRenderCard from './MdRenderCard'; // Re-use the existing sanitized renderer
+import MarkdownRenderer from './MarkdownRenderer'; // Re-use the existing sanitized renderer
 
 const VirtualizedMdPreview = ({ content }) => {
   const chunks = useMemo(() => {
@@ -38,7 +38,7 @@ const VirtualizedMdPreview = ({ content }) => {
       overscan={500} 
       itemContent={(index, chunkContent) => (
         <div className="pb-4 min-h-12.5 relative">
-           <MdRenderCard content={chunkContent} />
+           <MarkdownRenderer content={chunkContent} />
         </div>
       )}
     />

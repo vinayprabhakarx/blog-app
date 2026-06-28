@@ -24,7 +24,8 @@ const signJwt = promisify(jwt.sign);
 const verifyJwt = promisify(jwt.verify);
 // Helper function to convert JWT_EXPIRE string to milliseconds
 const getMaxAgeFromJwtExpire = (jwtExpire) => {
-  const match = jwtExpire.match(/^(\d+)([smhd])$/);
+  if (!jwtExpire) return 12 * 60 * 60 * 1000;
+  const match = String(jwtExpire).match(/^(\d+)([smhd])$/);
   if (!match) return 12 * 60 * 60 * 1000; // Default to 12 hours
 
   const value = parseInt(match[1]);
@@ -57,8 +58,8 @@ const sendTokenResponse = async (
   };
 
   try {
-    const accessTokenExpire = process.env.JWT_ACCESS_EXPIRE;
-    const refreshTokenExpire = process.env.JWT_REFRESH_EXPIRE;
+    const accessTokenExpire = process.env.JWT_ACCESS_EXPIRE || "15m";
+    const refreshTokenExpire = process.env.JWT_REFRESH_EXPIRE || "7d";
     
     const accessToken = await signJwt(payload, process.env.JWT_SECRET, {
       expiresIn: accessTokenExpire,
@@ -240,8 +241,17 @@ export const login = async (req, res, next) => {
     return next(authError("Invalid login credentials."));
   }
 
+  // Check if account is Google Auth before bcrypt
+  if (user.google_auth || user.authProvider === "google") {
+    return next(
+      authError(
+        "This account was registered with Google. Please sign in with Google."
+      )
+    );
+  }
+
   // Verify password FIRST to prevent account enumeration
-  const isMatch = await bcrypt.compare(password, user.personal_info.password);
+  const isMatch = await bcrypt.compare(password, user.personal_info.password || "");
   
   if (!isMatch) {
     // Increment login attempts on failed login
@@ -260,13 +270,6 @@ export const login = async (req, res, next) => {
     );
   }
 
-  if (user.google_auth || user.authProvider === "google") {
-    return next(
-      authError(
-        "This account was registered with Google. Please sign in with Google."
-      )
-    );
-  }
 
   // Block login if email not verified for local accounts
   if (!user.emailVerified) {
