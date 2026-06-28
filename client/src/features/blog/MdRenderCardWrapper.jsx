@@ -1,5 +1,4 @@
 import React, { Suspense } from "react";
-import LoadingSpinner from "@/components/common/LoadingSpinner";
 
 // Lazy load the heavy markdown component
 const MdRenderCardLazy = React.lazy(() => import("@/features/blog/MdRenderCard"));
@@ -8,8 +7,21 @@ const MdRenderCardWrapper = ({ content, onDeleteImage, ...props }) => {
   return (
     <Suspense
       fallback={
-        <div className="flex items-center justify-center min-h-50">
-          <LoadingSpinner size="md" message="Loading markdown renderer..." />
+        <div className="w-full mt-8 space-y-6">
+          {[1, 2, 3, 4].map((block) => (
+            <div key={block} className="space-y-3">
+              <div className="h-4 w-full bg-muted-foreground/10 rounded animate-pulse" />
+              <div className="h-4 w-full bg-muted-foreground/10 rounded animate-pulse" />
+              <div className="h-4 w-11/12 bg-muted-foreground/10 rounded animate-pulse" />
+              <div className="h-4 w-5/6 bg-muted-foreground/10 rounded animate-pulse" />
+            </div>
+          ))}
+          <div className="h-7 w-3/5 bg-muted-foreground/10 rounded-lg animate-pulse mt-8 mb-4" />
+          <div className="space-y-3">
+            <div className="h-4 w-full bg-muted-foreground/10 rounded animate-pulse" />
+            <div className="h-4 w-full bg-muted-foreground/10 rounded animate-pulse" />
+            <div className="h-4 w-4/5 bg-muted-foreground/10 rounded animate-pulse" />
+          </div>
         </div>
       }
     >

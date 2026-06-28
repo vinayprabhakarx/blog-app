@@ -136,17 +136,18 @@ const BlogPage = () => {
 
 
 
-  // Show skeleton while loading or no blog data
-  if (currentBlogLoading || (!currentBlog && !currentBlogError)) {
+  const currentSlug = currentBlog?.slug;
+  const currentId = currentBlog?._id;
+  const isStaleBlog = (slug && slug !== currentSlug) || (id && id !== currentId);
+
+  // Show skeleton while loading, if no blog data, OR if the loaded blog doesn't match the URL
+  if (currentBlogLoading || (!currentBlog && !currentBlogError) || (isStaleBlog && !currentBlogError)) {
     return <BlogPageSkeleton />;
   }
 
   const handleCommentClick = (e) => {
     e.preventDefault();
     e.stopPropagation();
-
-    // Pause chunk loading to prevent page height changes during scroll
-    window.dispatchEvent(new CustomEvent("blog-chunk-pause"));
 
     // Always show comments when clicked from header
     if (!showComments) {

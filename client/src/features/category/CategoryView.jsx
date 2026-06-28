@@ -8,7 +8,7 @@ import {
   selectCategoriesLoading,
   selectCategoriesError,
 } from "./categoriesSlice";
-import {Star}  from "lucide-react";
+import {Star, FileText}  from "lucide-react";
 import { PageStats } from "@/components/common/PageStats";
 
 const CategoriesView = () => {
