@@ -63,7 +63,13 @@ export const NotificationProvider = ({ children }) => {
         }
       } catch (error) {
         if (isMounted) {
-          console.error("Error polling notifications:", error);
+          if (error.response && error.response.status === 401) {
+            // Stop polling if unauthorized (token expired, etc.)
+            setIsPolling(false);
+            clearInterval(pollInterval);
+          } else {
+            console.error("Error polling notifications:", error);
+          }
         }
       }
     }, 30000); // Increased to 30 seconds to reduce API calls

@@ -121,8 +121,8 @@ const HomePage = React.memo(() => {
         return;
       }
 
-      // Only fetch blogs if categories have been loaded
-      if (!hasFetchedCategories) {
+      // If filtering by a specific category, wait for categories to load
+      if (selectedCategory !== "all" && !hasFetchedCategories) {
         return;
       }
 
