@@ -386,7 +386,7 @@ const blogSlice = createSlice({
         state.updateLoading = false;
         const updatedBlog = action.payload.blog || action.payload;
 
-        // Update in all relevant arrays
+        // Update in myBlogs and authorBlogs unconditionally
         const updateInArray = (array) => {
           const index = array.findIndex((blog) => blog._id === updatedBlog._id);
           if (index !== -1) {
@@ -394,9 +394,25 @@ const blogSlice = createSlice({
           }
         };
 
-        updateInArray(state.allBlogs);
         updateInArray(state.myBlogs);
         updateInArray(state.authorBlogs);
+
+        // Special handling for allBlogs regarding draft status
+        const allBlogsIndex = state.allBlogs.findIndex((blog) => blog._id === updatedBlog._id);
+        
+        if (updatedBlog.draft) {
+          // If it's a draft now, it shouldn't be in allBlogs (public blogs)
+          if (allBlogsIndex !== -1) {
+            state.allBlogs.splice(allBlogsIndex, 1);
+          }
+        } else {
+          // If it's published, update it if it exists, otherwise add it to the front
+          if (allBlogsIndex !== -1) {
+            state.allBlogs[allBlogsIndex] = updatedBlog;
+          } else {
+            state.allBlogs.unshift(updatedBlog);
+          }
+        }
 
         if (state.currentBlog && state.currentBlog._id === updatedBlog._id) {
           state.currentBlog = updatedBlog;

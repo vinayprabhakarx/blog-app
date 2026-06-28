@@ -91,10 +91,10 @@ export const DesktopSidebar = React.memo(
             e.preventDefault();
             setOpen(!open);
           }}
-          className="absolute -right-3 top-1/2 -translate-y-1/2 h-7 w-7 text-muted-foreground transition-all z-60 flex items-center justify-center cursor-pointer bg-background border border-border rounded-full hover:bg-accent hover:text-accent-foreground shadow-sm focus:outline-none"
+          className="absolute -right-3 top-1/2 -translate-y-1/2 h-6 w-6 text-muted-foreground transition-all z-60 flex items-center justify-center cursor-pointer bg-background border border-border rounded-full hover:bg-accent hover:text-accent-foreground shadow-sm focus:outline-none"
           title={open ? "Unpin sidebar" : "Pin sidebar"}
         >
-          {open ? <IconPinnedOff size={16} /> : <IconPin size={16} />}
+          {open ? <IconPinnedOff size={14} /> : <IconPin size={14} />}
         </button>
       </Motion.aside>
     );
