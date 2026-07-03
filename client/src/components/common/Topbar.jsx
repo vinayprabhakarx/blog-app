@@ -88,7 +88,7 @@ const Topbar = React.memo(() => {
           </div>
 
           {/* Middle Section: Search Bar (Desktop) */}
-          <div className="flex items-center justify-center hidden md:flex shrink-0 px-4">
+          <div className="items-center justify-center hidden md:flex shrink-0 px-4">
             <div className="w-64 lg:w-96">
               <SearchBar />
             </div>

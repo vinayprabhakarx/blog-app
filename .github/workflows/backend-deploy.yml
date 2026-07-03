@@ -1,0 +1,139 @@
+name: Deploy Blog Backend to Oracle Cloud
+
+on:
+  push:
+    branches: [ main ]
+    paths:
+      - 'api/**'
+      - '.github/workflows/backend-deploy.yml'
+  workflow_dispatch:
+
+env:
+  REGISTRY: docker.io
+  IMAGE_NAME: ${{ secrets.DOCKERHUB_USERNAME }}/blog-app
+
+jobs:
+  docker-build:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Extract Docker metadata
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
+          tags: |
+            type=raw,value=latest
+            type=sha,format=short
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: ./api
+          file: ./api/Dockerfile
+          platforms: linux/amd64,linux/arm64
+          push: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' }}
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache
+          cache-to: type=registry,ref=${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:buildcache,mode=max
+
+  deploy-to-oracle:
+    name: Deploy to Oracle Cloud (Production)
+    needs: docker-build
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
+    steps:
+      - name: Deploy to Oracle Cloud server via SSH
+        env:
+          ORACLE_HOST: ${{ secrets.ORACLE_HOST }}
+          ORACLE_USER: ubuntu
+          ORACLE_SSH_KEY: ${{ secrets.ORACLE_SSH_KEY }}
+          DOCKER_IMAGE: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:latest
+          REGISTRY_USERNAME: ${{ secrets.DOCKERHUB_USERNAME }}
+          REGISTRY_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        run: |
+          set -e
+          # Save the private key to a secure temporary file
+          echo "$ORACLE_SSH_KEY" > private_key
+          chmod 600 private_key
+
+          # 1. Securely log in to Docker Hub over SSH without saving credentials to disk
+          echo "Logging into private Docker Hub registry on remote server..."
+          echo "$REGISTRY_TOKEN" | ssh -i private_key -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=60 "$ORACLE_USER@$ORACLE_HOST" "docker login -u '$REGISTRY_USERNAME' --password-stdin"
+
+          # 2. Execute deployment logic on remote server
+          ssh -i private_key -o StrictHostKeyChecking=no -o ConnectTimeout=30 -o ServerAliveInterval=60 "$ORACLE_USER@$ORACLE_HOST" "DOCKER_IMAGE='$DOCKER_IMAGE' bash -s" << 'DEPLOY_EOF'
+            set -e
+            echo "--- Starting Blog Backend Deployment on Oracle Cloud ---"
+            
+            # Validate required environment secrets file
+            if [ ! -f /home/ubuntu/blog-app/.env.production ]; then
+              echo "❌ ERROR: /home/ubuntu/blog-app/.env.production is missing on the server! Cannot launch container securely."
+              exit 1
+            fi
+            
+            # Pull latest image
+            echo "Pulling image: $DOCKER_IMAGE"
+            docker pull "$DOCKER_IMAGE"
+            
+            # Stop and remove existing container
+            if [ "$(docker ps -a -q -f name=blog-app)" ]; then
+              echo "Stopping and removing old container..."
+              docker stop blog-app || true
+              docker rm blog-app || true
+            fi
+            
+            # Create necessary host directories if missing
+            mkdir -p /home/ubuntu/blog-app/logs
+            
+            # Launch new container
+            echo "Starting new container..."
+            docker run -d \
+              --name blog-app \
+              --restart unless-stopped \
+              -p 5000:5000 \
+              --env-file /home/ubuntu/blog-app/.env.production \
+              -v /home/ubuntu/blog-app/logs:/app/logs \
+              "$DOCKER_IMAGE"
+            
+            # Cleanup old unused images
+            echo "Cleaning up dangling Docker images..."
+            docker image prune -a -f
+            
+            # Verify deployment with retry loop
+            echo "--- Checking Live Health Endpoint ---"
+            for i in {1..10}; do
+              if curl -s -f http://localhost:5000/api/health > /dev/null; then
+                echo "✅ Health check passed on attempt $i!"
+                curl -i http://localhost:5000/api/health
+                break
+              fi
+              echo "Attempt $i failed, retrying in 3 seconds..."
+              sleep 3
+              if [ $i -eq 10 ]; then
+                echo "❌ Health check failed after 10 attempts! Showing container logs:"
+                docker logs --tail 50 blog-app
+                exit 1
+              fi
+            done
+            echo "✅ Blog Backend Deployment Successful!"
+          DEPLOY_EOF
+
+          # Clean up local sensitive private key
+          rm -f private_key

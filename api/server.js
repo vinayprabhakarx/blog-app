@@ -136,6 +136,43 @@ app.use("/api/send-email", contactRoutes);
 app.use("/sitemap.xml", sitemapRoutes);
 app.use("/api/sitemap.xml", sitemapRoutes);
 
+// Health Check Endpoint
+app.get("/api/health", async (req, res) => {
+  let mongoStatus = "DISCONNECTED";
+  try {
+    if (mongoose.connection.readyState === 1) {
+      await mongoose.connection.db.admin().ping();
+      mongoStatus = "CONNECTED";
+    }
+  } catch (err) {
+    mongoStatus = `ERROR: ${err.message}`;
+  }
+
+  let cloudinaryStatus = "DISCONNECTED";
+  try {
+    const cloudOk = await testCloudinaryConnection();
+    cloudinaryStatus = cloudOk ? "CONNECTED" : "DISCONNECTED";
+  } catch (err) {
+    cloudinaryStatus = `ERROR: ${err.message}`;
+  }
+
+  const overallStatus = mongoStatus === "CONNECTED" ? "ALL_OK" : "DEGRADED";
+  const httpStatus = mongoStatus === "CONNECTED" ? 200 : 503;
+
+  res.status(httpStatus).json({
+    service: "blog-app-backend",
+    timestamp: new Date().toISOString(),
+    mongodb: {
+      status: mongoStatus,
+      readyState: mongoose.connection.readyState
+    },
+    cloudinary: {
+      status: cloudinaryStatus
+    },
+    status: "UP",
+    overall_status: overallStatus
+  });
+});
 
 // Global Error Handler
 app.use((err, req, res, next) => {
