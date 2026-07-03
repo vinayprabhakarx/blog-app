@@ -99,7 +99,7 @@ const HomePage = React.memo(() => {
   }, [dispatch, hasFetchedCategories]);
   // Set dynamic page title for SEO
   useEffect(() => {
-    document.title = "VinayPrabhakarX-Blog | Deep Dives on Tech, Algorithms & Science";
+    document.title = "Vinay's Blog | Deep Dives on Tech, Algorithms & Science";
   }, []);
   /* eslint-disable react-hooks/exhaustive-deps */
   useEffect(() => {

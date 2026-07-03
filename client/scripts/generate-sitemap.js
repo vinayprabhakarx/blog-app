@@ -9,46 +9,54 @@ const __dirname = path.dirname(__filename);
 
 // Simple self-contained helper to load variables from client/.env
 function loadEnv() {
-  const envPath = path.resolve(__dirname, "../.env");
+  const envFiles = [
+    process.env.NODE_ENV === "production" ? "../.env.production" : null,
+    "../.env.local",
+    "../.env",
+  ].filter(Boolean);
+
   const env = {};
-  if (fs.existsSync(envPath)) {
-    try {
-      const content = fs.readFileSync(envPath, "utf8");
-      content.split("\n").forEach((line) => {
-        const trimmed = line.trim();
-        if (trimmed && !trimmed.startsWith("#")) {
-          const parts = trimmed.split("=");
-          if (parts.length >= 2) {
-            const key = parts[0].trim();
-            let val = parts.slice(1).join("=").trim();
-            if (
-              (val.startsWith('"') && val.endsWith('"')) ||
-              (val.startsWith("'") && val.endsWith("'"))
-            ) {
-              val = val.slice(1, -1);
+  for (const file of envFiles) {
+    const envPath = path.resolve(__dirname, file);
+    if (fs.existsSync(envPath)) {
+      try {
+        const content = fs.readFileSync(envPath, "utf8");
+        content.split("\n").forEach((line) => {
+          const trimmed = line.trim();
+          if (trimmed && !trimmed.startsWith("#")) {
+            const parts = trimmed.split("=");
+            if (parts.length >= 2) {
+              const key = parts[0].trim();
+              let val = parts.slice(1).join("=").trim();
+              if (
+                (val.startsWith('"') && val.endsWith('"')) ||
+                (val.startsWith("'") && val.endsWith("'"))
+              ) {
+                val = val.slice(1, -1);
+              }
+              if (!env[key]) env[key] = val;
             }
-            env[key] = val;
           }
-        }
-      });
-    } catch (err) {
-      console.warn("⚠️ Failed to parse client/.env file:", err.message);
+        });
+      } catch (err) {
+        console.warn(`⚠️ Failed to parse ${file}:`, err.message);
+      }
     }
   }
   return env;
 }
 
 // Recursively fetch all blogs from paginated endpoint
-async function fetchAllBlogs(apiBaseUrl) {
+async function fetchAllBlogs(apiEndpoint) {
   let page = 1;
   const allBlogs = [];
   let totalPages = 1;
 
-  console.log(`fetching blogs from: ${apiBaseUrl}/api/blogs`);
+  console.log(`fetching blogs from: ${apiEndpoint}/blogs`);
 
   do {
     try {
-      const url = `${apiBaseUrl}/api/blogs?page=${page}&limit=50`;
+      const url = `${apiEndpoint}/blogs?page=${page}&limit=50`;
       const res = await fetch(url);
       if (!res.ok) {
         throw new Error(`HTTP error ${res.status}`);
@@ -71,10 +79,10 @@ async function fetchAllBlogs(apiBaseUrl) {
 }
 
 // Fetch categories from API
-async function fetchCategories(apiBaseUrl) {
-  console.log(`fetching categories from: ${apiBaseUrl}/api/category`);
+async function fetchCategories(apiEndpoint) {
+  console.log(`fetching categories from: ${apiEndpoint}/category`);
   try {
-    const res = await fetch(`${apiBaseUrl}/api/category`);
+    const res = await fetch(`${apiEndpoint}/category`);
     if (!res.ok) {
       throw new Error(`HTTP error ${res.status}`);
     }
@@ -82,11 +90,7 @@ async function fetchCategories(apiBaseUrl) {
     if (data.success && Array.isArray(data.categories)) {
       return data.categories;
     }
-    // API might wrap list in a different property, or return array directly
-    if (Array.isArray(data)) {
-      return data;
-    }
-    return [];
+    return Array.isArray(data) ? data : [];
   } catch (error) {
     console.error("⚠️ Failed to fetch categories:", error.message);
     return [];
@@ -95,16 +99,20 @@ async function fetchCategories(apiBaseUrl) {
 
 async function generate() {
   const env = loadEnv();
-  const apiBaseUrl =
-    env.VITE_API_BASE_URL ||
+  const rawApiBaseUrl =
     process.env.VITE_API_BASE_URL ||
-    "http://localhost:5000";
+    env.VITE_API_BASE_URL ||
+    "http://localhost:5000/api";
+  const cleanUrl = rawApiBaseUrl.replace(/\/+$/, "");
+  const apiEndpoint = (cleanUrl.endsWith("/api") || cleanUrl.endsWith("/blog"))
+    ? cleanUrl
+    : `${cleanUrl}/api`;
 
   // Determine site URL (sitemaps should contain site base URL links)
   // Usually the site URL in production is the domain the frontend runs on.
   // We can default to the production domain or a placeholder.
   let siteUrl = "https://blog.vinayprabhakar.dev";
-  if (apiBaseUrl.includes("localhost")) {
+  if (apiEndpoint.includes("localhost")) {
     siteUrl = "http://localhost:5173";
   }
 
@@ -112,8 +120,8 @@ async function generate() {
 
   // Fetch blogs & categories
   const [blogs, categories] = await Promise.all([
-    fetchAllBlogs(apiBaseUrl),
-    fetchCategories(apiBaseUrl),
+    fetchAllBlogs(apiEndpoint),
+    fetchCategories(apiEndpoint),
   ]);
 
   console.log(`Fetched ${blogs.length} blogs and ${categories.length} categories.`);

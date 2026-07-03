@@ -9,31 +9,33 @@ import FullScreenLoader from "@/components/common/FullScreenLoader";
 import { useAuth } from "@/hooks/useAuth";
 import ScrollToTop from "@/components/common/ScrollToTop";
 
-const HomePage = React.lazy(() => import("@/pages/HomePage"));
-const Login = React.lazy(() => import("@/features/auth/Login"));
-const Signup = React.lazy(() => import("@/features/auth/Signup"));
-const ForgotPassword = React.lazy(() => import("@/features/auth/ForgotPassword"));
-const ResetPassword = React.lazy(() => import("@/features/auth/ResetPassword"));
-const VerifyEmail = React.lazy(() => import("@/features/auth/VerifyEmail"));
-const ResendEmail = React.lazy(() => import("@/features/auth/ResendEmail"));
-const ProfilePage = React.lazy(() => import("@/pages/ProfilePage"));
-const EditProfile = React.lazy(() => import("@/features/settings/EditProfile"));
-const ChangePassword = React.lazy(() => import("@/features/settings/ChangePassword"));
-const Dashboard = React.lazy(() => import("@/features/dashboard/Dashboard"));
-const CommentManagement = React.lazy(() => import("@/features/comment/CommentManagement"));
-const NotificationCenter = React.lazy(() => import("@/features/notification/NotificationCenter"));
+// Critical / Lightweight / Public Auth Pages (Static direct imports - instant load, no network chunk requests)
+import HomePage from "@/pages/HomePage";
+import Login from "@/features/auth/Login";
+import Signup from "@/features/auth/Signup";
+import ForgotPassword from "@/features/auth/ForgotPassword";
+import ResetPassword from "@/features/auth/ResetPassword";
+import VerifyEmail from "@/features/auth/VerifyEmail";
+import ResendEmail from "@/features/auth/ResendEmail";
+import BlogPage from "@/pages/BlogPage";
+import PublicCategoriesView from "@/features/category/CategoryView";
+import NotFound from "@/components/common/NotFound";
+import DashboardRedirect from "@/components/common/DashboardRedirect";
+import Dashboard from "@/features/dashboard/Dashboard";
+import ChangePassword from "@/features/settings/ChangePassword";
+import NotificationCenter from "@/features/notification/NotificationCenter";
 
-const CategoryManagement = React.lazy(() => import("@/features/category/CategoryManagement"));
-const PublicCategoriesView = React.lazy(() => import("@/features/category/CategoryView"));
-const CategoryForm = React.lazy(() => import("@/features/category/CategoryForm"));
-const BlogManagement = React.lazy(() => import("@/features/blog/BlogManagement"));
+// Heavy / Editor / Admin Management Components (Lazy Loaded - code-split to save initial bundle size)
 const BlogForm = React.lazy(() => import("@/features/blog/BlogForm"));
 const BlogFormWrapper = React.lazy(() => import("@/features/blog/BlogFormWrapper"));
-const BlogPage = React.lazy(() => import("@/pages/BlogPage"));
-const NotFound = React.lazy(() => import("@/components/common/NotFound"));
-const DashboardRedirect = React.lazy(() => import("@/components/common/DashboardRedirect"));
+const BlogManagement = React.lazy(() => import("@/features/blog/BlogManagement"));
+const CategoryManagement = React.lazy(() => import("@/features/category/CategoryManagement"));
+const CategoryForm = React.lazy(() => import("@/features/category/CategoryForm"));
 const UserManagement = React.lazy(() => import("@/features/user_management/UserManagement"));
 const Analytics = React.lazy(() => import("@/features/user_management/Analytics"));
+const CommentManagement = React.lazy(() => import("@/features/comment/CommentManagement"));
+const ProfilePage = React.lazy(() => import("@/pages/ProfilePage"));
+const EditProfile = React.lazy(() => import("@/features/settings/EditProfile"));
 
 // ConditionalCategories component
 const ConditionalCategories = () => {

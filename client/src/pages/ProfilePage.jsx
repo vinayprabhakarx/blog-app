@@ -114,13 +114,13 @@ const ProfilePage = React.memo(() => {
       const name = profile.personal_info?.name || profile.name || "";
       const uname = profile.personal_info?.username || profile.username || "";
       if (name) {
-        document.title = `${name} (@${uname}) | VinayPrabhakarX-Blog`;
+        document.title = `${name} (@${uname}) | Vinay's Blog`;
       } else if (uname) {
-        document.title = `@${uname} | VinayPrabhakarX-Blog`;
+        document.title = `@${uname} | Vinay's Blog`;
       }
     }
     return () => {
-      document.title = "VinayPrabhakarX-Blog";
+      document.title = "Vinay's Blog";
     };
   }, [profile]);
 

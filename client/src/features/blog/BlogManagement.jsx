@@ -297,16 +297,16 @@ const BlogManagement = () => {
   // Set dynamic page title for SEO on lists/categories/user blogs
   useEffect(() => {
     if (isMyBlogsPage) {
-      document.title = "My Blogs | VinayPrabhakarX-Blog";
+      document.title = "My Blogs | Vinay's Blog";
     } else if (isUserBlogsPage && username) {
-      document.title = `${username}'s Blogs | VinayPrabhakarX-Blog`;
+      document.title = `${username}'s Blogs | Vinay's Blog`;
     } else if (isViewingCategory && currentCategory) {
-      document.title = `${currentCategory.name} Category | VinayPrabhakarX-Blog`;
+      document.title = `${currentCategory.name} Category | Vinay's Blog`;
     } else {
-      document.title = "All Blogs | VinayPrabhakarX-Blog";
+      document.title = "All Blogs | Vinay's Blog";
     }
     return () => {
-      document.title = "VinayPrabhakarX-Blog";
+      document.title = "Vinay's Blog";
     };
   }, [isMyBlogsPage, isUserBlogsPage, isViewingCategory, currentCategory, username]);
 

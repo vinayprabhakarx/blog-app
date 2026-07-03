@@ -1,146 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://blog.vinayprabhakar.dev/</loc>
+    <loc>http://localhost:5173/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://blog.vinayprabhakar.dev/blogs</loc>
+    <loc>http://localhost:5173/blogs</loc>
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://blog.vinayprabhakar.dev/browse-categories</loc>
+    <loc>http://localhost:5173/browse-categories</loc>
     <changefreq>weekly</changefreq>
     <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/category/dsa</loc>
-    <lastmod>2026-01-05T16:45:35.056Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/category/history</loc>
-    <lastmod>2025-12-27T18:24:04.859Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/category/interview</loc>
-    <lastmod>2026-01-05T10:06:55.863Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/category/linux</loc>
-    <lastmod>2025-09-01T01:03:09.604Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/category/machine-learning</loc>
-    <lastmod>2025-09-01T00:02:42.650Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/category/science</loc>
-    <lastmod>2025-09-01T00:56:29.678Z</lastmod>
-    <changefreq>weekly</changefreq>
-    <priority>0.7</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/blog/conquering-the-gradient-cliff-understanding-and-taming-vanishingexploding-gradients</loc>
-    <lastmod>2026-06-22T19:26:12.294Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/blog/80-real-coding-questions-from-past-placements</loc>
-    <lastmod>2026-06-22T18:32:33.909Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/blog/top-200-sql-interview-questions-and-answers-2026-comprehensive-guide</loc>
-    <lastmod>2026-06-21T16:22:29.972Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/blog/react-interview-guide-principal-level-preparation</loc>
-    <lastmod>2026-06-21T16:22:12.336Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/blog/complete-javascript-interview-preparation-guide</loc>
-    <lastmod>2026-06-22T18:32:52.595Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/blog/linux-directory-structure</loc>
-    <lastmod>2026-06-22T16:09:16.881Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/blog/beyond-compression-the-probabilistic-magic-of-variational-autoencoders-vaes</loc>
-    <lastmod>2026-06-20T10:17:10.330Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/blog/a-deep-dive-into-the-arch-build-system-aur</loc>
-    <lastmod>2026-06-21T19:43:54.656Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/blog/nalanda-the-ancient-supernova-of-knowledge-that-burned-for-800-years</loc>
-    <lastmod>2026-06-21T18:50:14.835Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/blog/attention-is-all-you-need-a-deep-dive-into-the-transformers-core</loc>
-    <lastmod>2026-06-21T19:44:56.760Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/blog/state-estimation-in-a-noisy-world-a-guide-to-the-kalman-filter</loc>
-    <lastmod>2026-06-21T19:45:00.340Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/blog/demystifying-the-magic-backpropagation-from-scratch</loc>
-    <lastmod>2026-06-21T19:45:08.933Z</lastmod>
-    <changefreq>monthly</changefreq>
-    <priority>0.9</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/vianyprabhakarx</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/vianyprabhakarx/blogs</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/vinayprabhakarx</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
-  </url>
-  <url>
-    <loc>https://blog.vinayprabhakar.dev/vinayprabhakarx/blogs</loc>
-    <changefreq>weekly</changefreq>
-    <priority>0.5</priority>
   </url>
 </urlset>

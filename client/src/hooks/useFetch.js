@@ -17,10 +17,7 @@ export const useFetch = (url, options = {}) => {
       setError(null);
 
       // Extract the endpoint from the full URL
-      const endpoint = url.replace(
-        `${import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"}/api`,
-        ""
-      );
+      const endpoint = url.replace(api.defaults.baseURL, "");
 
       // Use the appropriate HTTP method
       const method = options.method?.toLowerCase() || "get";

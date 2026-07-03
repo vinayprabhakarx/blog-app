@@ -117,10 +117,10 @@ const BlogPage = () => {
   // Set dynamic page title for SEO based on blog title
   useEffect(() => {
     if (blogData.title) {
-      document.title = `${blogData.title} | VinayPrabhakarX-Blog`;
+      document.title = `${blogData.title} | Vinay's Blog`;
     }
     return () => {
-      document.title = "VinayPrabhakarX-Blog";
+      document.title = "Vinay's Blog";
     };
   }, [blogData.title]);
 

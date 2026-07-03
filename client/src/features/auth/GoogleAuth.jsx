@@ -14,6 +14,10 @@ const GoogleAuth = () => {
   const dispatch = useDispatch();
 
   const handleLogin = async () => {
+    if (!auth || !provider) {
+      showToast("error", "Google login is currently unavailable. Please sign in with email and password.");
+      return;
+    }
     try {
       const googleResponse = await signInWithPopup(auth, provider);
       const user = googleResponse.user;

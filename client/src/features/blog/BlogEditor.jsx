@@ -34,6 +34,7 @@ import { showToast } from "@/utils/showToast";
 import { CustomDialog, CustomDialogFooter } from "@/components/common/CustomDialog";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import api from "@/api/api";
 const ToolButton = React.memo(({ onClick, title, children }) => (
   <button
     type="button"
@@ -226,21 +227,13 @@ const BlogEditor = ({
       const formData = new FormData();
       formData.append("image", file);
 
-      const token = localStorage.getItem("token");
-      const uploadResponse = await fetch(
-        `${
-          import.meta.env.VITE_API_BASE_URL || "http://localhost:5000"
-        }/api/blogs/upload-image`,
-        {
-          method: "POST",
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-          body: formData,
+      const response = await api.post("/blogs/upload-image", formData, {
+        headers: {
+          "Content-Type": "multipart/form-data",
         },
-      );
+      });
 
-      const data = await uploadResponse.json();
+      const data = response.data;
 
       if (data.success && data.url) {
         // Replace loading text with actual image using the callback pattern
