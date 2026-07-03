@@ -1,5 +1,5 @@
-# Use lightweight Node.js 20 Alpine Linux image
-FROM node:20-alpine
+# Use modern, high-performance Node.js 24 Alpine Linux image
+FROM node:24-alpine
 
 # Set working directory
 WORKDIR /app
@@ -7,8 +7,8 @@ WORKDIR /app
 # Copy package files for dependency caching
 COPY package*.json ./
 
-# Install exact production dependencies cleanly
-RUN npm ci --omit=dev && npm cache clean --force
+# Install exact production dependencies cleanly (fallback to npm install if lockfile is missing or out of sync)
+RUN (npm ci --omit=dev || npm install --omit=dev) && npm cache clean --force
 
 # Copy application source code
 COPY . .

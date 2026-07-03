@@ -115,7 +115,3 @@ coverage/
 build/
 dist/
 out/
-
-# Package lock files
-package-lock.json
-yarn.lock
