@@ -3,6 +3,7 @@ import MDEditor from "@uiw/react-md-editor";
 import remarkMath from "remark-math";
 import rehypeKatex from "rehype-katex";
 import rehypeRaw from "rehype-raw";
+import DOMPurify from "dompurify";
 import "@uiw/react-md-editor/markdown-editor.css";
 import "@uiw/react-markdown-preview/markdown.css";
 import "katex/dist/katex.min.css";
@@ -237,13 +238,15 @@ const MarkdownRenderer = React.memo(({ content = "", onDeleteImage }) => {
       ),
   }), [imageComponent]);
 
+  const sanitizedContent = useMemo(() => DOMPurify.sanitize(content), [content]);
+
   return (
     <section className="w-full overflow-hidden">
       <style>{markdownStyles}</style>
       <div data-color-mode={theme} className="w-full">
         <div style={{ overflow: "hidden" }}>
           <MDEditor.Markdown
-            source={content}
+            source={sanitizedContent}
             style={staticStyles.markdown}
             remarkPlugins={remarkPlugins}
             rehypePlugins={rehypePlugins}

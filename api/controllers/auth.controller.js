@@ -79,8 +79,14 @@ const sendTokenResponse = async (
       maxAge: getMaxAgeFromJwtExpire(refreshTokenExpire),
     });
     
-    // Clear legacy access_token cookie if present
-    res.clearCookie("access_token");
+    // Set HTTP-only cookie for Access Token
+    res.cookie("access_token", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "strict",
+      path: "/",
+      maxAge: getMaxAgeFromJwtExpire(accessTokenExpire),
+    });
 
     // Prepare safe user object
     const safeUser = user.toObject({ getters: true });
@@ -241,14 +247,7 @@ export const login = async (req, res, next) => {
     return next(authError("Invalid login credentials."));
   }
 
-  // Check if account is Google Auth before bcrypt
-  if (user.google_auth || user.authProvider === "google") {
-    return next(
-      authError(
-        "This account was registered with Google. Please sign in with Google."
-      )
-    );
-  }
+  // Password verification is next
 
   // Verify password FIRST to prevent account enumeration
   const isMatch = await bcrypt.compare(password, user.personal_info.password || "");
@@ -415,13 +414,7 @@ export const resendVerification = async (req, res, next) => {
       });
     }
 
-    if (user.google_auth || user.authProvider === "google") {
-      return res.status(200).json({
-        success: true,
-        message:
-          "This account uses Google Sign-In and does not require verification",
-      });
-    }
+    // Google accounts are pre-verified, so they will be caught by the next condition
 
     if (user.emailVerified) {
       return res
@@ -480,11 +473,47 @@ export const resendVerification = async (req, res, next) => {
 // @desc    Handle Google OAuth sign-in
 // @access  Public
 export const googleAuth = async (req, res, next) => {
-  const { name, email, profile_img } = req.body;
+  const { access_token } = req.body;
 
-  // Input validation
-  if (!name || !email) {
-    return next(authError("Name and email are required for Google login"));
+  if (!access_token) {
+    return next(authError("Access token is required for Google login"));
+  }
+
+  let name, email, profile_img;
+
+  try {
+    // 1. Verify the access token's audience (aud) matches our Google Client ID
+    // This prevents the "Confused Deputy" attack where a token issued for another app is used here.
+    const tokenInfoResponse = await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${access_token}`);
+    
+    if (!tokenInfoResponse.ok) {
+      return next(authError("Invalid or expired Google access token"));
+    }
+
+    const tokenInfo = await tokenInfoResponse.json();
+
+    // Verify the audience matches our backend GOOGLE_CLIENT_ID
+    if (process.env.GOOGLE_CLIENT_ID && tokenInfo.aud !== process.env.GOOGLE_CLIENT_ID) {
+      return next(authError("Access token was not issued for this application"));
+    }
+
+    // 2. Fetch the user profile from Google
+    const googleResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    if (!googleResponse.ok) {
+      return next(authError("Failed to fetch user profile from Google"));
+    }
+
+    const googleUser = await googleResponse.json();
+    name = googleUser.name;
+    email = googleUser.email;
+    profile_img = googleUser.picture;
+  } catch (error) {
+    return next(serverError("Failed to verify Google token", error));
   }
 
   // Email format validation
@@ -500,12 +529,13 @@ export const googleAuth = async (req, res, next) => {
   });
 
   if (user) {
-    if (!user.google_auth && user.authProvider !== "google") {
-      return next(
-        conflictError(
-          "This email was registered with a password. Please log in with your password."
-        )
-      );
+    if (!user.google_auth) {
+      // Auto-link Google Auth for existing email/password accounts
+      user.google_auth = true;
+      
+      // If they were purely local before, update authProvider to reflect mixed mode, or leave it.
+      // We will keep authProvider as it is or set to 'google' if we want, but 'local' is fine since google_auth boolean controls access.
+      await user.save();
     }
 
     // Update avatar logic for Google auth users
@@ -527,8 +557,8 @@ export const googleAuth = async (req, res, next) => {
 
     const userObject = {
       personal_info: {
-        name: name.trim(),
-        email: email.toLowerCase().trim(),
+        name: name.trim().substring(0, 50),
+        email: email.toLowerCase().trim().substring(0, 50),
         username,
         profile_img: profile_img || "",
         password: randomPassword,
@@ -544,6 +574,68 @@ export const googleAuth = async (req, res, next) => {
   }
 
   await sendTokenResponse(res, user, 200, "Google login successful.");
+};
+
+// @route   POST /api/auth/link-google
+// @desc    Link Google Auth to existing logged-in user
+// @access  Private
+export const linkGoogleAuth = async (req, res, next) => {
+  const { access_token } = req.body;
+
+  if (!access_token) {
+    return next(authError("Google access token is required"));
+  }
+
+  try {
+    // 1. Verify token audience
+    const tokenInfoResponse = await fetch(`https://oauth2.googleapis.com/tokeninfo?access_token=${access_token}`);
+    
+    if (!tokenInfoResponse.ok) {
+      return next(authError("Invalid or expired Google access token"));
+    }
+
+    const tokenInfo = await tokenInfoResponse.json();
+
+    if (process.env.GOOGLE_CLIENT_ID && tokenInfo.aud !== process.env.GOOGLE_CLIENT_ID) {
+      return next(authError("Access token was not issued for this application"));
+    }
+
+    // 2. Fetch the user profile from Google
+    const googleResponse = await fetch("https://www.googleapis.com/oauth2/v3/userinfo", {
+      headers: {
+        Authorization: `Bearer ${access_token}`,
+      },
+    });
+
+    if (!googleResponse.ok) {
+      return next(authError("Failed to fetch user profile from Google"));
+    }
+
+    const googleUser = await googleResponse.json();
+    const googleEmail = googleUser.email;
+
+    // 3. Ensure the currently logged-in user matches the Google account email
+    const currentUser = await User.findById(req.user._id);
+    if (!currentUser) {
+      return next(authError("User not found"));
+    }
+
+    if (currentUser.personal_info.email.toLowerCase() !== googleEmail.toLowerCase()) {
+      return next(conflictError("The Google account email does not match your registered email. Please use the Google account associated with your registered email."));
+    }
+
+    // 4. Update the user
+    currentUser.google_auth = true;
+    await currentUser.save();
+
+    res.status(200).json({
+      success: true,
+      message: "Google Auth successfully linked.",
+      user: currentUser,
+    });
+  } catch (error) {
+    return next(serverError("Failed to verify Google token", error));
+  }
 };
 
 // @route   POST /api/auth/logout
@@ -610,9 +702,17 @@ export const refreshToken = async (req, res, next) => {
       role: user.role,
     };
 
-    const accessTokenExpire = process.env.JWT_ACCESS_EXPIRE;
+    const accessTokenExpire = process.env.JWT_ACCESS_EXPIRE || "15m";
     const accessToken = await signJwt(payload, process.env.JWT_SECRET, {
       expiresIn: accessTokenExpire,
+    });
+
+    res.cookie("access_token", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "strict",
+      path: "/",
+      maxAge: getMaxAgeFromJwtExpire(accessTokenExpire),
     });
 
     res.status(200).json({
@@ -668,12 +768,7 @@ export const changePassword = async (req, res, next) => {
       return next(authError("User not found"));
     }
 
-    // Check if user registered via Google
-    if (user.authProvider === "google" || user.google_auth) {
-      return next(
-        authError("Cannot change password for Google authenticated accounts")
-      );
-    }
+    // Users can change password even if registered via Google (allows setting a local password)
 
     // Verify current password
     const isCurrentPasswordValid = await bcrypt.compare(
@@ -730,13 +825,7 @@ export const forgotPassword = async (req, res, next) => {
       });
     }
 
-    // Check if user registered via Google
-    if (user.google_auth) {
-      return res.status(400).json({
-        success: false,
-        message: "Please use Google Sign-In for your account",
-      });
-    }
+    // Allow Google users to reset their password so they can login locally
 
     // Generate reset token
     const resetToken = jwt.sign(

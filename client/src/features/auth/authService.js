@@ -35,6 +35,12 @@ const authService = {
     return response.data;
   },
 
+  // Link Google Auth
+  linkGoogleAuth: async (tokenData) => {
+    const response = await api.post("/auth/link-google", tokenData);
+    return response.data;
+  },
+
   getCurrentUser: async () => {
     const response = await api.get("/auth/me");
     return response.data;

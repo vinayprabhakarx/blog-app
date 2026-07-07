@@ -47,14 +47,6 @@ export default defineConfig({
             "katex",
           ],
 
-          // Firebase
-          firebase: [
-            "firebase/app",
-            "firebase/auth",
-            "firebase/firestore",
-            "firebase/storage",
-          ],
-
           // Utility
           utils: [
             "axios",

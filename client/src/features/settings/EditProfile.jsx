@@ -8,7 +8,8 @@ import {
   removeProfileImage,
   clearProfileImageRemovalStatus,
 } from "./settingsSlice";
-import { updateUserProfile, logout } from "@/features/auth/authSlice";
+import { updateUserProfile, logout, linkGoogleAuth } from "@/features/auth/authSlice";
+import { useGoogleLogin } from "@react-oauth/google";
 import { showToast } from "@/utils/showToast";
 import LoadingButton from "@/components/common/LoadingButton";
 import InputBox from "@/components/common/InputBox";
@@ -26,6 +27,7 @@ import {
   FaInstagram,
   FaArrowLeft,
 } from "react-icons/fa6";
+import { FaGoogle } from "react-icons/fa";
 import { IoCameraOutline } from "react-icons/io5";
 
 import LoadingSpinner from "@/components/common/LoadingSpinner";
@@ -43,11 +45,27 @@ const EditProfile = () => {
     profileImageRemovalSuccess,
     profileImageRemovalError,
   } = useSelector((state) => state.settings);
-  // Get token from localStorage since it's not in user object
-  const access_token = localStorage.getItem("token");
 
   const bioLimit = 150;
   const [characterLeft, setCharacterLeft] = useState(bioLimit);
+
+  const handleGoogleLink = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        await dispatch(linkGoogleAuth({ access_token: tokenResponse.access_token })).unwrap();
+        showToast("success", "Google Auth successfully linked!");
+      } catch (error) {
+        const errorMsg = typeof error === 'string' 
+          ? error 
+          : (error?.message || "Failed to link Google Auth");
+        showToast("error", typeof errorMsg === 'string' ? errorMsg : JSON.stringify(errorMsg));
+      }
+    },
+    onError: (error) => {
+      console.error("Google Auth linking failed:", error);
+      showToast("error", "Google Auth linking failed");
+    },
+  });
 
   const [isLoading, setIsLoading] = useState(true);
   const [formData, setFormData] = useState({
@@ -202,13 +220,13 @@ const EditProfile = () => {
       });
       setImagePreview(user.profile_img || user.avatar || user.personal_info?.profile_img || "");
       setIsLoading(false);
-    } else if (!access_token) {
+    } else {
       clearTimeout(timeoutId);
       setIsLoading(false);
     }
 
     return () => clearTimeout(timeoutId);
-  }, [access_token, user]);
+  }, [user]);
 
   // Handle profile update success and error
   useEffect(() => {
@@ -355,8 +373,6 @@ const EditProfile = () => {
           "success",
           "Email updated. Please verify your new email and sign in again."
         );
-        // Clear token and redirect to login
-        localStorage.removeItem("token");
         // Also clear any user state via auth slice logout
         dispatch(logout());
         navigate("/login");
@@ -504,6 +520,7 @@ const EditProfile = () => {
               />
 
               {/* Current image status */}
+
               {imagePreview && (
                 <div className="mt-2 text-center">
                   <p className="text-sm text-muted-foreground">
@@ -599,6 +616,7 @@ const EditProfile = () => {
                     onChange={handleInputChange}
                     placeholder="Full Name"
                     icon={FaUser}
+                    maxLength={50}
                   />
                 </div>
                 <div>
@@ -648,7 +666,6 @@ const EditProfile = () => {
                                 setEmailChangeMessage(
                                   "Email updated. Please verify your new email and sign in again."
                                 );
-                                localStorage.removeItem("token");
                                 dispatch(logout());
                                 navigate("/login");
                                 return;
@@ -673,6 +690,7 @@ const EditProfile = () => {
                         autoComplete="email"
                         pattern="[^\s@]+@[^\s@]+\.[^\s@]+"
                         icon={FaEnvelope}
+                        maxLength={50}
                       />
                     </div>
                     {!user?.authProvider || user?.authProvider !== "google" ? (
@@ -722,8 +740,7 @@ const EditProfile = () => {
                                 setEmailChangeMessage(
                                   "Email updated. Please verify your new email and sign in again."
                                 );
-                                localStorage.removeItem("token");
-                                dispatch(logout());
+                                // Clear user state via auth slice logout
                                 navigate("/login");
                                 return;
                               }
@@ -773,6 +790,7 @@ const EditProfile = () => {
                   onChange={handleInputChange}
                   placeholder="Username"
                   icon={FaAt}
+                  maxLength={20}
                 />
                 <p
                   className="text-sm mt-2 text-muted-foreground"
@@ -802,11 +820,30 @@ const EditProfile = () => {
 
               {/* Social Links */}
               <div>
-                <p
-                  className="text-base sm:text-lg font-medium mb-3 sm:mb-4 text-foreground"
-                >
-                  Social Links
-                </p>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 sm:mb-6 gap-4 border-t border-border pt-6">
+                  <p className="text-base sm:text-lg font-medium text-foreground m-0">
+                    Social Links & Connections
+                  </p>
+                  
+                  {/* Google Auth Linking */}
+                  <div className="bg-secondary/30 p-2 sm:p-3 rounded-lg border border-border flex items-center justify-between w-full sm:w-auto min-w-[200px]">
+                    <div className="flex items-center">
+                      <FaGoogle className="w-4 h-4 mr-2" />
+                      <span className="text-sm font-medium mr-4">Google Auth:</span>
+                    </div>
+                    {user?.google_auth ? (
+                      <span className="text-success text-sm font-semibold">✓ Linked</span>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => handleGoogleLink()}
+                        className="text-primary hover:underline text-sm font-medium cursor-pointer"
+                      >
+                        Link Account
+                      </button>
+                    )}
+                  </div>
+                </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
                   {Object.entries(formData.social_links).map(([key, value]) => (
                     <div key={key}>

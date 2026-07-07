@@ -28,11 +28,12 @@ const Login = () => {
   const debounceTimerRef = useRef(null);
 
   const formSchema = z.object({
-    email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
+    email: z.string().min(1, "Email is required").email("Please enter a valid email address").max(50, "Email cannot exceed 50 characters"),
     password: z
       .string()
       .min(1, "Password is required")
-      .min(6, "Password must be at least 6 characters long"),
+      .min(6, "Password must be at least 6 characters long")
+      .max(20, "Password cannot exceed 20 characters"),
   });
 
   const form = useForm({
@@ -81,13 +82,9 @@ const Login = () => {
   // Clear any stale tokens on mount to prevent redirect loops
   useEffect(() => {
     // Clear all auth-related items from localStorage
-    const token = localStorage.getItem("token");
-    if (token) {
-      console.log("Login page: Clearing stale token and auth state");
-      localStorage.removeItem("token");
-      // CRITICAL: Also clear Redux state to prevent PublicRoute from redirecting
-      dispatch({ type: 'auth/logout' });
-    }
+    localStorage.removeItem("user");
+    // CRITICAL: Also clear Redux state to prevent PublicRoute from redirecting
+    dispatch({ type: 'auth/logout' });
   }, [dispatch]);
 
   async function onSubmit(values) {
@@ -141,6 +138,7 @@ const Login = () => {
                       <InputBox
                         placeholder="Enter your Email"
                         icon={FaEnvelope}
+                        maxLength={50}
                         {...field}
                         onBlur={(e) => {
                           if (field.value === "" && !form.formState.isSubmitted) {
@@ -169,6 +167,7 @@ const Login = () => {
                         placeholder="Enter your Password"
                         icon={FaLock}
                         showPasswordToggle={true}
+                        maxLength={20}
                         {...field}
                         onBlur={(e) => {
                           if (field.value === "" && !form.formState.isSubmitted) {

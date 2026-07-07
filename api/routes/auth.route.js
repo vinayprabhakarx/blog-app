@@ -14,6 +14,7 @@ import {
   verifyEmailLink,
   resendVerification,
   refreshToken,
+  linkGoogleAuth,
 } from "../controllers/auth.controller.js";
 import asyncHandler from "../utils/asyncHandler.js"; // Assuming you have this utility
 import upload from "../config/multer.js"; // Assuming a multer setup for file uploads
@@ -23,46 +24,48 @@ const router = express.Router();
 
 // --- Validation Rules ---
 const registerValidation = [
-  check("name", "Name is required and must be at least 3 characters long.")
+  check("name", "Name is required and must be between 3 and 20 characters.")
     .not()
     .isEmpty()
-    .isLength({ min: 3 }),
-  check("email", "Please include a valid email.").isEmail(),
+    .isLength({ min: 3, max: 50 }),
+  check("email", "Please include a valid email (max 50 characters).").isEmail().isLength({ max: 50 }),
   check(
     "username",
-    "Username is required and must be at least 3 characters long."
+    "Username is required and must be between 3 and 20 characters."
   )
     .not()
     .isEmpty()
-    .isLength({ min: 3 }),
-  check("password", "Password must be at least 6 characters long.").isLength({
-    min: 6,
-  }),
+    .isLength({ min: 3, max: 20 }),
+  check("password", "Password must be between 8 and 20 characters, contain at least one uppercase, one lowercase, one number and one special character.")
+    .isLength({ min: 8, max: 20 })
+    .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).*$/),
 ];
 
 const loginValidation = [
-  check("email", "Please include a valid email.").isEmail(),
-  check("password", "Password is required.").exists(),
+  check("email", "Please include a valid email.").isEmail().isLength({ max: 50 }),
+  check("password", "Password is required.").exists().isLength({ max: 20 }),
 ];
 
 const changePasswordValidation = [
-  check("currentPassword", "Current password is required.").not().isEmpty(),
+  check("currentPassword", "Current password is required.").not().isEmpty().isLength({ max: 20 }),
   check(
     "newPassword",
-    "New password must be at least 8 characters long."
-  ).isLength({ min: 8 })
+    "New password must be between 8 and 20 characters, contain at least one uppercase, one lowercase, one number and one special character."
+  ).isLength({ min: 8, max: 20 })
+   .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).*$/),
 ];
 
 const resetPasswordValidation = [
   check("token", "Reset token is required.").not().isEmpty(),
   check(
     "newPassword",
-    "New password must be at least 8 characters long."
-  ).isLength({ min: 8 }),
+    "New password must be between 8 and 20 characters, contain at least one uppercase, one lowercase, one number and one special character."
+  ).isLength({ min: 8, max: 20 })
+   .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).*$/),
 ];
 
 const forgotPasswordValidation = [
-  check("email", "Please include a valid email.").isEmail(),
+  check("email", "Please include a valid email.").isEmail().isLength({ max: 50 }),
 ];
 
 // @route   POST /api/auth/register
@@ -84,6 +87,11 @@ router.post("/login", loginValidation, asyncHandler(login));
 // @desc    Authenticate user with Google
 // @access  Public
 router.post("/google", asyncHandler(googleAuth));
+
+// @route   POST /api/auth/link-google
+// @desc    Link Google Auth to existing logged-in user
+// @access  Private
+router.post("/link-google", authenticate, asyncHandler(linkGoogleAuth));
 
 // @route   POST /api/auth/logout
 // @desc    Logout user and clear cookie

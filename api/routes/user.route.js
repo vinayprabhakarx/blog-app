@@ -26,15 +26,15 @@ const router = express.Router();
 
 // --- Validation Rules ---
 const updateProfileValidation = [
-  check("name", "Name must be at least 3 characters long.")
+  check("name", "Name must be between 3 and 20 characters long.")
     .optional()
     .isString()
-    .isLength({ min: 3 }),
-  check("username", "Username must be at least 3 characters long.")
+    .isLength({ min: 3, max: 50 }),
+  check("username", "Username must be between 3 and 20 characters long.")
     .optional()
     .isString()
     .isLength({ min: 3, max: 20 }),
-  check("email", "Please include a valid email.").optional().isEmail(),
+  check("email", "Please include a valid email.").optional().isEmail().isLength({ max: 50 }),
   check("bio", "Bio must be less than 200 characters.")
     .optional()
     .isString()
@@ -66,11 +66,12 @@ const updateProfileValidation = [
 ];
 
 const changePasswordValidation = [
-  check("oldPassword", "Old password is required.").not().isEmpty(),
+  check("oldPassword", "Old password is required.").not().isEmpty().isLength({ max: 20 }),
   check(
     "newPassword",
-    "New password must be at least 6 characters long."
-  ).isLength({ min: 6 }),
+    "New password must be between 8 and 20 characters, contain at least one uppercase, one lowercase, one number and one special character."
+  ).isLength({ min: 8, max: 20 })
+   .matches(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).*$/),
 ];
 
 // --- Public Routes ---

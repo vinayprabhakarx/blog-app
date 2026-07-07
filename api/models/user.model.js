@@ -50,7 +50,7 @@ const userSchema = new mongoose.Schema(
         unique: true,
         index: true,
         minlength: [3, "Username must be at least 3 characters long"],
-        maxlength: [50, "Username cannot exceed 50 characters"],
+        maxlength: [20, "Username cannot exceed 20 characters"],
         lowercase: true,
       },
       email: {
@@ -59,6 +59,7 @@ const userSchema = new mongoose.Schema(
         unique: true,
         trim: true,
         lowercase: true,
+        maxlength: [50, "Email cannot exceed 50 characters"],
         validate: {
           validator: function (email) {
             return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);

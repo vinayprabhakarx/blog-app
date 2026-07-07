@@ -29,21 +29,23 @@ const SignUp = () => {
 
   const formSchema = z
     .object({
-      name: z.string().min(1, "Name is required").min(3, "Name must be at least 3 characters long."),
+      name: z.string().min(1, "Name is required").min(3, "Name must be at least 3 characters long.").max(50, "Name cannot exceed 50 characters"),
       username: z
         .string()
         .min(1, "Username is required")
-        .min(3, "Username must be at least 3 characters long."),
-      email: z.string().min(1, "Email is required").email("Please enter a valid email address"),
+        .min(3, "Username must be at least 3 characters long.")
+        .max(20, "Username cannot exceed 20 characters"),
+      email: z.string().min(1, "Email is required").email("Please enter a valid email address").max(50, "Email cannot exceed 50 characters"),
       password: z
         .string()
         .min(1, "Password is required")
-        .min(6, "Password must be at least 6 characters long")
+        .min(8, "Password must be at least 8 characters long")
+        .max(20, "Password cannot exceed 20 characters")
         .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
         .regex(/[a-z]/, "Password must contain at least one lowercase letter")
         .regex(/[0-9]/, "Password must contain at least one number")
         .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
-      confirmPassword: z.string().min(1, "Please confirm your password"),
+      confirmPassword: z.string().min(1, "Please confirm your password").max(20, "Password cannot exceed 20 characters"),
     })
     .refine((data) => data.password === data.confirmPassword, {
       message: "Password and confirm password should be same.",
@@ -139,6 +141,7 @@ const SignUp = () => {
                       <InputBox
                         placeholder="Enter your name"
                         icon={FaUser}
+                        maxLength={50}
                         {...field}
                         onBlur={(e) => {
                           if (field.value === "" && !form.formState.isSubmitted) {
@@ -165,6 +168,7 @@ const SignUp = () => {
                       <InputBox
                         placeholder="Enter your username"
                         icon={FaAt}
+                        maxLength={20}
                         {...field}
                         onBlur={(e) => {
                           if (field.value === "" && !form.formState.isSubmitted) {
@@ -191,6 +195,7 @@ const SignUp = () => {
                       <InputBox
                         placeholder="Enter your email address"
                         icon={FaEnvelope}
+                        maxLength={50}
                         {...field}
                         onBlur={(e) => {
                           if (field.value === "" && !form.formState.isSubmitted) {
@@ -219,6 +224,7 @@ const SignUp = () => {
                         placeholder="Enter your password"
                         icon={FaLock}
                         showPasswordToggle={true}
+                        maxLength={20}
                         {...field}
                         onBlur={(e) => {
                           if (field.value === "" && !form.formState.isSubmitted) {
@@ -247,6 +253,7 @@ const SignUp = () => {
                         placeholder="Enter password again"
                         icon={FaLock}
                         showPasswordToggle={true}
+                        maxLength={20}
                         {...field}
                         onBlur={(e) => {
                           if (field.value === "" && !form.formState.isSubmitted) {

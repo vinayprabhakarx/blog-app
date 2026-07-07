@@ -5,12 +5,16 @@ import { authError, handleError, databaseError } from "../utils/handleError.js";
 // JWT authentication middleware
 const authenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
-
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return next(authError("Authentication token is required."));
+  let token;
+  if (req.cookies && req.cookies.access_token) {
+    token = req.cookies.access_token;
+  } else if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
   }
 
-  const token = authHeader.split(" ")[1];
+  if (!token) {
+    return next(authError("Authentication token is required."));
+  }
 
   if (!process.env.JWT_SECRET) {
     return next(

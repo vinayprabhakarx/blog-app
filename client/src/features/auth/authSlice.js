@@ -60,7 +60,23 @@ export const googleAuth = createAsyncThunk(
     } catch (error) {
       const isNetworkError = !error.response;
       return rejectWithValue({
-        message: error.response?.data?.message || "Google auth failed",
+        message: error.response?.data?.details?.message || error.response?.data?.message || "Google auth failed",
+        isNetworkError
+      });
+    }
+  }
+);
+
+export const linkGoogleAuth = createAsyncThunk(
+  "auth/linkGoogleAuth",
+  async (tokenData, { rejectWithValue }) => {
+    try {
+      const data = await authService.linkGoogleAuth(tokenData);
+      return data;
+    } catch (error) {
+      const isNetworkError = !error.response;
+      return rejectWithValue({
+        message: error.response?.data?.details?.message || error.response?.data?.message || "Failed to link Google Auth",
         isNetworkError
       });
     }
@@ -167,10 +183,10 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(loginUser.fulfilled, (state, action) => {
+      .addCase(loginUser.fulfilled, (state) => {
         state.loading = false;
         state.user = null; // Login only returns token, user data loaded separately
-        state.token = action.payload.token;
+        state.token = null; // Token is handled by HttpOnly cookie
         state.isAuthenticated = true;
         state.error = null;
       })
@@ -214,14 +230,35 @@ const authSlice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(googleAuth.fulfilled, (state, action) => {
+      .addCase(googleAuth.fulfilled, (state) => {
         state.loading = false;
         state.user = null; // Google auth only returns token, user data loaded separately
-        state.token = action.payload.token;
+        state.token = null; // Token is handled by HttpOnly cookie
         state.isAuthenticated = true;
         state.error = null;
       })
       .addCase(googleAuth.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload?.message || action.payload;
+        if (action.payload?.isNetworkError || action.error?.message === 'Network Error') {
+          state.isServerDown = true;
+        }
+      });
+
+    // Link Google Auth
+    builder
+      .addCase(linkGoogleAuth.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(linkGoogleAuth.fulfilled, (state) => {
+        state.loading = false;
+        if (state.user) {
+          state.user.google_auth = true;
+        }
+        state.error = null;
+      })
+      .addCase(linkGoogleAuth.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload?.message || action.payload;
         if (action.payload?.isNetworkError || action.error?.message === 'Network Error') {
@@ -241,6 +278,7 @@ const authSlice = createSlice({
           username: dbUser.personal_info?.username || dbUser.username,
           email: dbUser.personal_info?.email || dbUser.email,
           avatar: dbUser.personal_info?.profile_img || dbUser.avatar || "",
+          google_auth: dbUser.google_auth || false,
           // Keep the original structure for components that might need it
           personal_info: dbUser.personal_info,
         };
@@ -261,8 +299,8 @@ const authSlice = createSlice({
 
     // Refresh Token
     builder
-      .addCase(refreshTokenThunk.fulfilled, (state, action) => {
-        state.token = action.payload.token;
+      .addCase(refreshTokenThunk.fulfilled, (state) => {
+        state.token = null; // Token is handled by HttpOnly cookie
         state.isAuthenticated = true;
         state.isServerDown = false;
       })

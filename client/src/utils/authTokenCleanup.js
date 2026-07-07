@@ -14,12 +14,7 @@ export const cleanupStaleToken = () => {
   const currentPath = window.location.pathname;
   const isPublicRoute = publicRoutes.some((route) => currentPath.startsWith(route));
   
-  // If we're on an auth page and there's a token, it's likely stale
-  // Clear it BEFORE Redux initializes to prevent redirect loops
-  if (isPublicRoute && localStorage.getItem("token")) {
-    console.log("Clearing stale token on auth page before Redux initialization");
-    localStorage.removeItem("token");
-  }
+
   
   // CRITICAL: Also clear redux-persist storage for auth on auth pages
   // This prevents rehydration of old isAuthenticated state

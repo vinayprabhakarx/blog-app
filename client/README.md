@@ -81,7 +81,7 @@ client/
 - **State**: Redux Toolkit + RTK Query + Redux Persist
 - **Styling**: Tailwind CSS + Shadcn/UI
 - **Routing**: React Router v6
-- **Auth**: Firebase Auth + JWT
+- **Auth**: Google OAuth 2.0 + JWT
 - **Forms**: React Hook Form + Zod
 - **Content**: React Markdown
 - **HTTP**: Axios

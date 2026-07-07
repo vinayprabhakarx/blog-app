@@ -63,7 +63,32 @@ app.use(express.urlencoded({ extended: true, limit: "16kb" }));
 app.use(cookieParser());
 
 // Security Middlewares
-app.use(helmet());
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      directives: {
+        defaultSrc: ["'self'"],
+        scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+        styleSrc: ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com", "https://cdn.jsdelivr.net"],
+        fontSrc: ["'self'", "https://fonts.gstatic.com", "data:"],
+        imgSrc: [
+          "'self'",
+          "data:",
+          "blob:",
+          "https://res.cloudinary.com",
+          "https://images.unsplash.com",
+          "https://lh3.googleusercontent.com",
+          "https://avatars.githubusercontent.com",
+        ],
+        connectSrc: ["'self'", "https://api.cloudinary.com"],
+        objectSrc: ["'none'"],
+        mediaSrc: ["'self'", "https://res.cloudinary.com"],
+        frameSrc: ["'self'", "https://www.youtube.com"],
+      },
+    },
+    crossOriginResourcePolicy: { policy: "cross-origin" },
+  })
+);
 app.use((req, res, next) => {
   if (req.body) mongoSanitize.sanitize(req.body, { replaceWith: '_' });
   if (req.query) mongoSanitize.sanitize(req.query, { replaceWith: '_' });

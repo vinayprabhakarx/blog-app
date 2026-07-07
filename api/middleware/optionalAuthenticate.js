@@ -4,15 +4,16 @@ import User from "../models/user.model.js";
 // Optional JWT authentication middleware
 const optionalAuthenticate = async (req, res, next) => {
   const authHeader = req.headers.authorization;
+  let token;
 
-  if (!authHeader || !authHeader.startsWith("Bearer ")) {
-    return next(); // No token, proceed as anonymous
+  if (req.cookies && req.cookies.access_token) {
+    token = req.cookies.access_token;
+  } else if (authHeader && authHeader.startsWith("Bearer ")) {
+    token = authHeader.split(" ")[1];
   }
 
-  const token = authHeader.split(" ")[1];
-
-  if (!process.env.JWT_SECRET) {
-    return next(); // Missing secret, just proceed
+  if (!token || !process.env.JWT_SECRET) {
+    return next(); // No token or missing secret, proceed as anonymous
   }
 
   try {
