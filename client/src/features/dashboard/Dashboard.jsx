@@ -24,7 +24,8 @@ import {
   Eye,
   FolderOpen,
   Activity,
-  PenTool
+  PenTool,
+  Mail
 } from "lucide-react";
 import api from "@/api/api";
 import { EmptyState, LoadingState } from "@/components/common/StateDisplays";
@@ -150,6 +151,13 @@ const Dashboard = () => {
           icon: FolderOpen,
           path: "/category",
           variant: "outline",
+        },
+        {
+          title: "Contact Messages",
+          description: "View and manage submitted contact forms",
+          icon: Mail,
+          path: "/contacts",
+          variant: "outline",
         }
       );
     }
@@ -233,7 +241,7 @@ const Dashboard = () => {
   return (
     <section className="min-h-screen bg-background">
       {/* Header */}
-      <div className="text-center mb-8 p-6">
+      <div className="text-center mb-6 sm:mb-8 p-2 sm:p-4 md:p-6">
         <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2">
           {isAdmin
             ? "Admin Dashboard"
@@ -330,9 +338,9 @@ const Dashboard = () => {
             </div>
             <div className="p-0">
               {recentActivitiesLoading ? (
-                <div className="p-6"><LoadingState variant="compact" message="Loading activities..." /></div>
+                <div className="p-3 sm:p-4 md:p-6"><LoadingState variant="compact" message="Loading activities..." /></div>
               ) : recentActivities?.length === 0 ? (
-                <div className="p-6">
+                <div className="p-3 sm:p-4 md:p-6">
                   <EmptyState 
                     variant="compact" 
                     icon={Activity} 
@@ -371,9 +379,9 @@ const Dashboard = () => {
             </div>
             <div className="p-0">
               {blogsLoading ? (
-                <div className="p-6"><LoadingState variant="compact" message="Loading blogs..." /></div>
+                <div className="p-3 sm:p-4 md:p-6"><LoadingState variant="compact" message="Loading blogs..." /></div>
               ) : recentBlogs.length === 0 ? (
-                <div className="p-6">
+                <div className="p-3 sm:p-4 md:p-6">
                   <EmptyState 
                     variant="compact" 
                     icon={PenTool} 

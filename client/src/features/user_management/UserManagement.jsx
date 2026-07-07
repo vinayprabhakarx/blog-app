@@ -293,7 +293,7 @@ const UserManagement = () => {
 
 
   return (
-    <section className="p-6 space-y-6" aria-label="User Management">
+    <section className="p-2 sm:p-4 md:p-6 space-y-6" aria-label="User Management">
       <div className="text-center">
         <h1 className="text-2xl font-bold text-foreground flex items-center justify-center gap-2 mb-2">
           User Management
@@ -418,7 +418,7 @@ const UserManagement = () => {
         />
       ) : (
         <>
-          <div className="hidden lg:block">
+          <div className="w-full">
         <Card>
           <CardContent className="p-0">
             <div className="overflow-x-auto">
@@ -550,106 +550,6 @@ const UserManagement = () => {
         </Card>
       </div>
 
-      <div className="lg:hidden space-y-4">
-        {processedUsers.map((user) => (
-          <Card key={user._id} className="hover:shadow-md transition-shadow">
-            <CardContent className="p-4">
-              <div className="space-y-3">
-                <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-3 flex-1 min-w-0">
-                    <Avatar className="h-10 w-10 shrink-0">
-                      <AvatarImage
-                        src={user.personal_info?.profile_img}
-                        alt={user.personal_info?.name || "User"}
-                      />
-                      <AvatarFallback>
-                        {user.personal_info?.name?.charAt(0)?.toUpperCase() ||
-                          user.personal_info?.username
-                            ?.charAt(0)
-                            ?.toUpperCase() ||
-                          "U"}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-1.5">
-                        {user.personal_info?.username ? (
-                          <Link
-                            to={`/${user.personal_info.username}`}
-                            className="font-medium text-lg hover:text-primary transition-colors cursor-pointer hover:underline truncate block"
-                          >
-                            {user.personal_info?.name || "Unnamed User"}
-                          </Link>
-                        ) : (
-                          <p className="font-medium text-lg truncate">
-                            {user.personal_info?.name || "Unnamed User"}
-                          </p>
-                        )}
-                        <span className="text-muted-foreground shrink-0" title={`Role: ${user.role}`}>
-                          {getRoleIcon(user.role, "w-4 h-4")}
-                        </span>
-                      </div>
-                      <p className="text-sm text-muted-foreground truncate">
-                        {user.personal_info?.username
-                          ? `@${user.personal_info.username}`
-                          : user.personal_info?.email}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="space-y-2 text-sm">
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Email:</span>
-                    <div className="flex items-center gap-2">
-                      <span className="truncate max-w-40">
-                        {user.personal_info?.email}
-                      </span>
-                      {user.emailVerified && (
-                        <CheckCircle className="h-4 w-4 text-success" />
-                      )}
-                    </div>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-muted-foreground">Joined:</span>
-                    <span>{formatDate(user.createdAt)}</span>
-                  </div>
-                </div>
-
-                <div className="flex justify-center gap-2 pt-2 border-t">
-                  {canChangeRole(user) && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="px-3 py-1 h-8 text-xs transition-colors duration-200 hover:bg-primary hover:text-primary-foreground cursor-pointer"
-                      title="Change Role"
-                      onClick={() => {
-                        setRoleChangeUser(user);
-                        setNewRole(user.role);
-                      }}
-                    >
-                      <UserCog className="h-3 w-3 mr-1" />
-                      Role
-                    </Button>
-                  )}
-
-                  {canDeleteUser(user) && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      className="px-3 py-1 h-8 text-xs transition-colors duration-200 hover:text-destructive hover:border-destructive cursor-pointer"
-                      title="Delete User"
-                      onClick={() => setDeleteUserObj(user)}
-                    >
-                      <Trash2 className="h-3 w-3 mr-1" />
-                      Delete
-                    </Button>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
         </>
       )}
 

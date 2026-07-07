@@ -12,6 +12,7 @@ import {
   IconPencil,
   IconChartBar,
   IconNotification,
+  IconMail,
 } from "@tabler/icons-react";
 
 // Navigation configuration
@@ -79,6 +80,13 @@ export const NAVIGATION_CONFIG = {
     activeIcon: IconUsers,
     roles: ["admin"],
   },
+  contacts: {
+    title: "Contact Messages",
+    path: "/contacts",
+    icon: IconMail,
+    activeIcon: IconMail,
+    roles: ["admin"],
+  },
 };
 
 // Navigation sections configuration
@@ -94,7 +102,7 @@ export const NAVIGATION_SECTIONS = {
   },
   admin: {
     label: "Admin Panel",
-    items: ["analytics", "users"],
+    items: ["analytics", "users", "contacts"],
     showFor: ["admin"],
     icon: IconShield,
   },

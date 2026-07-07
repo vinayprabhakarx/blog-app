@@ -13,6 +13,7 @@ import blogReducer from "@/features/blog/blogSlice";
 import categoriesReducer from "@/features/category/categoriesSlice";
 import commentsReducer from "@/features/comment/commentsSlice";
 import userReducer from "@/features/user_management/userSlice";
+import contactReducer from "@/features/contact/contactSlice";
 import likesReducer from "@/features/like/likesSlice";
 import notificationsReducer from "@/features/notification/notificationsSlice";
 import settingsReducer from "@/features/settings/settingsSlice";
@@ -33,6 +34,7 @@ const persistConfig = {
     "user",
     "notifications",
     "gallery",
+    "contact",
   ],
 };
 
@@ -42,6 +44,7 @@ const rootReducer = combineReducers({
   categories: categoriesReducer,
   comments: commentsReducer,
   user: userReducer,
+  contact: contactReducer,
   likes: likesReducer,
   notifications: notificationsReducer,
   settings: settingsReducer,

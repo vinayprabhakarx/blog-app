@@ -36,6 +36,7 @@ const Analytics = React.lazy(() => import("@/features/user_management/Analytics"
 const CommentManagement = React.lazy(() => import("@/features/comment/CommentManagement"));
 const ProfilePage = React.lazy(() => import("@/pages/ProfilePage"));
 const EditProfile = React.lazy(() => import("@/features/settings/EditProfile"));
+const ContactManagement = React.lazy(() => import("@/features/contact/ContactManagement"));
 
 // ConditionalCategories component
 const ConditionalCategories = () => {
@@ -111,6 +112,7 @@ const AppRouter = () => {
               <Route element={<AdminRoute />}>
                 <Route path="users" element={<UserManagement />} />
                 <Route path="analytics" element={<Analytics />} />
+                <Route path="contacts" element={<ContactManagement />} />
               </Route>
 
               {/* Legacy Routes */}

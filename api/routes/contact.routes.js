@@ -1,6 +1,13 @@
 import express from "express";
 import { body } from "express-validator";
-import { sendContactMessage } from "../controllers/contact.controller.js";
+import {
+  sendContactMessage,
+  getContacts,
+  updateContactStatus,
+  deleteContact,
+} from "../controllers/contact.controller.js";
+import authenticate from "../middleware/authenticate.js";
+import onlyAdmin from "../middleware/onlyAdmin.js";
 
 const router = express.Router();
 
@@ -39,5 +46,10 @@ const contactValidation = [
 // @desc    Send contact form message from portfolio
 // @access  Public
 router.post("/", contactValidation, sendContactMessage);
+
+// Admin Routes for managing contacts
+router.get("/", authenticate, onlyAdmin, getContacts);
+router.put("/:id/status", authenticate, onlyAdmin, updateContactStatus);
+router.delete("/:id", authenticate, onlyAdmin, deleteContact);
 
 export default router;

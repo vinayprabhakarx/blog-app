@@ -105,7 +105,7 @@ const CategoriesView = () => {
   }
 
   return (
-    <section className="p-6 space-y-6" aria-label="Categories">
+    <section className="p-2 sm:p-4 md:p-6 space-y-6" aria-label="Categories">
       {/* Header with Stats */}
       <div className="text-center mb-8">
         <div className="flex items-center justify-center mb-2">
