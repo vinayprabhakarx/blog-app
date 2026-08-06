@@ -49,28 +49,22 @@ const BlogDisplay = ({ blog }) => {
   return (
     <div
       ref={containerRef}
-      className="w-full transition-colors duration-300"
+      id="blog-content"
+      className="w-full px-2 sm:px-4 md:px-0 blog-content-responsive transition-colors duration-300"
       style={{
         backgroundColor: "var(--background)",
         color: "var(--foreground)",
       }}
     >
-      <div
-        id="blog-content"
-        className="w-full px-2 sm:px-4 md:px-0 blog-content-responsive"
-      >
-        <div className="w-full">
-          <MarkdownRendererWrapper content={content} />
-        </div>
+      <MarkdownRendererWrapper content={content} />
 
-        <footer
-          className="mt-12 pt-6 border-t w-full"
-          style={{
-            borderColor: "var(--border)",
-            color: "var(--muted-foreground)",
-          }}
-        ></footer>
-      </div>
+      <hr
+        className="mt-12 pt-6 border-t w-full border-0"
+        aria-hidden="true"
+        style={{
+          borderColor: "var(--border)",
+        }}
+      />
     </div>
   );
 };

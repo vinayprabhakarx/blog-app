@@ -29,9 +29,10 @@ const CodeCopyButton = React.memo(({ code }) => {
       onClick={handleCopy}
       className="absolute top-2 right-2 p-1.5 rounded-md bg-background/80 hover:bg-primary hover:text-primary-foreground text-muted-foreground border border-border backdrop-blur-sm shadow-sm transition-all duration-200 z-10 opacity-90 cursor-pointer"
       title="Copy code"
-      aria-label="Copy code"
+      aria-label={copied ? "Copied to clipboard" : "Copy code"}
     >
-      {copied ? <Check size={14} className="text-green-500" /> : <Copy size={14} />}
+      {copied ? <Check size={14} className="text-green-500" aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
+      <span className="sr-only" aria-live="polite">{copied ? "Code copied to clipboard" : ""}</span>
     </button>
   );
 });
@@ -125,10 +126,11 @@ const MarkdownImage = ({ src, alt, onDeleteImage, ...props }) => {
         onClick={handleDelete}
         style={buttonStyle}
         title="Delete this image"
+        aria-label={`Delete image${alt ? ': ' + alt : ''}`}
         onMouseOver={(e) => { e.currentTarget.style.opacity = "0.85"; e.currentTarget.style.transform = "scale(1.05)"; }}
         onMouseOut={(e) => { e.currentTarget.style.opacity = "1"; e.currentTarget.style.transform = "scale(1)"; }}
       >
-        <Trash2 size={18} />
+        <Trash2 size={18} aria-hidden="true" />
       </button>
     </div>
   );
@@ -220,12 +222,12 @@ const MarkdownRenderer = React.memo(({ content = "", onDeleteImage }) => {
       const filteredChildren = childrenArray.filter(c => c?.props?.className !== 'copied');
 
       return (
-        <div className="relative my-6 group">
+        <figure className="relative my-6 group" role="figure" aria-label="Code block">
           <CodeCopyButton code={codeString} />
           <pre {...props} style={staticStyles.pre}>
             {filteredChildren}
           </pre>
-        </div>
+        </figure>
       );
     },
     code: ({ inline, children, ...props }) =>
@@ -241,19 +243,15 @@ const MarkdownRenderer = React.memo(({ content = "", onDeleteImage }) => {
   const sanitizedContent = useMemo(() => DOMPurify.sanitize(content), [content]);
 
   return (
-    <section className="w-full overflow-hidden">
+    <section className="w-full overflow-hidden" itemProp="articleBody" data-color-mode={theme}>
       <style>{markdownStyles}</style>
-      <div data-color-mode={theme} className="w-full">
-        <div style={{ overflow: "hidden" }}>
-          <MDEditor.Markdown
-            source={sanitizedContent}
-            style={staticStyles.markdown}
-            remarkPlugins={remarkPlugins}
-            rehypePlugins={rehypePlugins}
-            components={components}
-          />
-        </div>
-      </div>
+      <MDEditor.Markdown
+        source={sanitizedContent}
+        style={staticStyles.markdown}
+        remarkPlugins={remarkPlugins}
+        rehypePlugins={rehypePlugins}
+        components={components}
+      />
     </section>
   );
 });

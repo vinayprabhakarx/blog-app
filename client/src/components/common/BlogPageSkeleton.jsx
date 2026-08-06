@@ -3,7 +3,7 @@ import React from "react";
 
 const BlogPageSkeleton = () => {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" role="status" aria-busy="true" aria-label="Loading blog post">
       {/* Main Content Container */}
       <div className="w-full sm:px-6 md:px-8 pt-4 sm:pt-6 md:pt-8">
         {/* Breadcrumb skeleton */}

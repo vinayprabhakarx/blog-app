@@ -58,9 +58,7 @@ const AppLayout = () => {
                 </div>
               ) : (
                 <div className="w-full min-h-[calc(100vh-4rem)] pt-4 pb-8 px-2 sm:px-4 md:px-6 lg:px-8 xl:px-10 mx-auto max-w-[1600px]">
-                  <div className="w-full max-w-full mx-auto">
-                    <Outlet />
-                  </div>
+                  <Outlet />
                 </div>
               )}
             </main>

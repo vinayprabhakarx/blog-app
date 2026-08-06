@@ -126,7 +126,7 @@ const BlogHeader = ({ blog, onCommentClick }) => {
       <div className="w-full px-2 sm:px-4 md:px-0 pb-6 blog-content-responsive">
         <header className="mb-6 border-b border-border pb-4">
           {/* Title */}
-          <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-2 text-foreground">
+          <h1 itemProp="headline" className="text-2xl md:text-3xl lg:text-4xl font-bold leading-tight mb-2 text-foreground">
             {blogMetadata.title}
           </h1>
           {/* Subtitle/Excerpt */}
@@ -141,10 +141,11 @@ const BlogHeader = ({ blog, onCommentClick }) => {
             <Link
               to={`/${authorInfo.username}`}
               className="font-semibold hover:underline text-foreground hover:text-primary transition-colors"
+              itemProp="author"
             >
               {authorInfo.username}
             </Link>
-            <span className="text-muted-foreground italic">&nbsp;|&nbsp;{formattedDateMobile}</span>
+            <time dateTime={blogMetadata.createdAt} itemProp="datePublished" className="text-muted-foreground italic">&nbsp;|&nbsp;{formattedDateMobile}</time>
           </div>
           {/* Stats Row */}
           <div className="flex flex-nowrap items-center gap-4 md:gap-6 lg:gap-8 text-sm sm:text-base text-muted-foreground mt-4 min-w-0">
@@ -152,8 +153,9 @@ const BlogHeader = ({ blog, onCommentClick }) => {
               type="button"
               onClick={handleCommentClick}
               className="flex items-center gap-2 shrink-0 whitespace-nowrap hover:text-primary cursor-pointer transition-colors"
+              aria-label={`${activityStats.totalComments} comments, jump to comments section`}
             >
-              <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" />
+              <MessageCircle className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
               <span>{activityStats.totalComments}</span>
             </button>
             <LikeButton
@@ -163,10 +165,10 @@ const BlogHeader = ({ blog, onCommentClick }) => {
               isDisabled={likeButtonState.isDisabled}
               onLike={likeButtonState.handleLike}
             />
-            <div className="flex items-center gap-2 shrink-0 whitespace-nowrap">
-              <Clock className="w-4 h-4 sm:w-5 sm:h-5" />
+            <span className="flex items-center gap-2 shrink-0 whitespace-nowrap" role="text" aria-label={`${readTimeTextMobile} read time`}>
+              <Clock className="w-4 h-4 sm:w-5 sm:h-5" aria-hidden="true" />
               <span>{readTimeTextMobile}</span>
-            </div>
+            </span>
             {canEdit &&
               (blogMetadata.draft ? (
                 <Link

@@ -124,6 +124,58 @@ const BlogPage = () => {
     };
   }, [blogData.title]);
 
+  // Set meta tags and structured data for browser reading mode detection
+  useEffect(() => {
+    if (!currentBlog) return;
+
+    const metaTags = [];
+    const addMeta = (attr, name, content) => {
+      let tag = document.querySelector(`meta[${attr}="${name}"]`);
+      if (!tag) {
+        tag = document.createElement('meta');
+        tag.setAttribute(attr, name);
+        document.head.appendChild(tag);
+        metaTags.push(tag);
+      }
+      tag.setAttribute('content', content);
+    };
+
+    addMeta('property', 'og:type', 'article');
+    addMeta('property', 'og:title', currentBlog.title);
+    if (currentBlog.excerpt) {
+      addMeta('name', 'description', currentBlog.excerpt);
+      addMeta('property', 'og:description', currentBlog.excerpt);
+    }
+    if (currentBlog.createdAt) {
+      addMeta('property', 'article:published_time', currentBlog.createdAt);
+    }
+    const authorName = currentBlog.author?.personal_info?.username || 'vinayprabhakarx';
+    addMeta('name', 'author', authorName);
+    addMeta('property', 'article:author', authorName);
+
+    // JSON-LD structured data for reading mode and SEO
+    const jsonLd = document.createElement('script');
+    jsonLd.type = 'application/ld+json';
+    jsonLd.textContent = JSON.stringify({
+      '@context': 'https://schema.org',
+      '@type': 'Article',
+      headline: currentBlog.title,
+      datePublished: currentBlog.createdAt,
+      dateModified: currentBlog.updatedAt || currentBlog.createdAt,
+      author: {
+        '@type': 'Person',
+        name: authorName,
+      },
+      description: currentBlog.excerpt || '',
+    });
+    document.head.appendChild(jsonLd);
+
+    return () => {
+      metaTags.forEach(tag => tag.remove());
+      jsonLd.remove();
+    };
+  }, [currentBlog]);
+
   // Callback functions
   const toggleComments = useCallback((e) => {
     if (e) {
@@ -225,7 +277,7 @@ const BlogPage = () => {
             </li>
             {blogData.category && (
               <>
-                <li>/</li>
+                <li aria-hidden="true">/</li>
                 <li>
                   <Link
                     to={`/category/${breadcrumbData.categorySlug}`}
@@ -236,13 +288,13 @@ const BlogPage = () => {
                 </li>
               </>
             )}
-            <li>/</li>
-            <li className="truncate max-w-[40ch]" title={breadcrumbData.title}>
+            <li aria-hidden="true">/</li>
+            <li className="truncate max-w-[40ch]" title={breadcrumbData.title} aria-current="page">
               {breadcrumbData.title}
             </li>
           </ol>
         </nav>
-        <article className="w-full">
+        <article className="w-full" itemScope itemType="https://schema.org/Article">
           <BlogHeader blog={currentBlog} onCommentClick={handleCommentClick} />
         
           {/* Main Blog Content - Centered by BlogDisplay internal styles */}
@@ -251,9 +303,7 @@ const BlogPage = () => {
               The BlogDisplay component inside handles its own centering (max-width: 50vw, margin: 0 auto).
               We avoid wrapping it in flex/grid here to prevent interfering with that centering logic.
           */}
-          <div className="relative">
-            <BlogDisplay blog={currentBlog} />
-          </div>
+          <BlogDisplay blog={currentBlog} />
         </article>
 
         {/* Comment Toggle Button - Now directly after blog content */}
@@ -272,12 +322,12 @@ const BlogPage = () => {
               >
                 {showComments ? (
                   <>
-                    <MessageCircleOff className="w-5 h-5" />
+                    <MessageCircleOff className="w-5 h-5" aria-hidden="true" />
                     <span>Hide Comments</span>
                   </>
                 ) : (
                   <>
-                    <MessageCircle className="w-5 h-5" />
+                    <MessageCircle className="w-5 h-5" aria-hidden="true" />
                     <span>
                       {commentData.count}{" "}
                       {commentData.count === 1 ? "Comment" : "Comments"}
@@ -292,8 +342,9 @@ const BlogPage = () => {
 
       {/* Comments Section - Full width outside the constrained container */}
       {showComments && (
-        <div
+        <section
           id="comment-section"
+          aria-label="Comments"
           className="w-full px-1 sm:px-2 md:px-4 pb-8 sm:pb-12"
         >
           <CommentSection
@@ -303,7 +354,7 @@ const BlogPage = () => {
             maxNestingLevel={2}
             className="border-border p-6"
           />
-        </div>
+        </section>
       )}
 
     </div>
