@@ -37,7 +37,7 @@ export const buildContactSubmissionEmail = ({
   message,
 }) => {
   const htmlMessage = createHtmlMessage(message);
-  const websiteUrl = process.env.SENDER_WEBSITE || "https://vinayprabhakar.dev";
+  const websiteUrl = process.env.SENDER_WEBSITE || "https://vinaykr.dev";
   const displayUrl = websiteUrl.replace(/^https?:\/\//, "");
   const formattedName = toTitleCase(userName);
 
@@ -127,7 +127,7 @@ export const buildContactConfirmationEmail = (
 ) => {
   const recipientEmail =
     process.env.RECIPIENT_EMAIL || "work.vinayprabhakar@gmail.com";
-  const websiteUrl = process.env.SENDER_WEBSITE || "https://vinayprabhakar.dev";
+  const websiteUrl = process.env.SENDER_WEBSITE || "https://vinaykr.dev";
   const displayUrl = websiteUrl.replace(/^https?:\/\//, "");
 
   const formattedName = toTitleCase(userName);

@@ -111,7 +111,7 @@ async function generate() {
   // Determine site URL (sitemaps should contain site base URL links)
   // Usually the site URL in production is the domain the frontend runs on.
   // We can default to the production domain or a placeholder.
-  let siteUrl = "https://blog.vinayprabhakar.dev";
+  let siteUrl = "https://blog.vinaykr.dev";
   if (apiEndpoint.includes("localhost")) {
     siteUrl = "http://localhost:5173";
   }

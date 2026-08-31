@@ -32,5 +32,5 @@ Disallow: /reset-password
 Disallow: /verify-email
 
 # Host and Sitemap locations
-Host: https://blog.vinayprabhakar.dev
-Sitemap: https://blog.vinayprabhakar.dev/sitemap.xml
+Host: https://blog.vinaykr.dev
+Sitemap: https://blog.vinaykr.dev/sitemap.xml

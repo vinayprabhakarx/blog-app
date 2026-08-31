@@ -97,7 +97,7 @@ const Topbar = React.memo(() => {
           {/* Right Section: Docs, Mobile Search, Actions */}
           <div className="flex items-center justify-end gap-1 sm:gap-4 flex-1">
             <a
-              href="https://docs.vinayprabhakar.dev"
+              href="https://docs.vinaykr.dev"
               target="_blank"
               rel="noopener noreferrer"
               className={`text-sm font-semibold text-foreground hover:text-primary transition-colors duration-200 ${isAuthenticated ? "hidden md:block" : "block"}`}

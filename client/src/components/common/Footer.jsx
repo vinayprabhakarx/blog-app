@@ -7,7 +7,7 @@ const Footer = () => {
     <footer className="w-full text-sm text-center bg-background py-4 text-foreground no-print border-t border-border">
       &copy; {currentYear} | Designed & Developed By:{" "}
       <a
-        href="https://vinayprabhakar.dev"
+        href="https://vinaykr.dev"
         target="_blank"
         rel="noopener noreferrer"
         className="hover:text-primary"

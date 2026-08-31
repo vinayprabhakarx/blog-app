@@ -34,10 +34,10 @@ const corsOptions = {
     if (!origin) return callback(null, true);
 
     const allowedOrigins = [
-      "https://blog.vinayprabhakar.dev",
-      "http://blog.vinayprabhakar.dev",
-      "https://www.vinayprabhakar.dev",
-      "https://vinayprabhakar.dev",
+      "https://blog.vinaykr.dev",
+      "http://blog.vinaykr.dev",
+      "https://www.vinaykr.dev",
+      "https://vinaykr.dev",
       "http://localhost:5173",
     ];
 
@@ -100,11 +100,11 @@ app.use(
         connectSrc: [
           "'self'",
           "https://api.cloudinary.com",
-          "https://api.vinayprabhakar.dev",
+          "https://api.vinaykr.dev",
           "http://localhost:5000",
-          "https://blog.vinayprabhakar.dev",
-          "https://vinayprabhakar.dev",
-          "https://www.vinayprabhakar.dev",
+          "https://blog.vinaykr.dev",
+          "https://vinaykr.dev",
+          "https://www.vinaykr.dev",
           "https://accounts.google.com",
           "https://oauth2.googleapis.com",
           "https://www.googleapis.com",
@@ -112,7 +112,7 @@ app.use(
         ],
         objectSrc: ["'none'"],
         mediaSrc: ["'self'", "https://res.cloudinary.com"],
-        frameSrc: ["'self'", "https://www.youtube.com", "https://accounts.google.com", "https://vinayprabhakar.dev", "https://www.vinayprabhakar.dev"],
+        frameSrc: ["'self'", "https://www.youtube.com", "https://accounts.google.com", "https://vinaykr.dev", "https://www.vinaykr.dev"],
       },
     },
     crossOriginResourcePolicy: { policy: "cross-origin" },

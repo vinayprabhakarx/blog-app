@@ -418,8 +418,8 @@ npm run dev
 
 The application is deployed and available for live testing.
 
-- **Frontend:** [https://blog.vinayprabhakar.dev](https://blog.vinayprabhakar.dev)
-- **API Base URL:** [https://blog.vinayprabhakar.dev/api](https://blog.vinayprabhakar.dev/api)
+- **Frontend:** [https://blog.vinaykr.dev](https://blog.vinaykr.dev)
+- **API Base URL:** [https://blog.vinaykr.dev/api](https://blog.vinaykr.dev/api)
 
 ## Scripts
 

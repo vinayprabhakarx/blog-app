@@ -6,7 +6,7 @@ import Category from "../models/category.model.js";
 // @access  Public
 export const getSitemap = async (req, res) => {
   try {
-    const clientUrl = process.env.CLIENT_URL || "https://blog.vinayprabhakar.dev";
+    const clientUrl = process.env.CLIENT_URL || "https://blog.vinaykr.dev";
     // Ensure the base URL has a protocol and no trailing slash
     let baseUrl = clientUrl.trim();
     if (!baseUrl.startsWith("http://") && !baseUrl.startsWith("https://")) {
