@@ -265,7 +265,7 @@ const BlogPage = () => {
       {/* Main Content Container */}
       <div className="w-full  sm:px-6 md:px-8 pt-4 sm:pt-6 md:pt-8">
         {/* Breadcrumb */}
-        <nav className="max-w-2xl mx-auto mb-6 text-sm" aria-label="Breadcrumb">
+        <nav className="w-full blog-content-responsive mb-6 text-sm px-2 sm:px-4 md:px-0" aria-label="Breadcrumb">
           <ol className="flex items-center gap-2 text-muted-foreground flex-wrap">
             <li>
               <Link
@@ -298,17 +298,12 @@ const BlogPage = () => {
           <BlogHeader blog={currentBlog} onCommentClick={handleCommentClick} />
         
           {/* Main Blog Content - Centered by BlogDisplay internal styles */}
-          {/* 
-              LAYOUT EXPLANATION:
-              The BlogDisplay component inside handles its own centering (max-width: 50vw, margin: 0 auto).
-              We avoid wrapping it in flex/grid here to prevent interfering with that centering logic.
-          */}
           <BlogDisplay blog={currentBlog} />
         </article>
 
         {/* Comment Toggle Button - Now directly after blog content */}
         <div className="px-1 sm:px-2 md:px-4 pb-4">
-          <div className="max-w-[75ch] md:max-w-[80ch] mx-auto">
+          <div className="w-full blog-content-responsive mx-auto">
             <div className="flex justify-center items-center gap-4">
               <button
                 type="button"
@@ -340,12 +335,12 @@ const BlogPage = () => {
         </div>
       </div>
 
-      {/* Comments Section - Full width outside the constrained container */}
+      {/* Comments Section */}
       {showComments && (
         <section
           id="comment-section"
           aria-label="Comments"
-          className="w-full px-1 sm:px-2 md:px-4 pb-8 sm:pb-12"
+          className="w-full blog-content-responsive px-2 sm:px-4 md:px-0 pb-8 sm:pb-12"
         >
           <CommentSection
             blogId={blogData.id}

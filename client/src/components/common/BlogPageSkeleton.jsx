@@ -7,7 +7,7 @@ const BlogPageSkeleton = () => {
       {/* Main Content Container */}
       <div className="w-full sm:px-6 md:px-8 pt-4 sm:pt-6 md:pt-8">
         {/* Breadcrumb skeleton */}
-        <nav className="max-w-2xl mx-auto mb-6">
+        <nav className="w-full blog-content-responsive mb-6 px-2 sm:px-4 md:px-0">
           <div className="flex items-center gap-2">
             <div className="h-4 w-16 bg-muted-foreground/10 rounded animate-pulse" />
             <div className="h-4 w-4 bg-muted-foreground/10 rounded animate-pulse" />

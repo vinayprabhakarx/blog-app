@@ -10,32 +10,7 @@ import "katex/dist/katex.min.css";
 import { useTheme } from "@/utils/ThemeContext";
 import { Trash2, Copy, Check } from "lucide-react";
 
-// CodeCopyButton receives a primitive string, so React.memo IS highly effective here!
-const CodeCopyButton = React.memo(({ code }) => {
-  const [copied, setCopied] = React.useState(false);
-
-  const handleCopy = useCallback((e) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (code) {
-      navigator.clipboard.writeText(code);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
-    }
-  }, [code]);
-
-  return (
-    <button
-      onClick={handleCopy}
-      className="absolute top-2 right-2 p-1.5 rounded-md bg-background/80 hover:bg-primary hover:text-primary-foreground text-muted-foreground border border-border backdrop-blur-sm shadow-sm transition-all duration-200 z-10 opacity-90 cursor-pointer"
-      title="Copy code"
-      aria-label={copied ? "Copied to clipboard" : "Copy code"}
-    >
-      {copied ? <Check size={14} className="text-green-500" aria-hidden="true" /> : <Copy size={14} aria-hidden="true" />}
-      <span className="sr-only" aria-live="polite">{copied ? "Code copied to clipboard" : ""}</span>
-    </button>
-  );
-});
+import { CopyButton } from "@/components/modern-ui/copy-button";
 
 // Static styles moved OUTSIDE the components to prevent re-creation completely (No useMemo needed!)
 const staticStyles = {
@@ -222,12 +197,14 @@ const MarkdownRenderer = React.memo(({ content = "", onDeleteImage }) => {
       const filteredChildren = childrenArray.filter(c => c?.props?.className !== 'copied');
 
       return (
-        <figure className="relative my-6 group" role="figure" aria-label="Code block">
-          <CodeCopyButton code={codeString} />
+        <div className="relative my-6 group" style={{ position: "relative", margin: "1.5rem 0" }}>
+          <div style={{ position: "absolute", top: "0.625rem", right: "0.625rem", zIndex: 10 }}>
+            <CopyButton value={codeString} />
+          </div>
           <pre {...props} style={staticStyles.pre}>
             {filteredChildren}
           </pre>
-        </figure>
+        </div>
       );
     },
     code: ({ inline, children, ...props }) =>
@@ -243,7 +220,7 @@ const MarkdownRenderer = React.memo(({ content = "", onDeleteImage }) => {
   const sanitizedContent = useMemo(() => DOMPurify.sanitize(content), [content]);
 
   return (
-    <section className="w-full overflow-hidden" itemProp="articleBody" data-color-mode={theme}>
+    <section className="w-full" itemProp="articleBody" data-color-mode={theme}>
       <style>{markdownStyles}</style>
       <MDEditor.Markdown
         source={sanitizedContent}
